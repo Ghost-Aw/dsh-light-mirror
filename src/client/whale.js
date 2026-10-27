@@ -4,29 +4,28 @@
  * 资源侧 APNG：light-mirror/media/art/triquetra-{orbit,heartbeat,rotate}.png
  * 64×64 RGBA、白色 RGB + alpha、无限循环；另有 *-first.png 静态首帧。
  *
- * 说明：Chrome 对「APNG 作为 CSS mask」只取首帧（已本地实测），因此改用
- * <img> 播放 APNG + 主题色 filter 着色；静态 SVG（运行指示器原兜底）在资源
- * 未就绪时保持原样。
+ * Chrome 对「APNG 作为 CSS mask」只取首帧（已实测），因此用 <img> 播放 APNG +
+ * 主题色 filter；静态 SVG 兜底在资源未就绪时保持原样。
  *
- * 三种状态每 8s 轮换一次，模拟「不同情况不同动画」：
- *   orbit（思考中）→ heartbeat（等待）→ rotate（链接/初始化）→ …
- * reduced-motion 时只加载静态首帧，不轮换。
+ * 状态映射（不按固定 8s 轮换，绑定可观测 DOM 信号）：
+ *   - rotate    ：[data-chat-running] 首次挂载后的前 2s（连接/刚进入运行）
+ *   - heartbeat ：可见的审批/提问/计划确认面板（[data-approval-key] /
+ *                 [data-question-key] / [data-plan-review-key]）出现时（停滞等待）
+ *   - orbit     ：其余正常思考/运行（默认）
+ * 每 400ms 重新判定一次；无等待信号时回 orbit。reduced-motion 固定 orbit 静态首帧。
  */
 
 import { resolveMedia } from './media.js'
 
 const ART_PREFIX = '/light-mirror/media/art/'
-const STATES = [
-  { id: 'orbit', label: '思考中', animated: 'triquetra-orbit.png', still: 'triquetra-orbit-first.png' },
-  { id: 'heartbeat', label: '等待', animated: 'triquetra-heartbeat.png', still: 'triquetra-heartbeat-first.png' },
-  { id: 'rotate', label: '链接/初始化', animated: 'triquetra-rotate.png', still: 'triquetra-rotate-first.png' },
-]
-const CYCLE_MS = 8000
-const ICON_SELECTOR = '[data-chat-running] [class*="_runningIcon"]'
-
-function artUrl(file) {
-  return resolveMedia(ART_PREFIX + file)
+const STATES = {
+  orbit: { animated: 'triquetra-orbit.png', still: 'triquetra-orbit-first.png' },
+  heartbeat: { animated: 'triquetra-heartbeat.png', still: 'triquetra-heartbeat-first.png' },
+  rotate: { animated: 'triquetra-rotate.png', still: 'triquetra-rotate-first.png' },
 }
+const INITIAL_ROTATE_MS = 2000
+const POLL_MS = 400
+const WAIT_SELECTORS = ['[data-approval-key]', '[data-question-key]', '[data-plan-review-key]']
 
 function reducedMotion() {
   try {
@@ -36,86 +35,122 @@ function reducedMotion() {
   }
 }
 
+function isVisible(el) {
+  try {
+    const rect = el.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return false
+    const cs = window.getComputedStyle(el)
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && Number(cs.opacity) !== 0
+  } catch (e) {
+    return false
+  }
+}
+
+function hasWaitingSurface() {
+  for (let i = 0; i < WAIT_SELECTORS.length; i += 1) {
+    const nodes = document.querySelectorAll(WAIT_SELECTORS[i])
+    for (let k = 0; k < nodes.length; k += 1) {
+      if (isVisible(nodes[k])) return true
+    }
+  }
+  return false
+}
+
+function artUrl(file) {
+  return resolveMedia(ART_PREFIX + file)
+}
+
 export function createWhaleIndicator() {
   let disposed = false
   let ready = false
-  let current = 0
   let timer = null
   let observer = null
   let mediaOff = null
-  const availability = new Map()
+  const availability = new Set()
+  const mountTimes = new WeakMap()
+  const currentState = new WeakMap()
 
-  function availableStates() {
-    return STATES.filter((state) => availability.get(state.id) === true)
+  function resolveState(root) {
+    if (reducedMotion()) return 'orbit'
+    if (hasWaitingSurface()) return 'heartbeat'
+    const mountedAt = mountTimes.get(root)
+    if (mountedAt === undefined || Date.now() - mountedAt < INITIAL_ROTATE_MS) return 'rotate'
+    return 'orbit'
   }
 
-  function frameUrl(state) {
-    return artUrl(reducedMotion() ? state.still : state.animated)
+  function stateUrl(state) {
+    const entry = STATES[state] || STATES.orbit
+    return artUrl(reducedMotion() ? entry.still : entry.animated)
   }
 
-  function applyState(index) {
-    if (disposed) return
-    const states = availableStates()
-    if (states.length === 0) return
-    current = ((index % states.length) + states.length) % states.length
-    const state = states[current]
-    try {
-      document.documentElement.setAttribute('data-lmui-whale-state', state.id)
-      const roots = document.querySelectorAll('[data-chat-running]')
-      for (let i = 0; i < roots.length; i += 1) {
-        roots[i].setAttribute('data-lmui-whale-state', state.id)
-        const imgs = roots[i].querySelectorAll('.lmui-whale-img')
-        for (let k = 0; k < imgs.length; k += 1) {
-          const next = frameUrl(state)
-          if (imgs[k].getAttribute('src') !== next) imgs[k].setAttribute('src', next)
-        }
-      }
-    } catch (e) {
-      /* noop */
-    }
-  }
-
-  function ensureImages() {
-    if (disposed || !ready) return
-    const states = availableStates()
-    if (states.length === 0) return
-    const state = states[current % states.length]
-    const icons = document.querySelectorAll(ICON_SELECTOR)
-    for (let i = 0; i < icons.length; i += 1) {
-      const icon = icons[i]
-      if (icon.querySelector('.lmui-whale-img')) continue
-      const img = document.createElement('img')
+  function ensureImage(icon) {
+    if (!ready || !icon) return null
+    let img = icon.querySelector('.lmui-whale-img')
+    if (!img) {
+      img = document.createElement('img')
       img.className = 'lmui-whale-img'
       img.alt = ''
       img.draggable = false
       img.decoding = 'async'
       img.setAttribute('aria-hidden', 'true')
-      img.setAttribute('src', frameUrl(state))
       icon.appendChild(img)
     }
-    applyState(current)
+    return img
+  }
+
+  function paintRoot(root, state) {
+    if (!root || !root.isConnected) return
+    root.setAttribute('data-lmui-whale-state', state)
+    try {
+      document.documentElement.setAttribute('data-lmui-whale-state', state)
+    } catch (e) {
+      /* noop */
+    }
+    currentState.set(root, state)
+    const icons = root.querySelectorAll('[class*="_runningIcon"]')
+    for (let i = 0; i < icons.length; i += 1) {
+      const img = ensureImage(icons[i])
+      if (img && img.getAttribute('src') !== stateUrl(state)) img.setAttribute('src', stateUrl(state))
+    }
+  }
+
+  function noteMounts() {
+    const roots = document.querySelectorAll('[data-chat-running]')
+    for (let i = 0; i < roots.length; i += 1) {
+      if (!mountTimes.has(roots[i])) mountTimes.set(roots[i], Date.now())
+    }
+  }
+
+  function tick() {
+    if (disposed || !ready) return
+    const roots = document.querySelectorAll('[data-chat-running]')
+    for (let i = 0; i < roots.length; i += 1) {
+      const root = roots[i]
+      if (!mountTimes.has(root)) mountTimes.set(root, Date.now())
+      const state = resolveState(root)
+      if (currentState.get(root) !== state) paintRoot(root, state)
+      else if (!root.querySelector('.lmui-whale-img')) paintRoot(root, state)
+    }
   }
 
   function probe() {
-    let pending = STATES.length
+    const ids = Object.keys(STATES)
+    let pending = ids.length
     let any = false
-    STATES.forEach((state) => {
+    ids.forEach((id) => {
       const img = new Image()
       img.onload = () => {
-        availability.set(state.id, true)
+        availability.add(id)
         any = true
         pending -= 1
         if (pending === 0) finish()
       }
       img.onerror = () => {
-        availability.set(state.id, false)
         pending -= 1
         if (pending === 0) finish()
       }
-      img.src = artUrl(state.animated)
+      img.src = artUrl(STATES[id].animated)
     })
-    const staticImg = new Image()
-    staticImg.src = artUrl(STATES[0].still)
 
     function finish() {
       if (disposed || !any) return
@@ -125,31 +160,33 @@ export function createWhaleIndicator() {
       } catch (e) {
         /* noop */
       }
-      ensureImages()
-      if (!reducedMotion()) {
-        timer = window.setInterval(() => {
-          if (disposed) return
-          if (!document.querySelector('[data-chat-running]')) return
-          current = (current + 1) % availableStates().length
-          applyState(current)
-          ensureImages()
-        }, CYCLE_MS)
-      }
+      tick()
+      timer = window.setInterval(tick, POLL_MS)
     }
   }
 
   try {
     observer = new MutationObserver(() => {
-      if (!disposed) ensureImages()
+      if (disposed) return
+      noteMounts()
+      if (ready) tick()
     })
-    observer.observe(document.body, { subtree: true, childList: true })
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-approval-key', 'data-question-key', 'data-plan-review-key'],
+    })
   } catch (e) {
     observer = null
   }
+  noteMounts()
 
   try {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onChange = () => applyState(current)
+    const onChange = () => {
+      if (!disposed && ready) tick()
+    }
     if (typeof mq.addEventListener === 'function') {
       mq.addEventListener('change', onChange)
       mediaOff = () => mq.removeEventListener('change', onChange)

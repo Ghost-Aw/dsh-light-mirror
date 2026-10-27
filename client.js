@@ -713,26 +713,12 @@ html[data-lmui-scheme="light"] .lmui-paimon[data-lmui-paimon-source="line-white"
 .lmui-paimon[data-lmui-paimon="emoji"][data-lmui-paimon-source^="line"] .lmui-paimon__img {
   height: 128px;
 }
-.lmui-paimon__scan {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.055) 0 1px,
-    transparent 1px 3px
-  );
-  mix-blend-mode: screen;
-  opacity: 0.55;
-}
-/* 预渲染全息：本身已有青白描边 + 深青灰半透明填充，再叠柔光和扫描线 */
+/* 预渲染全息：本身已有青白描边 + 深青灰半透明填充，再叠柔光 */
 .lmui-paimon[data-lmui-paimon-source="holo"] .lmui-paimon__img {
   opacity: 0.95;
   filter: drop-shadow(0 0 6px rgba(200, 214, 210, 0.4)) drop-shadow(0 0 18px rgba(162, 169, 187, 0.24))
     drop-shadow(0 0 34px rgba(231, 189, 210, 0.12)) brightness(1.06) contrast(1.06);
 }
-.lmui-paimon[data-lmui-paimon-source="holo"] .lmui-paimon__scan { opacity: 0.5; }
 .lmui-paimon[data-lmui-paimon-source="holo"] .lmui-paimon__glow {
   background: radial-gradient(ellipse at 50% 78%, rgba(200, 214, 210, 0.2), transparent 66%);
 }
@@ -747,7 +733,6 @@ html[data-lmui-scheme="light"] .lmui-paimon[data-lmui-paimon-source="line-white"
     drop-shadow(0 0 7px rgba(200, 214, 210, 0.4))
     drop-shadow(0 0 18px rgba(162, 169, 187, 0.22));
 }
-.lmui-paimon[data-lmui-paimon-source="half"] .lmui-paimon__scan { opacity: 0.42; }
 /* 表情档是方图：压成徽章尺度，避免贴纸感 */
 /* v8e 固定框内取景（档位映射不变）：
    guide=半身 → scale 2.15，origin top center，头+肩+胸上缘
@@ -834,11 +819,6 @@ html[data-lmui-scheme="light"] .lmui-paimon[data-lmui-paimon-source="half"] .lmu
     drop-shadow(1px 0 0 rgba(255, 255, 255, 0.5)) drop-shadow(-1px 0 0 rgba(94, 91, 96, 0.28))
     drop-shadow(0 0 3px rgba(255, 255, 255, 0.4)) drop-shadow(0 6px 14px rgba(29, 28, 32, 0.18));
 }
-.lmui-paimon__scan {
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 10%, #000 88%, transparent 100%);
-  mask-image: linear-gradient(180deg, transparent 0%, #000 10%, #000 88%, transparent 100%);
-}
-html[data-lmui-scheme="light"] .lmui-paimon__scan { opacity: 0.28; }
 @keyframes lmui-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
@@ -1751,6 +1731,7 @@ html[data-lmui-scheme="light"] {
 
 /* ── v11 派蒙横向扫描带：从框顶连续扫到框底，4–6s 一次 ─────────────── */
 .lmui-paimon__scan {
+  position: absolute;
   z-index: 3;
   inset: 0;
   height: auto;
@@ -1767,21 +1748,21 @@ html[data-lmui-scheme="light"] {
   left: 0;
   right: 0;
   top: 0;
-  height: 44px;
+  height: 20px;
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(230, 242, 255, 0) 0%,
-    rgba(215, 235, 255, 0.12) 24%,
-    rgba(255, 255, 255, 0.42) 44%,
-    rgba(255, 255, 255, 0.78) 56%,
-    rgba(200, 225, 255, 0.26) 72%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(200, 235, 248, 0) 0%,
+    rgba(200, 235, 248, 0.08) 24%,
+    rgba(220, 244, 255, 0.34) 42%,
+    rgba(240, 250, 255, 0.7) 52%,
+    rgba(190, 235, 245, 0.3) 64%,
+    rgba(200, 235, 248, 0) 100%
   );
-  filter: blur(0.6px);
+  filter: blur(0.4px);
   mix-blend-mode: screen;
   opacity: 0;
-  translate: 0 -44px;
+  translate: 0 -20px;
   animation: lmui-paimon-scan-band var(--lmui-scan-cycle, 5s) linear infinite;
 }
 .lmui-paimon__scan::after {
@@ -1789,29 +1770,29 @@ html[data-lmui-scheme="light"] {
   position: absolute;
   left: 0;
   right: 0;
-  top: -6px;
-  height: 14px;
+  top: -4px;
+  height: 26px;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0) 100%);
-  filter: blur(3px);
+  background: linear-gradient(180deg, rgba(205, 240, 250, 0) 0%, rgba(205, 240, 250, 0.2) 55%, rgba(205, 240, 250, 0) 100%);
+  filter: blur(4px);
   mix-blend-mode: screen;
   opacity: 0;
-  translate: 0 -20px;
+  translate: 0 -26px;
   animation: lmui-paimon-scan-trail var(--lmui-scan-cycle, 5s) linear infinite;
 }
 @keyframes lmui-paimon-scan-band {
-  0%, 7.9% { opacity: 0; translate: 0 -44px; }
-  8% { opacity: 0.5; translate: 0 0; }
-  10% { opacity: 0.92; }
-  26% { opacity: 0.82; translate: 0 188px; }
+  0%, 7.9% { opacity: 0; translate: 0 -20px; }
+  8% { opacity: 0.16; translate: 0 0; }
+  10% { opacity: 0.26; }
+  24% { opacity: 0.22; translate: 0 184px; }
   28% { opacity: 0; translate: 0 196px; }
-  28.01%, 100% { opacity: 0; translate: 0 -44px; }
+  28.01%, 100% { opacity: 0; translate: 0 -20px; }
 }
 @keyframes lmui-paimon-scan-trail {
-  0%, 7.9% { opacity: 0; translate: 0 -30px; }
-  8% { opacity: 0.4; translate: 0 0; }
-  10% { opacity: 0.65; }
-  26% { opacity: 0.5; translate: 0 196px; }
+  0%, 7.9% { opacity: 0; translate: 0 -26px; }
+  8% { opacity: 0.06; translate: 0 0; }
+  10% { opacity: 0.12; }
+  24% { opacity: 0.08; translate: 0 196px; }
   28%, 100% { opacity: 0; translate: 0 196px; }
 }
 /* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
@@ -2799,16 +2780,14 @@ function resolveMedia(url) {
 
 // src/client/whale.js
 var ART_PREFIX = "/light-mirror/media/art/";
-var STATES = [
-  { id: "orbit", label: "思考中", animated: "triquetra-orbit.png", still: "triquetra-orbit-first.png" },
-  { id: "heartbeat", label: "等待", animated: "triquetra-heartbeat.png", still: "triquetra-heartbeat-first.png" },
-  { id: "rotate", label: "链接/初始化", animated: "triquetra-rotate.png", still: "triquetra-rotate-first.png" }
-];
-var CYCLE_MS = 8e3;
-var ICON_SELECTOR = '[data-chat-running] [class*="_runningIcon"]';
-function artUrl(file) {
-  return resolveMedia(ART_PREFIX + file);
-}
+var STATES = {
+  orbit: { animated: "triquetra-orbit.png", still: "triquetra-orbit-first.png" },
+  heartbeat: { animated: "triquetra-heartbeat.png", still: "triquetra-heartbeat-first.png" },
+  rotate: { animated: "triquetra-rotate.png", still: "triquetra-rotate-first.png" }
+};
+var INITIAL_ROTATE_MS = 2e3;
+var POLL_MS = 400;
+var WAIT_SELECTORS = ["[data-approval-key]", "[data-question-key]", "[data-plan-review-key]"];
 function reducedMotion() {
   try {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2816,80 +2795,111 @@ function reducedMotion() {
     return false;
   }
 }
+function isVisible(el) {
+  try {
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return false;
+    const cs = window.getComputedStyle(el);
+    return cs.display !== "none" && cs.visibility !== "hidden" && Number(cs.opacity) !== 0;
+  } catch (e) {
+    return false;
+  }
+}
+function hasWaitingSurface() {
+  for (let i = 0; i < WAIT_SELECTORS.length; i += 1) {
+    const nodes = document.querySelectorAll(WAIT_SELECTORS[i]);
+    for (let k = 0; k < nodes.length; k += 1) {
+      if (isVisible(nodes[k])) return true;
+    }
+  }
+  return false;
+}
+function artUrl(file) {
+  return resolveMedia(ART_PREFIX + file);
+}
 function createWhaleIndicator() {
   let disposed = false;
   let ready = false;
-  let current = 0;
   let timer = null;
   let observer = null;
   let mediaOff = null;
-  const availability = /* @__PURE__ */ new Map();
-  function availableStates() {
-    return STATES.filter((state) => availability.get(state.id) === true);
+  const availability = /* @__PURE__ */ new Set();
+  const mountTimes = /* @__PURE__ */ new WeakMap();
+  const currentState = /* @__PURE__ */ new WeakMap();
+  function resolveState(root) {
+    if (reducedMotion()) return "orbit";
+    if (hasWaitingSurface()) return "heartbeat";
+    const mountedAt = mountTimes.get(root);
+    if (mountedAt === void 0 || Date.now() - mountedAt < INITIAL_ROTATE_MS) return "rotate";
+    return "orbit";
   }
-  function frameUrl(state) {
-    return artUrl(reducedMotion() ? state.still : state.animated);
+  function stateUrl(state) {
+    const entry = STATES[state] || STATES.orbit;
+    return artUrl(reducedMotion() ? entry.still : entry.animated);
   }
-  function applyState(index) {
-    if (disposed) return;
-    const states = availableStates();
-    if (states.length === 0) return;
-    current = (index % states.length + states.length) % states.length;
-    const state = states[current];
-    try {
-      document.documentElement.setAttribute("data-lmui-whale-state", state.id);
-      const roots = document.querySelectorAll("[data-chat-running]");
-      for (let i = 0; i < roots.length; i += 1) {
-        roots[i].setAttribute("data-lmui-whale-state", state.id);
-        const imgs = roots[i].querySelectorAll(".lmui-whale-img");
-        for (let k = 0; k < imgs.length; k += 1) {
-          const next = frameUrl(state);
-          if (imgs[k].getAttribute("src") !== next) imgs[k].setAttribute("src", next);
-        }
-      }
-    } catch (e) {
-    }
-  }
-  function ensureImages() {
-    if (disposed || !ready) return;
-    const states = availableStates();
-    if (states.length === 0) return;
-    const state = states[current % states.length];
-    const icons = document.querySelectorAll(ICON_SELECTOR);
-    for (let i = 0; i < icons.length; i += 1) {
-      const icon = icons[i];
-      if (icon.querySelector(".lmui-whale-img")) continue;
-      const img = document.createElement("img");
+  function ensureImage(icon) {
+    if (!ready || !icon) return null;
+    let img = icon.querySelector(".lmui-whale-img");
+    if (!img) {
+      img = document.createElement("img");
       img.className = "lmui-whale-img";
       img.alt = "";
       img.draggable = false;
       img.decoding = "async";
       img.setAttribute("aria-hidden", "true");
-      img.setAttribute("src", frameUrl(state));
       icon.appendChild(img);
     }
-    applyState(current);
+    return img;
+  }
+  function paintRoot(root, state) {
+    if (!root || !root.isConnected) return;
+    root.setAttribute("data-lmui-whale-state", state);
+    try {
+      document.documentElement.setAttribute("data-lmui-whale-state", state);
+    } catch (e) {
+    }
+    currentState.set(root, state);
+    const icons = root.querySelectorAll('[class*="_runningIcon"]');
+    for (let i = 0; i < icons.length; i += 1) {
+      const img = ensureImage(icons[i]);
+      if (img && img.getAttribute("src") !== stateUrl(state)) img.setAttribute("src", stateUrl(state));
+    }
+  }
+  function noteMounts() {
+    const roots = document.querySelectorAll("[data-chat-running]");
+    for (let i = 0; i < roots.length; i += 1) {
+      if (!mountTimes.has(roots[i])) mountTimes.set(roots[i], Date.now());
+    }
+  }
+  function tick() {
+    if (disposed || !ready) return;
+    const roots = document.querySelectorAll("[data-chat-running]");
+    for (let i = 0; i < roots.length; i += 1) {
+      const root = roots[i];
+      if (!mountTimes.has(root)) mountTimes.set(root, Date.now());
+      const state = resolveState(root);
+      if (currentState.get(root) !== state) paintRoot(root, state);
+      else if (!root.querySelector(".lmui-whale-img")) paintRoot(root, state);
+    }
   }
   function probe() {
-    let pending = STATES.length;
+    const ids = Object.keys(STATES);
+    let pending = ids.length;
     let any = false;
-    STATES.forEach((state) => {
+    ids.forEach((id) => {
       const img = new Image();
       img.onload = () => {
-        availability.set(state.id, true);
+        availability.add(id);
         any = true;
         pending -= 1;
         if (pending === 0) finish();
       };
       img.onerror = () => {
-        availability.set(state.id, false);
         pending -= 1;
         if (pending === 0) finish();
       };
-      img.src = artUrl(state.animated);
+      img.src = artUrl(STATES[id].animated);
     });
-    const staticImg = new Image();
-    staticImg.src = artUrl(STATES[0].still);
     function finish() {
       if (disposed || !any) return;
       ready = true;
@@ -2897,29 +2907,31 @@ function createWhaleIndicator() {
         document.documentElement.setAttribute("data-lmui-whale-ready", "1");
       } catch (e) {
       }
-      ensureImages();
-      if (!reducedMotion()) {
-        timer = window.setInterval(() => {
-          if (disposed) return;
-          if (!document.querySelector("[data-chat-running]")) return;
-          current = (current + 1) % availableStates().length;
-          applyState(current);
-          ensureImages();
-        }, CYCLE_MS);
-      }
+      tick();
+      timer = window.setInterval(tick, POLL_MS);
     }
   }
   try {
     observer = new MutationObserver(() => {
-      if (!disposed) ensureImages();
+      if (disposed) return;
+      noteMounts();
+      if (ready) tick();
     });
-    observer.observe(document.body, { subtree: true, childList: true });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["data-approval-key", "data-question-key", "data-plan-review-key"]
+    });
   } catch (e) {
     observer = null;
   }
+  noteMounts();
   try {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => applyState(current);
+    const onChange = () => {
+      if (!disposed && ready) tick();
+    };
     if (typeof mq.addEventListener === "function") {
       mq.addEventListener("change", onChange);
       mediaOff = () => mq.removeEventListener("change", onChange);
