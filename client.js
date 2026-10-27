@@ -2780,6 +2780,7 @@ function resolveMedia(url) {
 
 // src/client/whale.js
 var ART_PREFIX = "/light-mirror/media/art/";
+var ART_CACHE_KEY = "?v=triq2";
 var STATES = {
   orbit: { animated: "triquetra-orbit.png", still: "triquetra-orbit-first.png" },
   heartbeat: { animated: "triquetra-heartbeat.png", still: "triquetra-heartbeat-first.png" },
@@ -2815,7 +2816,7 @@ function hasWaitingSurface() {
   return false;
 }
 function artUrl(file) {
-  return resolveMedia(ART_PREFIX + file);
+  return resolveMedia(ART_PREFIX + file) + ART_CACHE_KEY;
 }
 function createWhaleIndicator() {
   let disposed = false;
@@ -2824,13 +2825,13 @@ function createWhaleIndicator() {
   let observer = null;
   let mediaOff = null;
   const availability = /* @__PURE__ */ new Set();
-  const mountTimes = /* @__PURE__ */ new WeakMap();
   const currentState = /* @__PURE__ */ new WeakMap();
-  function resolveState(root) {
+  let startedAt = 0;
+  function resolveState() {
     if (reducedMotion()) return "orbit";
     if (hasWaitingSurface()) return "heartbeat";
-    const mountedAt = mountTimes.get(root);
-    if (mountedAt === void 0 || Date.now() - mountedAt < INITIAL_ROTATE_MS) return "rotate";
+    if (startedAt === 0) return "rotate";
+    if (Date.now() - startedAt < INITIAL_ROTATE_MS) return "rotate";
     return "orbit";
   }
   function stateUrl(state) {
@@ -2865,19 +2866,12 @@ function createWhaleIndicator() {
       if (img && img.getAttribute("src") !== stateUrl(state)) img.setAttribute("src", stateUrl(state));
     }
   }
-  function noteMounts() {
-    const roots = document.querySelectorAll("[data-chat-running]");
-    for (let i = 0; i < roots.length; i += 1) {
-      if (!mountTimes.has(roots[i])) mountTimes.set(roots[i], Date.now());
-    }
-  }
   function tick() {
     if (disposed || !ready) return;
     const roots = document.querySelectorAll("[data-chat-running]");
     for (let i = 0; i < roots.length; i += 1) {
       const root = roots[i];
-      if (!mountTimes.has(root)) mountTimes.set(root, Date.now());
-      const state = resolveState(root);
+      const state = resolveState();
       if (currentState.get(root) !== state) paintRoot(root, state);
       else if (!root.querySelector(".lmui-whale-img")) paintRoot(root, state);
     }
@@ -2903,6 +2897,7 @@ function createWhaleIndicator() {
     function finish() {
       if (disposed || !any) return;
       ready = true;
+      startedAt = Date.now();
       try {
         document.documentElement.setAttribute("data-lmui-whale-ready", "1");
       } catch (e) {
@@ -2914,7 +2909,6 @@ function createWhaleIndicator() {
   try {
     observer = new MutationObserver(() => {
       if (disposed) return;
-      noteMounts();
       if (ready) tick();
     });
     observer.observe(document.body, {
@@ -2926,7 +2920,6 @@ function createWhaleIndicator() {
   } catch (e) {
     observer = null;
   }
-  noteMounts();
   try {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onChange = () => {

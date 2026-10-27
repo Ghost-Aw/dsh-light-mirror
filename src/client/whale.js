@@ -18,6 +18,8 @@
 import { resolveMedia } from './media.js'
 
 const ART_PREFIX = '/light-mirror/media/art/'
+/* 资源侧 v2 几何更新：查询串同时用于浏览器缓存失效 */
+const ART_CACHE_KEY = '?v=triq2'
 const STATES = {
   orbit: { animated: 'triquetra-orbit.png', still: 'triquetra-orbit-first.png' },
   heartbeat: { animated: 'triquetra-heartbeat.png', still: 'triquetra-heartbeat-first.png' },
@@ -57,7 +59,7 @@ function hasWaitingSurface() {
 }
 
 function artUrl(file) {
-  return resolveMedia(ART_PREFIX + file)
+  return resolveMedia(ART_PREFIX + file) + ART_CACHE_KEY
 }
 
 export function createWhaleIndicator() {
@@ -67,14 +69,14 @@ export function createWhaleIndicator() {
   let observer = null
   let mediaOff = null
   const availability = new Set()
-  const mountTimes = new WeakMap()
   const currentState = new WeakMap()
+  let startedAt = 0
 
-  function resolveState(root) {
+  function resolveState() {
     if (reducedMotion()) return 'orbit'
     if (hasWaitingSurface()) return 'heartbeat'
-    const mountedAt = mountTimes.get(root)
-    if (mountedAt === undefined || Date.now() - mountedAt < INITIAL_ROTATE_MS) return 'rotate'
+    if (startedAt === 0) return 'rotate'
+    if (Date.now() - startedAt < INITIAL_ROTATE_MS) return 'rotate'
     return 'orbit'
   }
 
@@ -114,20 +116,12 @@ export function createWhaleIndicator() {
     }
   }
 
-  function noteMounts() {
-    const roots = document.querySelectorAll('[data-chat-running]')
-    for (let i = 0; i < roots.length; i += 1) {
-      if (!mountTimes.has(roots[i])) mountTimes.set(roots[i], Date.now())
-    }
-  }
-
   function tick() {
     if (disposed || !ready) return
     const roots = document.querySelectorAll('[data-chat-running]')
     for (let i = 0; i < roots.length; i += 1) {
       const root = roots[i]
-      if (!mountTimes.has(root)) mountTimes.set(root, Date.now())
-      const state = resolveState(root)
+      const state = resolveState()
       if (currentState.get(root) !== state) paintRoot(root, state)
       else if (!root.querySelector('.lmui-whale-img')) paintRoot(root, state)
     }
@@ -155,6 +149,7 @@ export function createWhaleIndicator() {
     function finish() {
       if (disposed || !any) return
       ready = true
+      startedAt = Date.now()
       try {
         document.documentElement.setAttribute('data-lmui-whale-ready', '1')
       } catch (e) {
@@ -168,7 +163,6 @@ export function createWhaleIndicator() {
   try {
     observer = new MutationObserver(() => {
       if (disposed) return
-      noteMounts()
       if (ready) tick()
     })
     observer.observe(document.body, {
@@ -180,7 +174,6 @@ export function createWhaleIndicator() {
   } catch (e) {
     observer = null
   }
-  noteMounts()
 
   try {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
