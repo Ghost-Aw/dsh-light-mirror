@@ -1446,32 +1446,119 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
     drop-shadow(0 1px 2px rgba(29, 28, 32, 0.16)) !important;
 }
 
-/* ── v9 派蒙间歇扫描线 + 间歇 glitch（纯 transform/opacity/背景位置）──── */
+/* ── v11 whale 思考指示器：APNG <img> 播放（mask 对 APNG 只取首帧）──── */
+html[data-lmui-whale-ready="1"] [data-chat-running] [class*="_runningWhaleAnimated"],
+html[data-lmui-whale-ready="1"] [data-chat-running] [class*="_runningWhaleStill"] {
+  display: none !important;
+}
+.lmui-whale-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  opacity: 0.92;
+  filter: brightness(0) invert(1) drop-shadow(0 0 2px rgba(160, 196, 255, 0.55));
+}
+html[data-lmui-scheme="light"] .lmui-whale-img {
+  opacity: 0.78;
+  filter: brightness(0) saturate(100%) drop-shadow(0 0 1px rgba(70, 58, 82, 0.28));
+}
+
+/* ── v11 思考文案：低饱和虹彩 gradient text（只作用于新文案）────────── */
+:root {
+  --lmui-thinking-iris: linear-gradient(100deg, #f7f4ff 0%, #d8c7ff 24%, #ffd2e8 48%, #c4f4ec 72%, #ffffff 100%);
+}
+html[data-lmui-scheme="light"] {
+  --lmui-thinking-iris: linear-gradient(100deg, #4b4560 0%, #7a619e 24%, #a2607c 48%, #3f7f79 72%, #4a4a5d 100%);
+}
+[data-chat-running] [data-shimmer] [class*="_text"],
+[data-chat-running] [data-shimmer] [data-shimmer-text]::after {
+  background-image: var(--lmui-thinking-iris) !important;
+  background-size: 220% 100% !important;
+  background-position: 0% 50%;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: lmui-thinking-iris-flow 8s ease-in-out infinite !important;
+}
+@keyframes lmui-thinking-iris-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-chat-running] [data-shimmer] [class*="_text"],
+  [data-chat-running] [data-shimmer] [data-shimmer-text]::after {
+    animation: none !important;
+    background-position: 42% 50%;
+  }
+}
+
+/* ── v11 派蒙横向扫描带：从框顶连续扫到框底，4–6s 一次 ─────────────── */
 .lmui-paimon__scan {
   z-index: 3;
   inset: 0;
   height: auto;
-  opacity: 0;
+  overflow: hidden;
+  opacity: 1;
+  pointer-events: none;
   -webkit-mask-image: none;
   mask-image: none;
-  background-repeat: repeat;
-  animation: lmui-paimon-scan var(--lmui-scan-cycle, 5s) linear infinite;
+  background: none;
 }
-@keyframes lmui-paimon-scan {
-  0%, 84% { opacity: 0; background-position: 0 0; }
-  85% { opacity: 0.45; background-position: 0 8px; }
-  86% { opacity: 0.2; background-position: 0 16px; }
-  87% { opacity: 0.6; background-position: 0 4px; }
-  88% { opacity: 0.22; background-position: 0 12px; }
-  89% { opacity: 0.5; background-position: 0 2px; }
-  90% { opacity: 0.18; background-position: 0 18px; }
-  91% { opacity: 0.55; background-position: 0 6px; }
-  92% { opacity: 0.2; background-position: 0 14px; }
-  93% { opacity: 0.45; background-position: 0 3px; }
-  94% { opacity: 0.12; background-position: 0 10px; }
-  95% { opacity: 0.3; background-position: 0 1px; }
-  96% { opacity: 0.1; background-position: 0 5px; }
-  97%, 100% { opacity: 0; background-position: 0 0; }
+.lmui-paimon__scan::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 44px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(230, 242, 255, 0) 0%,
+    rgba(215, 235, 255, 0.12) 24%,
+    rgba(255, 255, 255, 0.42) 44%,
+    rgba(255, 255, 255, 0.78) 56%,
+    rgba(200, 225, 255, 0.26) 72%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(0.6px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  translate: 0 -44px;
+  animation: lmui-paimon-scan-band var(--lmui-scan-cycle, 5s) linear infinite;
+}
+.lmui-paimon__scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: 14px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0) 100%);
+  filter: blur(3px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  translate: 0 -20px;
+  animation: lmui-paimon-scan-trail var(--lmui-scan-cycle, 5s) linear infinite;
+}
+@keyframes lmui-paimon-scan-band {
+  0%, 7.9% { opacity: 0; translate: 0 -44px; }
+  8% { opacity: 0.5; translate: 0 0; }
+  10% { opacity: 0.92; }
+  26% { opacity: 0.82; translate: 0 188px; }
+  28% { opacity: 0; translate: 0 196px; }
+  28.01%, 100% { opacity: 0; translate: 0 -44px; }
+}
+@keyframes lmui-paimon-scan-trail {
+  0%, 7.9% { opacity: 0; translate: 0 -30px; }
+  8% { opacity: 0.4; translate: 0 0; }
+  10% { opacity: 0.65; }
+  26% { opacity: 0.5; translate: 0 196px; }
+  28%, 100% { opacity: 0; translate: 0 196px; }
 }
 /* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
 .lmui-paimon__ghost {
@@ -1569,6 +1656,8 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
   .lmui-paimon__scan,
   .lmui-paimon__ghost,
   .lmui-paimon__glitchBar { opacity: 0 !important; }
+  .lmui-paimon__scan::before,
+  .lmui-paimon__scan::after { animation: none !important; opacity: 0 !important; }
   .lmui-rail { transition: opacity 0.01s linear !important; }
 }
 `

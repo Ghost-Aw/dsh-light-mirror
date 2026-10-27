@@ -65,6 +65,7 @@ export function createDomPatches(store) {
   const subagentTextOriginals = new Map()
   const subagentAriaOriginals = new Map()
   const thinkingOriginals = new Map()
+  const shimmerOriginals = new Map()
   const knownHeadings = new WeakSet()
 
   function readConfig() {
@@ -176,6 +177,23 @@ export function createDomPatches(store) {
         const next = base.replace(/深度求索中/g, desired)
         if (node.nodeValue !== next) node.nodeValue = next
       }
+      /* TextShimmer 的克隆层用 data-shimmer-text 的 ::after 渲染同一句；
+         必须同步改属性，否则旧「深度求索中」会和新文案重叠。 */
+      const shimmerNodes = roots[i].querySelectorAll('[data-shimmer-text]')
+      for (let k = 0; k < shimmerNodes.length; k += 1) {
+        const el = shimmerNodes[k]
+        const raw = el.getAttribute('data-shimmer-text') || ''
+        let base = raw
+        if (raw.indexOf('深度求索中') >= 0) {
+          shimmerOriginals.set(el, raw)
+        } else if (shimmerOriginals.has(el)) {
+          base = shimmerOriginals.get(el)
+        } else {
+          continue
+        }
+        const next = base.replace(/深度求索中/g, desired)
+        if (raw !== next) el.setAttribute('data-shimmer-text', next)
+      }
     }
   }
 
@@ -188,6 +206,16 @@ export function createDomPatches(store) {
       }
     })
     thinkingOriginals.clear()
+    shimmerOriginals.forEach((original, el) => {
+      try {
+        if (el.isConnected && el.getAttribute('data-shimmer-text') !== original) {
+          el.setAttribute('data-shimmer-text', original)
+        }
+      } catch (e) {
+        /* noop */
+      }
+    })
+    shimmerOriginals.clear()
   }
 
   /* ── Hero 标题 ── */
@@ -248,6 +276,8 @@ export function createDomPatches(store) {
       subtree: true,
       childList: true,
       characterData: true,
+      attributes: true,
+      attributeFilter: ['data-shimmer-text', 'aria-label'],
     })
   } catch (e) {
     observer = null

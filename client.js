@@ -1700,32 +1700,119 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
     drop-shadow(0 1px 2px rgba(29, 28, 32, 0.16)) !important;
 }
 
-/* ── v9 派蒙间歇扫描线 + 间歇 glitch（纯 transform/opacity/背景位置）──── */
+/* ── v11 whale 思考指示器：APNG <img> 播放（mask 对 APNG 只取首帧）──── */
+html[data-lmui-whale-ready="1"] [data-chat-running] [class*="_runningWhaleAnimated"],
+html[data-lmui-whale-ready="1"] [data-chat-running] [class*="_runningWhaleStill"] {
+  display: none !important;
+}
+.lmui-whale-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  opacity: 0.92;
+  filter: brightness(0) invert(1) drop-shadow(0 0 2px rgba(160, 196, 255, 0.55));
+}
+html[data-lmui-scheme="light"] .lmui-whale-img {
+  opacity: 0.78;
+  filter: brightness(0) saturate(100%) drop-shadow(0 0 1px rgba(70, 58, 82, 0.28));
+}
+
+/* ── v11 思考文案：低饱和虹彩 gradient text（只作用于新文案）────────── */
+:root {
+  --lmui-thinking-iris: linear-gradient(100deg, #f7f4ff 0%, #d8c7ff 24%, #ffd2e8 48%, #c4f4ec 72%, #ffffff 100%);
+}
+html[data-lmui-scheme="light"] {
+  --lmui-thinking-iris: linear-gradient(100deg, #4b4560 0%, #7a619e 24%, #a2607c 48%, #3f7f79 72%, #4a4a5d 100%);
+}
+[data-chat-running] [data-shimmer] [class*="_text"],
+[data-chat-running] [data-shimmer] [data-shimmer-text]::after {
+  background-image: var(--lmui-thinking-iris) !important;
+  background-size: 220% 100% !important;
+  background-position: 0% 50%;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: lmui-thinking-iris-flow 8s ease-in-out infinite !important;
+}
+@keyframes lmui-thinking-iris-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-chat-running] [data-shimmer] [class*="_text"],
+  [data-chat-running] [data-shimmer] [data-shimmer-text]::after {
+    animation: none !important;
+    background-position: 42% 50%;
+  }
+}
+
+/* ── v11 派蒙横向扫描带：从框顶连续扫到框底，4–6s 一次 ─────────────── */
 .lmui-paimon__scan {
   z-index: 3;
   inset: 0;
   height: auto;
-  opacity: 0;
+  overflow: hidden;
+  opacity: 1;
+  pointer-events: none;
   -webkit-mask-image: none;
   mask-image: none;
-  background-repeat: repeat;
-  animation: lmui-paimon-scan var(--lmui-scan-cycle, 5s) linear infinite;
+  background: none;
 }
-@keyframes lmui-paimon-scan {
-  0%, 84% { opacity: 0; background-position: 0 0; }
-  85% { opacity: 0.45; background-position: 0 8px; }
-  86% { opacity: 0.2; background-position: 0 16px; }
-  87% { opacity: 0.6; background-position: 0 4px; }
-  88% { opacity: 0.22; background-position: 0 12px; }
-  89% { opacity: 0.5; background-position: 0 2px; }
-  90% { opacity: 0.18; background-position: 0 18px; }
-  91% { opacity: 0.55; background-position: 0 6px; }
-  92% { opacity: 0.2; background-position: 0 14px; }
-  93% { opacity: 0.45; background-position: 0 3px; }
-  94% { opacity: 0.12; background-position: 0 10px; }
-  95% { opacity: 0.3; background-position: 0 1px; }
-  96% { opacity: 0.1; background-position: 0 5px; }
-  97%, 100% { opacity: 0; background-position: 0 0; }
+.lmui-paimon__scan::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 44px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(230, 242, 255, 0) 0%,
+    rgba(215, 235, 255, 0.12) 24%,
+    rgba(255, 255, 255, 0.42) 44%,
+    rgba(255, 255, 255, 0.78) 56%,
+    rgba(200, 225, 255, 0.26) 72%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(0.6px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  translate: 0 -44px;
+  animation: lmui-paimon-scan-band var(--lmui-scan-cycle, 5s) linear infinite;
+}
+.lmui-paimon__scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: 14px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0) 100%);
+  filter: blur(3px);
+  mix-blend-mode: screen;
+  opacity: 0;
+  translate: 0 -20px;
+  animation: lmui-paimon-scan-trail var(--lmui-scan-cycle, 5s) linear infinite;
+}
+@keyframes lmui-paimon-scan-band {
+  0%, 7.9% { opacity: 0; translate: 0 -44px; }
+  8% { opacity: 0.5; translate: 0 0; }
+  10% { opacity: 0.92; }
+  26% { opacity: 0.82; translate: 0 188px; }
+  28% { opacity: 0; translate: 0 196px; }
+  28.01%, 100% { opacity: 0; translate: 0 -44px; }
+}
+@keyframes lmui-paimon-scan-trail {
+  0%, 7.9% { opacity: 0; translate: 0 -30px; }
+  8% { opacity: 0.4; translate: 0 0; }
+  10% { opacity: 0.65; }
+  26% { opacity: 0.5; translate: 0 196px; }
+  28%, 100% { opacity: 0; translate: 0 196px; }
 }
 /* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
 .lmui-paimon__ghost {
@@ -1823,6 +1910,8 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
   .lmui-paimon__scan,
   .lmui-paimon__ghost,
   .lmui-paimon__glitchBar { opacity: 0 !important; }
+  .lmui-paimon__scan::before,
+  .lmui-paimon__scan::after { animation: none !important; opacity: 0 !important; }
   .lmui-rail { transition: opacity 0.01s linear !important; }
 }
 `;
@@ -2457,6 +2546,7 @@ function createDomPatches(store) {
   const subagentTextOriginals = /* @__PURE__ */ new Map();
   const subagentAriaOriginals = /* @__PURE__ */ new Map();
   const thinkingOriginals = /* @__PURE__ */ new Map();
+  const shimmerOriginals = /* @__PURE__ */ new Map();
   const knownHeadings = /* @__PURE__ */ new WeakSet();
   function readConfig2() {
     try {
@@ -2554,6 +2644,21 @@ function createDomPatches(store) {
         const next = base.replace(/深度求索中/g, desired);
         if (node.nodeValue !== next) node.nodeValue = next;
       }
+      const shimmerNodes = roots[i].querySelectorAll("[data-shimmer-text]");
+      for (let k = 0; k < shimmerNodes.length; k += 1) {
+        const el = shimmerNodes[k];
+        const raw = el.getAttribute("data-shimmer-text") || "";
+        let base = raw;
+        if (raw.indexOf("深度求索中") >= 0) {
+          shimmerOriginals.set(el, raw);
+        } else if (shimmerOriginals.has(el)) {
+          base = shimmerOriginals.get(el);
+        } else {
+          continue;
+        }
+        const next = base.replace(/深度求索中/g, desired);
+        if (raw !== next) el.setAttribute("data-shimmer-text", next);
+      }
     }
   }
   function restoreThinkingLabel() {
@@ -2564,6 +2669,15 @@ function createDomPatches(store) {
       }
     });
     thinkingOriginals.clear();
+    shimmerOriginals.forEach((original, el) => {
+      try {
+        if (el.isConnected && el.getAttribute("data-shimmer-text") !== original) {
+          el.setAttribute("data-shimmer-text", original);
+        }
+      } catch (e) {
+      }
+    });
+    shimmerOriginals.clear();
   }
   function applyHeroTitle() {
     if (disposed) return;
@@ -2615,7 +2729,9 @@ function createDomPatches(store) {
     observer.observe(document.body, {
       subtree: true,
       childList: true,
-      characterData: true
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["data-shimmer-text", "aria-label"]
     });
   } catch (e) {
     observer = null;
@@ -2666,9 +2782,6 @@ function createDomPatches(store) {
   };
 }
 
-// src/client/brand.js
-var ReactNS = __toESM(require("react"), 1);
-
 // src/client/media.js
 var MEDIA_PREFIX = "/light-mirror/media/";
 function resolveMedia(url) {
@@ -2684,7 +2797,176 @@ function resolveMedia(url) {
   return url;
 }
 
+// src/client/whale.js
+var ART_PREFIX = "/light-mirror/media/art/";
+var STATES = [
+  { id: "orbit", label: "思考中", animated: "triquetra-orbit.png", still: "triquetra-orbit-first.png" },
+  { id: "heartbeat", label: "等待", animated: "triquetra-heartbeat.png", still: "triquetra-heartbeat-first.png" },
+  { id: "rotate", label: "链接/初始化", animated: "triquetra-rotate.png", still: "triquetra-rotate-first.png" }
+];
+var CYCLE_MS = 8e3;
+var ICON_SELECTOR = '[data-chat-running] [class*="_runningIcon"]';
+function artUrl(file) {
+  return resolveMedia(ART_PREFIX + file);
+}
+function reducedMotion() {
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch (e) {
+    return false;
+  }
+}
+function createWhaleIndicator() {
+  let disposed = false;
+  let ready = false;
+  let current = 0;
+  let timer = null;
+  let observer = null;
+  let mediaOff = null;
+  const availability = /* @__PURE__ */ new Map();
+  function availableStates() {
+    return STATES.filter((state) => availability.get(state.id) === true);
+  }
+  function frameUrl(state) {
+    return artUrl(reducedMotion() ? state.still : state.animated);
+  }
+  function applyState(index) {
+    if (disposed) return;
+    const states = availableStates();
+    if (states.length === 0) return;
+    current = (index % states.length + states.length) % states.length;
+    const state = states[current];
+    try {
+      document.documentElement.setAttribute("data-lmui-whale-state", state.id);
+      const roots = document.querySelectorAll("[data-chat-running]");
+      for (let i = 0; i < roots.length; i += 1) {
+        roots[i].setAttribute("data-lmui-whale-state", state.id);
+        const imgs = roots[i].querySelectorAll(".lmui-whale-img");
+        for (let k = 0; k < imgs.length; k += 1) {
+          const next = frameUrl(state);
+          if (imgs[k].getAttribute("src") !== next) imgs[k].setAttribute("src", next);
+        }
+      }
+    } catch (e) {
+    }
+  }
+  function ensureImages() {
+    if (disposed || !ready) return;
+    const states = availableStates();
+    if (states.length === 0) return;
+    const state = states[current % states.length];
+    const icons = document.querySelectorAll(ICON_SELECTOR);
+    for (let i = 0; i < icons.length; i += 1) {
+      const icon = icons[i];
+      if (icon.querySelector(".lmui-whale-img")) continue;
+      const img = document.createElement("img");
+      img.className = "lmui-whale-img";
+      img.alt = "";
+      img.draggable = false;
+      img.decoding = "async";
+      img.setAttribute("aria-hidden", "true");
+      img.setAttribute("src", frameUrl(state));
+      icon.appendChild(img);
+    }
+    applyState(current);
+  }
+  function probe() {
+    let pending = STATES.length;
+    let any = false;
+    STATES.forEach((state) => {
+      const img = new Image();
+      img.onload = () => {
+        availability.set(state.id, true);
+        any = true;
+        pending -= 1;
+        if (pending === 0) finish();
+      };
+      img.onerror = () => {
+        availability.set(state.id, false);
+        pending -= 1;
+        if (pending === 0) finish();
+      };
+      img.src = artUrl(state.animated);
+    });
+    const staticImg = new Image();
+    staticImg.src = artUrl(STATES[0].still);
+    function finish() {
+      if (disposed || !any) return;
+      ready = true;
+      try {
+        document.documentElement.setAttribute("data-lmui-whale-ready", "1");
+      } catch (e) {
+      }
+      ensureImages();
+      if (!reducedMotion()) {
+        timer = window.setInterval(() => {
+          if (disposed) return;
+          if (!document.querySelector("[data-chat-running]")) return;
+          current = (current + 1) % availableStates().length;
+          applyState(current);
+          ensureImages();
+        }, CYCLE_MS);
+      }
+    }
+  }
+  try {
+    observer = new MutationObserver(() => {
+      if (!disposed) ensureImages();
+    });
+    observer.observe(document.body, { subtree: true, childList: true });
+  } catch (e) {
+    observer = null;
+  }
+  try {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => applyState(current);
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onChange);
+      mediaOff = () => mq.removeEventListener("change", onChange);
+    }
+  } catch (e) {
+    mediaOff = null;
+  }
+  probe();
+  return {
+    dispose() {
+      disposed = true;
+      if (timer !== null) {
+        try {
+          window.clearInterval(timer);
+        } catch (e) {
+        }
+        timer = null;
+      }
+      if (observer) {
+        try {
+          observer.disconnect();
+        } catch (e) {
+        }
+        observer = null;
+      }
+      if (typeof mediaOff === "function") {
+        try {
+          mediaOff();
+        } catch (e) {
+        }
+        mediaOff = null;
+      }
+      try {
+        document.querySelectorAll(".lmui-whale-img").forEach((img) => {
+          if (img.parentNode) img.parentNode.removeChild(img);
+        });
+        document.querySelectorAll("[data-chat-running]").forEach((el) => el.removeAttribute("data-lmui-whale-state"));
+        document.documentElement.removeAttribute("data-lmui-whale-ready");
+        document.documentElement.removeAttribute("data-lmui-whale-state");
+      } catch (e) {
+      }
+    }
+  };
+}
+
 // src/client/brand.js
+var ReactNS = __toESM(require("react"), 1);
 var React = ReactNS && typeof ReactNS.createElement === "function" ? ReactNS : ReactNS && ReactNS.default && typeof ReactNS.default.createElement === "function" ? ReactNS.default : ReactNS;
 var h = React.createElement;
 var BRAND_PRIORITY = -200;
@@ -2717,7 +2999,7 @@ var ART_DIR = (() => {
   const url = resolve(MEDIA.art.phanesFull);
   return url ? url.replace(/[^/]+$/i, "") : "";
 })();
-function artUrl(name) {
+function artUrl2(name) {
   return ART_DIR ? ART_DIR + name : "";
 }
 function newArtCandidates(variant, scheme) {
@@ -2725,7 +3007,7 @@ function newArtCandidates(variant, scheme) {
   const list = [];
   const push = (kind, names) => {
     names.forEach((name) => {
-      if (name) list.push({ kind, url: artUrl(name) });
+      if (name) list.push({ kind, url: artUrl2(name) });
     });
   };
   if (variant === "phanes") {
@@ -5452,6 +5734,11 @@ function apply(ctx) {
     try {
       const domPatches = createDomPatches(store);
       keep(() => domPatches.dispose());
+    } catch (e) {
+    }
+    try {
+      const whale = createWhaleIndicator();
+      keep(() => whale.dispose());
     } catch (e) {
     }
   }

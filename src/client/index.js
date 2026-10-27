@@ -27,6 +27,7 @@ import {
 import { DECOR_CSS, SETTINGS_CSS } from './styles.js'
 import { createThemeController } from './theme.js'
 import { createDomPatches } from './dompatches.js'
+import { createWhaleIndicator } from './whale.js'
 import { normalizeHeroTitle, normalizeThinkingLabel } from './heroTitle.js'
 import { registerBrand } from './brand.js'
 import { registerDecor } from './decor.js'
@@ -205,6 +206,13 @@ export function apply(ctx) {
       keep(() => domPatches.dispose())
     } catch (e) {
       /* DOM 文案补丁失败不影响主要主题 */
+    }
+    try {
+      /* 思考指示器：三态 APNG（orbit/heartbeat/rotate），8s 轮换 */
+      const whale = createWhaleIndicator()
+      keep(() => whale.dispose())
+    } catch (e) {
+      /* 指示器失败保留原鲸尾动画 */
     }
   }
 

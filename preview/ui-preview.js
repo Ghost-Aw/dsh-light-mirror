@@ -566,6 +566,15 @@ body {
   animation: mock-running-pulse 1.6s ease-in-out infinite;
 }
 .mock-running__text { font-variant-numeric: tabular-nums; }
+.mock-running__icon { position: relative; flex: none; width: 14px; height: 14px; display: inline-flex; overflow: hidden; }
+.mock-running__icon .EvIC1a_runningWhaleAnimated { display: none; }
+.mock-running__icon .EvIC1a_runningWhaleStill { width: 100%; height: 100%; display: block; }
+.mock-running__icon .lmui-whale-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+html[data-lmui-whale-ready="1"] .mock-running__icon .EvIC1a_runningWhaleStill { display: none; }
+.mock-shimmer { position: relative; display: inline-grid; width: max-content; max-width: 100%; }
+.mock-shimmer ._content_1rdzk_11 { display: flex; align-items: center; min-width: 0; }
+.mock-shimmer__clone { position: absolute; inset: 0; overflow: clip; pointer-events: none; user-select: none; }
+.mock-shimmer__clone [data-shimmer-text]::after { content: attr(data-shimmer-text); }
 @keyframes mock-running-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
 .mock-perm summary { list-style: none; cursor: pointer; }
 .mock-perm summary::-webkit-details-marker { display: none; }
@@ -865,8 +874,18 @@ html[data-lmui-scheme="light"][data-lmui-composer="off"] .mock-composer {
             'div',
             { className: 'mock-running', 'data-chat-running': '' },
             h('span', { className: 'mock-running__divider', 'aria-hidden': 'true' }),
-            h('span', { className: 'mock-running__dot', 'aria-hidden': 'true' }),
-            h('span', { className: 'mock-running__text' }, '深度求索中，用时 3 秒 ···'),
+            h('span', { className: 'mock-running__icon EvIC1a_runningIcon', 'aria-hidden': 'true' },
+              h('span', { className: 'EvIC1a_runningWhaleAnimated' }),
+              h('svg', { className: 'EvIC1a_runningWhaleStill', width: '14', height: '14', viewBox: '0 0 16 16', fill: 'none' },
+                h('path', { d: 'M8.8 13.7C8.9 12.3 8.4 10.4 8.4 9.6C8.4 8.9 8.9 8.4 9.6 8.4C11.3 8.4 12.1 8.3 12.7 8.1C13.7 7.8 14.6 6.8 15 5.9C15.1 5.8 15 5.6 14.8 5.7C13.8 5.9 12.8 5.4 11.8 5C10.7 4.5 9.5 4.7 8.9 4.9C8.8 4.9 8.7 4.8 8.6 4.7C8.5 3.6 7.4 2.6 5.5 2.2C4.5 2 3.7 1.6 3.3 1.2C3.3 1.1 3.1 1.1 3 1.2C2.6 2.1 2.2 3.8 5.2 6.1C5.8 6.5 6.3 6.8 6.6 7.6C6.7 8.1 6.2 9.2 6.1 9.4C5.2 11.3 5.1 12.2 4.9 13.7', stroke: 'currentColor', strokeWidth: '1' }))),
+            h(
+              'span',
+              { className: 'mock-shimmer', 'data-shimmer': '' },
+              h('span', { className: '_content_1rdzk_11' },
+                h('span', { className: '_text_1rdzk_17 mock-running__text' }, '深度求索中，用时 3 秒 ···')),
+              h('span', { className: '_decoration_1rdzk_25 mock-shimmer__clone', 'aria-hidden': 'true' },
+                h('span', { className: '_text_1rdzk_17', 'data-shimmer-text': '深度求索中，用时 3 秒 ···' })),
+            ),
           ),
         ),
       ),
