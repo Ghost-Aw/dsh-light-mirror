@@ -1449,18 +1449,29 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
 /* ── v9 派蒙间歇扫描线 + 间歇 glitch（纯 transform/opacity/背景位置）──── */
 .lmui-paimon__scan {
   z-index: 3;
+  inset: 0;
+  height: auto;
   opacity: 0;
-  animation: lmui-paimon-scan var(--lmui-scan-cycle, 9s) linear infinite;
+  -webkit-mask-image: none;
+  mask-image: none;
+  background-repeat: repeat;
+  animation: lmui-paimon-scan var(--lmui-scan-cycle, 5s) linear infinite;
 }
 @keyframes lmui-paimon-scan {
   0%, 84% { opacity: 0; background-position: 0 0; }
-  86% { opacity: 0.55; background-position: 0 8px; }
-  87% { opacity: 0.22; background-position: 0 16px; }
-  88% { opacity: 0.6; background-position: 0 4px; }
-  89% { opacity: 0.18; background-position: 0 12px; }
-  90% { opacity: 0.5; background-position: 0 2px; }
-  91% { opacity: 0.25; background-position: 0 18px; }
-  92%, 100% { opacity: 0; background-position: 0 0; }
+  85% { opacity: 0.45; background-position: 0 8px; }
+  86% { opacity: 0.2; background-position: 0 16px; }
+  87% { opacity: 0.6; background-position: 0 4px; }
+  88% { opacity: 0.22; background-position: 0 12px; }
+  89% { opacity: 0.5; background-position: 0 2px; }
+  90% { opacity: 0.18; background-position: 0 18px; }
+  91% { opacity: 0.55; background-position: 0 6px; }
+  92% { opacity: 0.2; background-position: 0 14px; }
+  93% { opacity: 0.45; background-position: 0 3px; }
+  94% { opacity: 0.12; background-position: 0 10px; }
+  95% { opacity: 0.3; background-position: 0 1px; }
+  96% { opacity: 0.1; background-position: 0 5px; }
+  97%, 100% { opacity: 0; background-position: 0 0; }
 }
 /* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
 .lmui-paimon__ghost {

@@ -90,6 +90,8 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     /* 启动动画 */
     /* 新会话页 Hero 标题（设置可改；空字符串回退默认） */
     heroTitle: "封锁已至之境",
+    /* 思考状态前缀（设置可改；后半句「用时 n 秒…」保留） */
+    thinkingLabel: "黑玛门尼解算中",
     splashEnabled: true,
     splashMode: "session",
     // session | daily | every

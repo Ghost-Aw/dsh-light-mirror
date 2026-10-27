@@ -712,7 +712,7 @@ function PaimonHolo(props) {
   const isLine = /paimon-line-/.test(String(src))
   const fx = React.useMemo(
     () => ({
-      scan: (7 + Math.random() * 3).toFixed(2) + 's',
+      scan: (4 + Math.random() * 2).toFixed(2) + 's',
       ghostA: (8 + Math.random() * 6).toFixed(2) + 's',
       ghostB: (8 + Math.random() * 6).toFixed(2) + 's',
       bar: (11 + Math.random() * 5).toFixed(2) + 's',

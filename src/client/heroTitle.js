@@ -13,6 +13,10 @@ export const HERO_TITLE_DEFAULT = '封锁已至之境'
 export const HERO_TITLE_STORAGE = 'light-mirror:heroTitle'
 export const HERO_TITLE_MAX = 40
 
+export const THINKING_DEFAULT = '黑玛门尼解算中'
+export const THINKING_STORAGE = 'light-mirror:thinkingLabel'
+export const THINKING_MAX = 30
+
 export function readStoredHeroTitle() {
   try {
     const value = window.localStorage.getItem(HERO_TITLE_STORAGE)
@@ -39,4 +43,33 @@ export function normalizeHeroTitle(value) {
   const text = raw.trim()
   if (text === '') return ''
   return text.slice(0, HERO_TITLE_MAX)
+}
+
+function readStoredThinkingLabel() {
+  try {
+    const value = window.localStorage.getItem(THINKING_STORAGE)
+    return value === null ? null : value
+  } catch (e) {
+    return null
+  }
+}
+
+export function writeStoredThinkingLabel(value) {
+  try {
+    if (typeof value === 'string' && value.trim() !== '') {
+      window.localStorage.setItem(THINKING_STORAGE, value.trim().slice(0, THINKING_MAX))
+    } else {
+      window.localStorage.removeItem(THINKING_STORAGE)
+    }
+  } catch (e) {
+    /* 无 localStorage 时仅内存生效 */
+  }
+}
+
+export function normalizeThinkingLabel(value) {
+  let raw = value
+  if (raw === undefined) raw = readStoredThinkingLabel()
+  if (typeof raw !== 'string') return THINKING_DEFAULT
+  const text = raw.trim()
+  return text === '' ? THINKING_DEFAULT : text.slice(0, THINKING_MAX)
 }

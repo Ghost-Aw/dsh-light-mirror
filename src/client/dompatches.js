@@ -11,16 +11,27 @@
  *    保持 React 重渲染后仍生效；空字符串时恢复宿主原文。
  */
 
-import { HERO_TITLE_DEFAULT } from './heroTitle.js'
+import { HERO_TITLE_DEFAULT, THINKING_DEFAULT } from './heroTitle.js'
 
 const PERMISSION_MAP = {
   仅可查看: '天之御使',
   工作区内修改: '生死时空',
   完全权限: '理之大权',
 }
-const PERMISSION_SELECTOR = '[class*="_triggerLabel"],[class*="_optionLabelText"],[class*="_selector"]'
+/* 稳定 class 后缀 + 展开菜单：primitive menu 将菜单项 label 放在
+   button[role=menuitem] 内（可能 portal 到 body），统一按 role 限定。 */
+const PERMISSION_SELECTOR = [
+  '[class*="_triggerLabel"]',
+  '[class*="_optionLabelText"]',
+  '[class*="_selector"]',
+  '[role="menu"] button[role="menuitem"]',
+  '[role="menu"] [class*="_itemLabel"]',
+  '[role="listbox"] [role="option"]',
+].join(',')
 const HERO_SELECTOR =
   '[data-phase="hero"] h1,[data-phase="hero"] [class*="_titleGroup"] > span:first-child,.mock-hero__title'
+const SUBAGENT_BUTTON_SELECTOR = 'button[aria-haspopup="tree"]'
+const THINKING_SELECTOR = '[data-chat-running]'
 
 function textNodesOf(root) {
   const out = []
@@ -51,6 +62,9 @@ export function createDomPatches(store) {
   let observer = null
   let storeOff = null
   const permissionOriginals = new Map()
+  const subagentTextOriginals = new Map()
+  const subagentAriaOriginals = new Map()
+  const thinkingOriginals = new Map()
   const knownHeadings = new WeakSet()
 
   function readConfig() {
@@ -91,6 +105,83 @@ export function createDomPatches(store) {
     permissionOriginals.clear()
   }
 
+  /* ── 顶部子智能体数量：n 个子智能体 → n 个影子 ── */
+  function applySubagentCount() {
+    const buttons = document.querySelectorAll(SUBAGENT_BUTTON_SELECTOR)
+    for (let i = 0; i < buttons.length; i += 1) {
+      const button = buttons[i]
+      const countNodes = button.querySelectorAll('[class*="_count"]')
+      const scope = countNodes.length > 0 ? countNodes : [button]
+      for (let k = 0; k < scope.length; k += 1) {
+        const nodes = textNodesOf(scope[k])
+        for (let n = 0; n < nodes.length; n += 1) {
+          const node = nodes[n]
+          const raw = node.nodeValue || ''
+          if (raw.indexOf('个子智能体') < 0) continue
+          if (!subagentTextOriginals.has(node)) subagentTextOriginals.set(node, raw)
+          const next = raw.replace(/个子智能体/g, '个影子')
+          if (node.nodeValue !== next) node.nodeValue = next
+        }
+      }
+      const aria = button.getAttribute('aria-label')
+      if (aria && aria.indexOf('个子智能体') >= 0) {
+        if (!subagentAriaOriginals.has(button)) subagentAriaOriginals.set(button, aria)
+        const next = aria.replace(/个子智能体/g, '个影子')
+        if (next !== aria) button.setAttribute('aria-label', next)
+      }
+    }
+  }
+
+  function restoreSubagentCount() {
+    subagentTextOriginals.forEach((original, node) => {
+      try {
+        if (node.isConnected && node.nodeValue !== original) node.nodeValue = original
+      } catch (e) {
+        /* noop */
+      }
+    })
+    subagentTextOriginals.clear()
+    subagentAriaOriginals.forEach((original, button) => {
+      try {
+        if (button.isConnected && button.getAttribute('aria-label') !== original) {
+          button.setAttribute('aria-label', original)
+        }
+      } catch (e) {
+        /* noop */
+      }
+    })
+    subagentAriaOriginals.clear()
+  }
+
+  /* ── 思考状态前缀：只替换「深度求索中」，保留「，用时 n 秒…」 ── */
+  function applyThinkingLabel() {
+    const cfg = readConfig()
+    const desired = cfg && typeof cfg.thinkingLabel === 'string' ? cfg.thinkingLabel : THINKING_DEFAULT
+    const roots = document.querySelectorAll(THINKING_SELECTOR)
+    for (let i = 0; i < roots.length; i += 1) {
+      const nodes = textNodesOf(roots[i])
+      for (let k = 0; k < nodes.length; k += 1) {
+        const node = nodes[k]
+        const raw = node.nodeValue || ''
+        if (raw.indexOf('深度求索中') < 0) continue
+        if (!thinkingOriginals.has(node)) thinkingOriginals.set(node, raw)
+        const next = raw.replace(/深度求索中/g, desired)
+        if (node.nodeValue !== next) node.nodeValue = next
+      }
+    }
+  }
+
+  function restoreThinkingLabel() {
+    thinkingOriginals.forEach((original, node) => {
+      try {
+        if (node.isConnected && node.nodeValue !== original) node.nodeValue = original
+      } catch (e) {
+        /* noop */
+      }
+    })
+    thinkingOriginals.clear()
+  }
+
   /* ── Hero 标题 ── */
   function applyHeroTitle() {
     if (disposed) return
@@ -129,6 +220,8 @@ export function createDomPatches(store) {
     const cfg = readConfig()
     if (!cfg || cfg.enabled !== true) return
     applyPermissions()
+    applySubagentCount()
+    applyThinkingLabel()
     applyHeroTitle()
   }
 
@@ -142,7 +235,8 @@ export function createDomPatches(store) {
 
   try {
     observer = new window.MutationObserver(schedule)
-    observer.observe(document.documentElement, {
+    /* 需求：observer 挂 document.body（菜单可能 portal 到 body 外） */
+    observer.observe(document.body, {
       subtree: true,
       childList: true,
       characterData: true,
@@ -184,6 +278,8 @@ export function createDomPatches(store) {
         storeOff = null
       }
       restorePermissions()
+      restoreSubagentCount()
+      restoreThinkingLabel()
       /* Hero 标题恢复宿主原文 */
       const headings = document.querySelectorAll(HERO_SELECTOR)
       for (let i = 0; i < headings.length; i += 1) {

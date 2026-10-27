@@ -24,8 +24,11 @@ import {
 } from '../shared/content.js'
 import {
   HERO_TITLE_DEFAULT,
+  THINKING_DEFAULT,
   normalizeHeroTitle,
+  normalizeThinkingLabel,
   writeStoredHeroTitle,
+  writeStoredThinkingLabel,
 } from './heroTitle.js'
 
 const React =
@@ -75,6 +78,8 @@ export function normalizeConfig(input) {
   }
   /* Hero 标题（Host DEFAULTS 未含，localStorage 持久化兜底） */
   out.heroTitle = normalizeHeroTitle(src.heroTitle)
+  /* 思考状态文案前缀（Host DEFAULTS 待补） */
+  out.thinkingLabel = normalizeThinkingLabel(src.thinkingLabel)
   return out
 }
 
@@ -405,6 +410,9 @@ function MirrorSettings(props) {
     if (patch && Object.prototype.hasOwnProperty.call(patch, 'heroTitle')) {
       writeStoredHeroTitle(patch.heroTitle)
     }
+    if (patch && Object.prototype.hasOwnProperty.call(patch, 'thinkingLabel')) {
+      writeStoredThinkingLabel(patch.thinkingLabel)
+    }
     const next = normalizeConfig(Object.assign({}, draft, patch))
     setDraft(next)
     setNotice('')
@@ -415,6 +423,7 @@ function MirrorSettings(props) {
   const save = () => {
     if (!draft || busy) return
     if (typeof draft.heroTitle === 'string') writeStoredHeroTitle(draft.heroTitle)
+    if (typeof draft.thinkingLabel === 'string') writeStoredThinkingLabel(draft.thinkingLabel)
     setBusy(true)
     setNotice('')
     setError('')
@@ -432,6 +441,7 @@ function MirrorSettings(props) {
   const reset = () => {
     if (busy) return
     writeStoredHeroTitle(null)
+    writeStoredThinkingLabel(null)
     setBusy(true)
     setNotice('')
     setError('')
@@ -523,6 +533,16 @@ function MirrorSettings(props) {
         onChange: (v) => commit({ heroTitle: v }),
         onReset: () => commit({ heroTitle: '' }),
         resetLabel: '恢复原文',
+      }),
+      h(TextRow, {
+        label: '思考状态文案',
+        hint: '把「深度求索中」替换为自定义前缀（如「黑玛门尼解算中」）；「用时 n 秒…」保持不变。',
+        value: draft.thinkingLabel,
+        placeholder: THINKING_DEFAULT,
+        maxLength: 30,
+        onChange: (v) => commit({ thinkingLabel: v }),
+        onReset: () => commit({ thinkingLabel: THINKING_DEFAULT }),
+        resetLabel: '恢复默认',
       }),
       h(SelectRow, {
         label: '品牌图案',

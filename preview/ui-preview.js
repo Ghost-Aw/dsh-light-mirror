@@ -555,6 +555,18 @@ body {
 }
 .mock-header__left, .mock-header__right { display: flex; align-items: center; gap: 10px; }
 .mock-perm { position: relative; }
+.mock-subagents { font: inherit; }
+.mock-running {
+  display: flex; align-items: center; gap: 7px; margin-top: 14px;
+  color: var(--dsw-alias-label-tertiary); font-size: 12.5px; line-height: 18px;
+}
+.mock-running__dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #7da7ff; box-shadow: 0 0 8px rgba(125, 167, 255, 0.7);
+  animation: mock-running-pulse 1.6s ease-in-out infinite;
+}
+.mock-running__text { font-variant-numeric: tabular-nums; }
+@keyframes mock-running-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
 .mock-perm summary { list-style: none; cursor: pointer; }
 .mock-perm summary::-webkit-details-marker { display: none; }
 .mock-perm__menu {
@@ -793,7 +805,14 @@ html[data-lmui-scheme="light"][data-lmui-composer="off"] .mock-composer {
         h(
           'header',
           { className: 'mock-header' },
-          h('div', { className: 'mock-header__left' }, h('span', null, '新会话'), h('span', { className: 'mock-chip' }, '工作区 · 光之镜')),
+          h('div', { className: 'mock-header__left' }, h('span', null, '新会话'), h('span', { className: 'mock-chip' }, '工作区 · 光之镜'),
+          h('button', {
+            type: 'button',
+            className: 'mock-chip mock-subagents',
+            'aria-haspopup': 'tree',
+            'aria-label': '3 个子智能体',
+          }, h('span', { className: 'SubagentHeaderLineage_count' }, '3 个子智能体')),
+        ),
           h('div', { className: 'mock-header__right' }, h('span', { className: 'mock-chip' }, 'deepseek-chat'),
           h('details', { className: 'mock-perm' },
             h('summary', { className: 'mock-chip iWlSmW_trigger' }, h('span', { className: 'iWlSmW_triggerLabel' }, '完全权限')),
@@ -841,6 +860,13 @@ html[data-lmui-scheme="light"][data-lmui-composer="off"] .mock-composer {
                 tabIndex: -1,
               }, '↑'),
             ),
+          ),
+          h(
+            'div',
+            { className: 'mock-running', 'data-chat-running': '' },
+            h('span', { className: 'mock-running__divider', 'aria-hidden': 'true' }),
+            h('span', { className: 'mock-running__dot', 'aria-hidden': 'true' }),
+            h('span', { className: 'mock-running__text' }, '深度求索中，用时 3 秒 ···'),
           ),
         ),
       ),

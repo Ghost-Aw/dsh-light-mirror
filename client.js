@@ -135,6 +135,8 @@ var DEFAULTS = {
   /* 启动动画 */
   /* 新会话页 Hero 标题（设置可改；空字符串回退默认） */
   heroTitle: "封锁已至之境",
+  /* 思考状态前缀（设置可改；后半句「用时 n 秒…」保留） */
+  thinkingLabel: "黑玛门尼解算中",
   splashEnabled: true,
   splashMode: "session",
   // session | daily | every
@@ -1701,18 +1703,29 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
 /* ── v9 派蒙间歇扫描线 + 间歇 glitch（纯 transform/opacity/背景位置）──── */
 .lmui-paimon__scan {
   z-index: 3;
+  inset: 0;
+  height: auto;
   opacity: 0;
-  animation: lmui-paimon-scan var(--lmui-scan-cycle, 9s) linear infinite;
+  -webkit-mask-image: none;
+  mask-image: none;
+  background-repeat: repeat;
+  animation: lmui-paimon-scan var(--lmui-scan-cycle, 5s) linear infinite;
 }
 @keyframes lmui-paimon-scan {
   0%, 84% { opacity: 0; background-position: 0 0; }
-  86% { opacity: 0.55; background-position: 0 8px; }
-  87% { opacity: 0.22; background-position: 0 16px; }
-  88% { opacity: 0.6; background-position: 0 4px; }
-  89% { opacity: 0.18; background-position: 0 12px; }
-  90% { opacity: 0.5; background-position: 0 2px; }
-  91% { opacity: 0.25; background-position: 0 18px; }
-  92%, 100% { opacity: 0; background-position: 0 0; }
+  85% { opacity: 0.45; background-position: 0 8px; }
+  86% { opacity: 0.2; background-position: 0 16px; }
+  87% { opacity: 0.6; background-position: 0 4px; }
+  88% { opacity: 0.22; background-position: 0 12px; }
+  89% { opacity: 0.5; background-position: 0 2px; }
+  90% { opacity: 0.18; background-position: 0 18px; }
+  91% { opacity: 0.55; background-position: 0 6px; }
+  92% { opacity: 0.2; background-position: 0 14px; }
+  93% { opacity: 0.45; background-position: 0 3px; }
+  94% { opacity: 0.12; background-position: 0 10px; }
+  95% { opacity: 0.3; background-position: 0 1px; }
+  96% { opacity: 0.1; background-position: 0 5px; }
+  97%, 100% { opacity: 0; background-position: 0 0; }
 }
 /* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
 .lmui-paimon__ghost {
@@ -2343,6 +2356,9 @@ function createThemeController(ctx, store) {
 var HERO_TITLE_DEFAULT = "封锁已至之境";
 var HERO_TITLE_STORAGE = "light-mirror:heroTitle";
 var HERO_TITLE_MAX = 40;
+var THINKING_DEFAULT = "黑玛门尼解算中";
+var THINKING_STORAGE = "light-mirror:thinkingLabel";
+var THINKING_MAX = 30;
 function readStoredHeroTitle() {
   try {
     const value = window.localStorage.getItem(HERO_TITLE_STORAGE);
@@ -2367,6 +2383,31 @@ function normalizeHeroTitle(value) {
   if (text === "") return "";
   return text.slice(0, HERO_TITLE_MAX);
 }
+function readStoredThinkingLabel() {
+  try {
+    const value = window.localStorage.getItem(THINKING_STORAGE);
+    return value === null ? null : value;
+  } catch (e) {
+    return null;
+  }
+}
+function writeStoredThinkingLabel(value) {
+  try {
+    if (typeof value === "string" && value.trim() !== "") {
+      window.localStorage.setItem(THINKING_STORAGE, value.trim().slice(0, THINKING_MAX));
+    } else {
+      window.localStorage.removeItem(THINKING_STORAGE);
+    }
+  } catch (e) {
+  }
+}
+function normalizeThinkingLabel(value) {
+  let raw = value;
+  if (raw === void 0) raw = readStoredThinkingLabel();
+  if (typeof raw !== "string") return THINKING_DEFAULT;
+  const text = raw.trim();
+  return text === "" ? THINKING_DEFAULT : text.slice(0, THINKING_MAX);
+}
 
 // src/client/dompatches.js
 var PERMISSION_MAP = {
@@ -2374,8 +2415,17 @@ var PERMISSION_MAP = {
   工作区内修改: "生死时空",
   完全权限: "理之大权"
 };
-var PERMISSION_SELECTOR = '[class*="_triggerLabel"],[class*="_optionLabelText"],[class*="_selector"]';
+var PERMISSION_SELECTOR = [
+  '[class*="_triggerLabel"]',
+  '[class*="_optionLabelText"]',
+  '[class*="_selector"]',
+  '[role="menu"] button[role="menuitem"]',
+  '[role="menu"] [class*="_itemLabel"]',
+  '[role="listbox"] [role="option"]'
+].join(",");
 var HERO_SELECTOR = '[data-phase="hero"] h1,[data-phase="hero"] [class*="_titleGroup"] > span:first-child,.mock-hero__title';
+var SUBAGENT_BUTTON_SELECTOR = 'button[aria-haspopup="tree"]';
+var THINKING_SELECTOR = "[data-chat-running]";
 function textNodesOf(root) {
   const out = [];
   if (!root || typeof document === "undefined") return out;
@@ -2404,6 +2454,9 @@ function createDomPatches(store) {
   let observer = null;
   let storeOff = null;
   const permissionOriginals = /* @__PURE__ */ new Map();
+  const subagentTextOriginals = /* @__PURE__ */ new Map();
+  const subagentAriaOriginals = /* @__PURE__ */ new Map();
+  const thinkingOriginals = /* @__PURE__ */ new Map();
   const knownHeadings = /* @__PURE__ */ new WeakSet();
   function readConfig2() {
     try {
@@ -2437,6 +2490,74 @@ function createDomPatches(store) {
       }
     });
     permissionOriginals.clear();
+  }
+  function applySubagentCount() {
+    const buttons = document.querySelectorAll(SUBAGENT_BUTTON_SELECTOR);
+    for (let i = 0; i < buttons.length; i += 1) {
+      const button = buttons[i];
+      const countNodes = button.querySelectorAll('[class*="_count"]');
+      const scope = countNodes.length > 0 ? countNodes : [button];
+      for (let k = 0; k < scope.length; k += 1) {
+        const nodes = textNodesOf(scope[k]);
+        for (let n = 0; n < nodes.length; n += 1) {
+          const node = nodes[n];
+          const raw = node.nodeValue || "";
+          if (raw.indexOf("个子智能体") < 0) continue;
+          if (!subagentTextOriginals.has(node)) subagentTextOriginals.set(node, raw);
+          const next = raw.replace(/个子智能体/g, "个影子");
+          if (node.nodeValue !== next) node.nodeValue = next;
+        }
+      }
+      const aria = button.getAttribute("aria-label");
+      if (aria && aria.indexOf("个子智能体") >= 0) {
+        if (!subagentAriaOriginals.has(button)) subagentAriaOriginals.set(button, aria);
+        const next = aria.replace(/个子智能体/g, "个影子");
+        if (next !== aria) button.setAttribute("aria-label", next);
+      }
+    }
+  }
+  function restoreSubagentCount() {
+    subagentTextOriginals.forEach((original, node) => {
+      try {
+        if (node.isConnected && node.nodeValue !== original) node.nodeValue = original;
+      } catch (e) {
+      }
+    });
+    subagentTextOriginals.clear();
+    subagentAriaOriginals.forEach((original, button) => {
+      try {
+        if (button.isConnected && button.getAttribute("aria-label") !== original) {
+          button.setAttribute("aria-label", original);
+        }
+      } catch (e) {
+      }
+    });
+    subagentAriaOriginals.clear();
+  }
+  function applyThinkingLabel() {
+    const cfg = readConfig2();
+    const desired = cfg && typeof cfg.thinkingLabel === "string" ? cfg.thinkingLabel : THINKING_DEFAULT;
+    const roots = document.querySelectorAll(THINKING_SELECTOR);
+    for (let i = 0; i < roots.length; i += 1) {
+      const nodes = textNodesOf(roots[i]);
+      for (let k = 0; k < nodes.length; k += 1) {
+        const node = nodes[k];
+        const raw = node.nodeValue || "";
+        if (raw.indexOf("深度求索中") < 0) continue;
+        if (!thinkingOriginals.has(node)) thinkingOriginals.set(node, raw);
+        const next = raw.replace(/深度求索中/g, desired);
+        if (node.nodeValue !== next) node.nodeValue = next;
+      }
+    }
+  }
+  function restoreThinkingLabel() {
+    thinkingOriginals.forEach((original, node) => {
+      try {
+        if (node.isConnected && node.nodeValue !== original) node.nodeValue = original;
+      } catch (e) {
+      }
+    });
+    thinkingOriginals.clear();
   }
   function applyHeroTitle() {
     if (disposed) return;
@@ -2472,6 +2593,8 @@ function createDomPatches(store) {
     const cfg = readConfig2();
     if (!cfg || cfg.enabled !== true) return;
     applyPermissions();
+    applySubagentCount();
+    applyThinkingLabel();
     applyHeroTitle();
   }
   function schedule() {
@@ -2483,7 +2606,7 @@ function createDomPatches(store) {
   }
   try {
     observer = new window.MutationObserver(schedule);
-    observer.observe(document.documentElement, {
+    observer.observe(document.body, {
       subtree: true,
       childList: true,
       characterData: true
@@ -2521,6 +2644,8 @@ function createDomPatches(store) {
         storeOff = null;
       }
       restorePermissions();
+      restoreSubagentCount();
+      restoreThinkingLabel();
       const headings = document.querySelectorAll(HERO_SELECTOR);
       for (let i = 0; i < headings.length; i += 1) {
         const heading = headings[i];
@@ -3555,7 +3680,7 @@ function PaimonHolo(props) {
   const isLine = /paimon-line-/.test(String(src));
   const fx = React3.useMemo(
     () => ({
-      scan: (7 + Math.random() * 3).toFixed(2) + "s",
+      scan: (4 + Math.random() * 2).toFixed(2) + "s",
       ghostA: (8 + Math.random() * 6).toFixed(2) + "s",
       ghostB: (8 + Math.random() * 6).toFixed(2) + "s",
       bar: (11 + Math.random() * 5).toFixed(2) + "s"
@@ -4010,6 +4135,7 @@ function normalizeConfig(input) {
     }
   }
   out.heroTitle = normalizeHeroTitle(src.heroTitle);
+  out.thinkingLabel = normalizeThinkingLabel(src.thinkingLabel);
   return out;
 }
 function httpError(res) {
@@ -4291,6 +4417,9 @@ function MirrorSettings(props) {
     if (patch && Object.prototype.hasOwnProperty.call(patch, "heroTitle")) {
       writeStoredHeroTitle(patch.heroTitle);
     }
+    if (patch && Object.prototype.hasOwnProperty.call(patch, "thinkingLabel")) {
+      writeStoredThinkingLabel(patch.thinkingLabel);
+    }
     const next = normalizeConfig(Object.assign({}, draft, patch));
     setDraft(next);
     setNotice("");
@@ -4300,6 +4429,7 @@ function MirrorSettings(props) {
   const save = () => {
     if (!draft || busy) return;
     if (typeof draft.heroTitle === "string") writeStoredHeroTitle(draft.heroTitle);
+    if (typeof draft.thinkingLabel === "string") writeStoredThinkingLabel(draft.thinkingLabel);
     setBusy(true);
     setNotice("");
     setError("");
@@ -4313,6 +4443,7 @@ function MirrorSettings(props) {
   const reset = () => {
     if (busy) return;
     writeStoredHeroTitle(null);
+    writeStoredThinkingLabel(null);
     setBusy(true);
     setNotice("");
     setError("");
@@ -4389,6 +4520,16 @@ function MirrorSettings(props) {
         onChange: (v) => commit({ heroTitle: v }),
         onReset: () => commit({ heroTitle: "" }),
         resetLabel: "恢复原文"
+      }),
+      h4(TextRow, {
+        label: "思考状态文案",
+        hint: "把「深度求索中」替换为自定义前缀（如「黑玛门尼解算中」）；「用时 n 秒…」保持不变。",
+        value: draft.thinkingLabel,
+        placeholder: THINKING_DEFAULT,
+        maxLength: 30,
+        onChange: (v) => commit({ thinkingLabel: v }),
+        onReset: () => commit({ thinkingLabel: THINKING_DEFAULT }),
+        resetLabel: "恢复默认"
       }),
       h4(SelectRow, {
         label: "品牌图案",
@@ -5222,6 +5363,7 @@ function normalizeConfig2(input) {
     }
   }
   out.heroTitle = normalizeHeroTitle(src.heroTitle);
+  out.thinkingLabel = normalizeThinkingLabel(src.thinkingLabel);
   return out;
 }
 function createStore(initial) {

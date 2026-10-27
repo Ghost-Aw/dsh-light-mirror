@@ -27,7 +27,7 @@ import {
 import { DECOR_CSS, SETTINGS_CSS } from './styles.js'
 import { createThemeController } from './theme.js'
 import { createDomPatches } from './dompatches.js'
-import { normalizeHeroTitle } from './heroTitle.js'
+import { normalizeHeroTitle, normalizeThinkingLabel } from './heroTitle.js'
 import { registerBrand } from './brand.js'
 import { registerDecor } from './decor.js'
 import { registerRail } from './rail.js'
@@ -94,6 +94,8 @@ export function normalizeConfig(input) {
   /* 空会话 Hero 标题：DEFAULTS 未含该字段（Host 侧未加 key），
      由 heroTitle.js 做 localStorage 持久化兜底。 */
   out.heroTitle = normalizeHeroTitle(src.heroTitle)
+  /* 思考状态文案前缀（Host DEFAULTS 待补，先用 localStorage 兜底） */
+  out.thinkingLabel = normalizeThinkingLabel(src.thinkingLabel)
   return out
 }
 
