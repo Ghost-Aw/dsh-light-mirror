@@ -1369,18 +1369,27 @@ html[data-lmui-scheme="light"] {
   --lmui-irid-border: rgba(90, 78, 118, 0.2);
   --lmui-irid-line: linear-gradient(90deg, #ffd9e2 0%, #e3dcf6 46%, #d9e9f7 100%);
 }
-/* composer 发送按钮：低饱和虹彩渐变圆 + 深/浅各自可读图标色 */
+/* composer 发送按钮：低饱和虹彩渐变圆 + 深/浅各自可读图标色。
+   v13 修复：hover 不再用 filter（会触发整卡 backdrop-filter 重新合成，
+   主画面闪一下），改为仅按钮自身的 box-shadow/亮度叠加；按钮固定为独立
+   合成层，hover 只重绘按钮区域。 */
 [data-composer-card] button[class*="_primary"] {
+  position: relative;
+  isolation: isolate;
+  transform: translateZ(0);
+  will-change: box-shadow, background-color;
   background-image: linear-gradient(135deg, var(--lmui-irid-a) 0%, var(--lmui-irid-b) 52%, var(--lmui-irid-c) 100%) !important;
   background-color: transparent !important;
   color: var(--lmui-irid-ink) !important;
   border: none !important;
   box-shadow: 0.6px 0 0 rgba(255, 64, 96, 0.4), -0.6px 0 0 rgba(64, 128, 255, 0.4),
     inset 0 0 0 0.5px var(--lmui-irid-border);
-  transition: background-color 0.1s, filter 0.15s;
+  transition: box-shadow 0.15s var(--lmui-ease), background-color 0.15s var(--lmui-ease);
 }
 [data-composer-card] button[class*="_primary"]:hover:not(:disabled) {
-  filter: brightness(1.06) saturate(1.04);
+  box-shadow: 0.6px 0 0 rgba(255, 64, 96, 0.4), -0.6px 0 0 rgba(64, 128, 255, 0.4),
+    inset 0 0 0 0.5px var(--lmui-irid-border), inset 0 0 12px rgba(255, 255, 255, 0.18),
+    0 0 10px rgba(232, 233, 236, 0.2);
 }
 [data-composer-card] button[class*="_primary"] path,
 [data-composer-card] button[class*="_primary"] svg {

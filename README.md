@@ -38,18 +38,49 @@
 
 ## 安装
 
-依赖：DSH 0.2.x（web profile，含 DeepSeek Harness Desktop 桌面端）、Node ≥ 20。
+依赖：DSH 0.2.x（`web` 或 `desktop` profile）、Node ≥ 20。
 
-> 当前 profile（`web`）已安装：`dsh-light-mirror` → `link:E:/Program Files/DSH/1017/light-mirror`，行 id `light-mirror`。
+DSH 插件通过 profile 的 `package.json` 声明依赖，安装方式与其它 DSH 插件一致。下面以 **web profile（浏览器版，默认 http://127.0.0.1:3080）** 为例；桌面端把 `--profile web` 换成 `--profile desktop` 即可。
+
+### 方式一：从 GitHub 安装（推荐）
 
 ```powershell
-dsh plugin --profile web add "link:E:/Program Files/DSH/1017/light-mirror"
-# 再把 "dsh-light-mirror" 加入 profile package.json 的 dsh.profile.bundles
-dsh web   # 重启后刷新页面
+dsh plugin --profile web add github:Ghost-Aw/dsh-light-mirror
 ```
 
-卸载：`dsh plugin --profile web remove dsh-light-mirror`。
+然后把包名加入 `~/.dsh/profiles/web/package.json` 的 `dsh.profile.bundles`：
 
+```json
+{
+  "dsh": {
+    "profile": {
+      "bundles": [
+        "@deepseek-ai/dsh-base",
+        "@deepseek-ai/dsh-web-app",
+        "dsh-light-mirror"
+      ]
+    }
+  }
+}
+```
+
+重启 `dsh web`（桌面端重启 DSH）后刷新页面即可。
+
+### 方式二：本地 tarball 安装
+
+```powershell
+dsh plugin --profile web add file:C:/path/to/dsh-light-mirror-3.0.0.tgz
+```
+
+### 方式三：开发模式（链接源码目录）
+
+```powershell
+dsh plugin --profile web add link:C:/path/to/light-mirror
+```
+
+方式二/三同样需要在 `bundles` 中追加 `"dsh-light-mirror"`。
+
+卸载：`dsh plugin --profile web remove dsh-light-mirror`，并从 `bundles` 中移除包名。
 ### 如何看到启动动画 / 立即预览
 
 - 新标签页 / 重启 dsh web 后播放一次（默认 `session`：同一标签页刷新不重复）。
