@@ -163,9 +163,17 @@ export function createDomPatches(store) {
       for (let k = 0; k < nodes.length; k += 1) {
         const node = nodes[k]
         const raw = node.nodeValue || ''
-        if (raw.indexOf('深度求索中') < 0) continue
-        if (!thinkingOriginals.has(node)) thinkingOriginals.set(node, raw)
-        const next = raw.replace(/深度求索中/g, desired)
+        let base = raw
+        if (raw.indexOf('深度求索中') >= 0) {
+          /* React 重渲染回宿主原文：以最新原文为准 */
+          thinkingOriginals.set(node, raw)
+        } else if (thinkingOriginals.has(node)) {
+          /* 已是自定义前缀：配置变更时用保存的原文重新生成 */
+          base = thinkingOriginals.get(node)
+        } else {
+          continue
+        }
+        const next = base.replace(/深度求索中/g, desired)
         if (node.nodeValue !== next) node.nodeValue = next
       }
     }

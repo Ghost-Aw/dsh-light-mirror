@@ -2543,9 +2543,15 @@ function createDomPatches(store) {
       for (let k = 0; k < nodes.length; k += 1) {
         const node = nodes[k];
         const raw = node.nodeValue || "";
-        if (raw.indexOf("深度求索中") < 0) continue;
-        if (!thinkingOriginals.has(node)) thinkingOriginals.set(node, raw);
-        const next = raw.replace(/深度求索中/g, desired);
+        let base = raw;
+        if (raw.indexOf("深度求索中") >= 0) {
+          thinkingOriginals.set(node, raw);
+        } else if (thinkingOriginals.has(node)) {
+          base = thinkingOriginals.get(node);
+        } else {
+          continue;
+        }
+        const next = base.replace(/深度求索中/g, desired);
         if (node.nodeValue !== next) node.nodeValue = next;
       }
     }
