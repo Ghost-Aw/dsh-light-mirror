@@ -50,9 +50,11 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       second192Meta: ROUTE_BASE + "/media/seq/second192/frames.json"
     },
     bgm: [
-      { id: "echo-1", title: "回响 · 神殿", src: ROUTE_BASE + "/media/bgm/track-01.mp3" },
-      { id: "echo-2", title: "回响 · 终端", src: ROUTE_BASE + "/media/bgm/track-02.mp3" },
-      { id: "echo-3", title: "回响 · 镜面", src: ROUTE_BASE + "/media/bgm/track-03.mp3" }
+      { id: "echo-1", title: "万有尽收", src: ROUTE_BASE + "/media/bgm/track-04.mp3" },
+      { id: "echo-2", title: "寂石的哀忆", src: ROUTE_BASE + "/media/bgm/track-05.mp3" },
+      { id: "echo-3", title: "无言的忧惧", src: ROUTE_BASE + "/media/bgm/track-06.mp3" },
+      { id: "echo-4", title: "死夜深黯", src: ROUTE_BASE + "/media/bgm/track-07.mp3" },
+      { id: "echo-5", title: "苍镝呈光", src: ROUTE_BASE + "/media/bgm/track-08.mp3" }
     ],
     voice: {
       link: ROUTE_BASE + "/media/voice/line-01-link.mp3",
@@ -139,6 +141,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     railOpen: "light-mirror:rail-open",
     musicOn: "light-mirror:music-on",
     musicTrack: "light-mirror:music-track",
+    musicLoop: "light-mirror:music-loop",
     musicVolume: "light-mirror:music-volume"
   };
 

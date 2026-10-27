@@ -1013,6 +1013,22 @@ html[data-lmui-scheme="light"] .lmui-rail__surface::after {
   color: var(--lmui-ink);
   border-color: color-mix(in srgb, var(--lmui-ink) 26%, transparent);
 }
+.lmui-music__btn--loop {
+  width: 28px;
+  height: 28px;
+  font-family: var(--lmui-mono);
+  color: var(--lmui-ink-dim);
+}
+.lmui-music__btn--loop[data-lmui-loop="single"],
+.lmui-music__btn--loop[data-lmui-loop="shuffle"] {
+  color: var(--lmui-ink);
+  border-color: color-mix(in srgb, var(--lmui-ink) 28%, transparent);
+}
+.lmui-music__loopGlyph {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0;
+}
 .lmui-music__btn:focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--lmui-ink) 22%, transparent);

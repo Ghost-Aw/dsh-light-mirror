@@ -802,6 +802,13 @@ function PaimonHolo(props) {
 /* ── 回响播放器 ───────────────────────────────────────────────────────── */
 
 const BGM = Array.isArray(MEDIA.bgm) ? MEDIA.bgm : []
+const MUSIC_LOOP_KEY = (STORAGE && STORAGE.musicLoop) || 'light-mirror:music-loop'
+const LOOP_MODES = ['list', 'single', 'shuffle']
+const LOOP_META = {
+  list: { glyph: '列', label: '列表循环' },
+  single: { glyph: '单', label: '单曲循环' },
+  shuffle: { glyph: '随', label: '随机循环' },
+}
 
 function readTrackIndex() {
   try {
@@ -811,6 +818,16 @@ function readTrackIndex() {
     /* noop */
   }
   return 0
+}
+
+function readLoopMode() {
+  try {
+    const raw = window.localStorage.getItem(MUSIC_LOOP_KEY)
+    if (LOOP_MODES.indexOf(raw) >= 0) return raw
+  } catch (e) {
+    /* noop */
+  }
+  return 'list'
 }
 
 function readVolume() {
@@ -827,16 +844,30 @@ function MusicPlayer() {
   const [index, setIndex] = React.useState(readTrackIndex)
   const [volume, setVolume] = React.useState(readVolume)
   const [playing, setPlaying] = React.useState(false)
+  const [loopMode, setLoopMode] = React.useState(readLoopMode)
   const [error, setError] = React.useState('')
   const [time, setTime] = React.useState({ current: 0, duration: 0 })
   const audioRef = React.useRef(null)
   const playingRef = React.useRef(false)
+  const historyRef = React.useRef([])
 
   React.useEffect(() => {
     playingRef.current = playing
   }, [playing])
 
   const track = BGM[index] || null
+
+  /* 循环模式持久化；单曲循环立刻把 audio.loop 打开，切走时关闭，
+     不打断当前播放。 */
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem(MUSIC_LOOP_KEY, loopMode)
+    } catch (e) {
+      /* noop */
+    }
+    const audio = audioRef.current
+    if (audio) audio.loop = loopMode === 'single'
+  }, [loopMode])
 
   React.useEffect(() => {
     try {
@@ -846,6 +877,13 @@ function MusicPlayer() {
     }
     const audio = audioRef.current
     if (!audio) return
+    /* 切歌重置进度/时长；音量不动 */
+    setTime({ current: 0, duration: 0 })
+    try {
+      audio.currentTime = 0
+    } catch (e) {
+      /* noop */
+    }
     try {
       audio.volume = volume
       audio.load()
@@ -912,11 +950,75 @@ function MusicPlayer() {
 
   const toggle = () => (playing ? pause() : play())
 
+  const pickShuffle = (current) => {
+    if (BGM.length <= 1) return current
+    let next = current
+    let guard = 0
+    while (next === current && guard < 24) {
+      next = Math.floor(Math.random() * BGM.length)
+      guard += 1
+    }
+    return next
+  }
+
   const step = (delta) => {
     if (BGM.length === 0) return
     setError('')
+    if (loopMode === 'shuffle') {
+      if (delta < 0 && historyRef.current.length > 0) {
+        setIndex(historyRef.current.pop())
+        return
+      }
+      if (delta > 0) {
+        historyRef.current.push(index)
+        if (historyRef.current.length > 50) historyRef.current.shift()
+        setIndex(pickShuffle(index))
+        return
+      }
+    }
     setIndex((prev) => (prev + delta + BGM.length) % BGM.length)
   }
+
+  const cycleLoop = () => {
+    setLoopMode((prev) => LOOP_MODES[(LOOP_MODES.indexOf(prev) + 1) % LOOP_MODES.length])
+  }
+
+  const handleEnded = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (BGM.length === 0) {
+      setPlaying(false)
+      return
+    }
+    if (loopMode === 'single') {
+      try {
+        audio.currentTime = 0
+      } catch (e) {
+        /* noop */
+      }
+      setTime({ current: 0, duration: audio.duration || 0 })
+      play()
+      return
+    }
+    if (BGM.length === 1) {
+      try {
+        audio.currentTime = 0
+      } catch (e) {
+        /* noop */
+      }
+      play()
+      return
+    }
+    if (loopMode === 'shuffle') {
+      historyRef.current.push(index)
+      if (historyRef.current.length > 50) historyRef.current.shift()
+      setIndex(pickShuffle(index))
+      return
+    }
+    setIndex((prev) => (prev + 1) % BGM.length)
+  }
+
+  const loopMeta = LOOP_META[loopMode] || LOOP_META.list
 
   return h(
     'div',
@@ -930,7 +1032,7 @@ function MusicPlayer() {
         h('span', { className: 'lmui-rail__sectionTitle' }, UI_COPY.railMusic),
         h('span', { className: 'lmui-music__title' }, track.title),
       ),
-      h('span', { className: 'lmui-music__count' }, index + 1 + ' / ' + BGM.length),
+      h('span', { className: 'lmui-music__count', 'data-lmui-loop': loopMode }, index + 1 + ' / ' + BGM.length + ' · ' + loopMeta.label),
     ),
     h(
       'div',
@@ -983,6 +1085,18 @@ function MusicPlayer() {
         h(IconNext, null),
       ),
       h(
+        'button',
+        {
+          type: 'button',
+          className: 'lmui-music__btn lmui-music__btn--loop',
+          'data-lmui-loop': loopMode,
+          title: '循环模式：' + loopMeta.label + '（点击切换）',
+          'aria-label': '循环模式：' + loopMeta.label + '，点击切换',
+          onClick: cycleLoop,
+        },
+        h('span', { className: 'lmui-music__loopGlyph', 'aria-hidden': 'true' }, loopMeta.glyph),
+      ),
+      h(
         'div',
         { className: 'lmui-music__volume' },
         h('input', {
@@ -1010,10 +1124,7 @@ function MusicPlayer() {
         const audio = event.currentTarget
         setTime((prev) => Object.assign({}, prev, { duration: audio.duration || 0 }))
       },
-      onEnded: () => {
-        if (BGM.length > 1) step(1)
-        else setPlaying(false)
-      },
+      onEnded: handleEnded,
       onError: () => {
         setPlaying(false)
         setError('音频素材尚未就绪')

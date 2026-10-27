@@ -95,9 +95,11 @@ var MEDIA = {
     second192Meta: ROUTE_BASE + "/media/seq/second192/frames.json"
   },
   bgm: [
-    { id: "echo-1", title: "回响 · 神殿", src: ROUTE_BASE + "/media/bgm/track-01.mp3" },
-    { id: "echo-2", title: "回响 · 终端", src: ROUTE_BASE + "/media/bgm/track-02.mp3" },
-    { id: "echo-3", title: "回响 · 镜面", src: ROUTE_BASE + "/media/bgm/track-03.mp3" }
+    { id: "echo-1", title: "万有尽收", src: ROUTE_BASE + "/media/bgm/track-04.mp3" },
+    { id: "echo-2", title: "寂石的哀忆", src: ROUTE_BASE + "/media/bgm/track-05.mp3" },
+    { id: "echo-3", title: "无言的忧惧", src: ROUTE_BASE + "/media/bgm/track-06.mp3" },
+    { id: "echo-4", title: "死夜深黯", src: ROUTE_BASE + "/media/bgm/track-07.mp3" },
+    { id: "echo-5", title: "苍镝呈光", src: ROUTE_BASE + "/media/bgm/track-08.mp3" }
   ],
   voice: {
     link: ROUTE_BASE + "/media/voice/line-01-link.mp3",
@@ -259,6 +261,7 @@ var STORAGE = {
   railOpen: "light-mirror:rail-open",
   musicOn: "light-mirror:music-on",
   musicTrack: "light-mirror:music-track",
+  musicLoop: "light-mirror:music-loop",
   musicVolume: "light-mirror:music-volume"
 };
 
@@ -1266,6 +1269,22 @@ html[data-lmui-scheme="light"] .lmui-rail__surface::after {
   height: 34px;
   color: var(--lmui-ink);
   border-color: color-mix(in srgb, var(--lmui-ink) 26%, transparent);
+}
+.lmui-music__btn--loop {
+  width: 28px;
+  height: 28px;
+  font-family: var(--lmui-mono);
+  color: var(--lmui-ink-dim);
+}
+.lmui-music__btn--loop[data-lmui-loop="single"],
+.lmui-music__btn--loop[data-lmui-loop="shuffle"] {
+  color: var(--lmui-ink);
+  border-color: color-mix(in srgb, var(--lmui-ink) 28%, transparent);
+}
+.lmui-music__loopGlyph {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0;
 }
 .lmui-music__btn:focus-visible {
   outline: none;
@@ -4050,6 +4069,13 @@ function PaimonHolo(props) {
   );
 }
 var BGM = Array.isArray(MEDIA.bgm) ? MEDIA.bgm : [];
+var MUSIC_LOOP_KEY = STORAGE && STORAGE.musicLoop || "light-mirror:music-loop";
+var LOOP_MODES = ["list", "single", "shuffle"];
+var LOOP_META = {
+  list: { glyph: "列", label: "列表循环" },
+  single: { glyph: "单", label: "单曲循环" },
+  shuffle: { glyph: "随", label: "随机循环" }
+};
 function readTrackIndex() {
   try {
     const raw = Number(window.localStorage.getItem(STORAGE.musicTrack));
@@ -4057,6 +4083,14 @@ function readTrackIndex() {
   } catch (e) {
   }
   return 0;
+}
+function readLoopMode() {
+  try {
+    const raw = window.localStorage.getItem(MUSIC_LOOP_KEY);
+    if (LOOP_MODES.indexOf(raw) >= 0) return raw;
+  } catch (e) {
+  }
+  return "list";
 }
 function readVolume() {
   try {
@@ -4070,14 +4104,24 @@ function MusicPlayer() {
   const [index, setIndex] = React3.useState(readTrackIndex);
   const [volume, setVolume] = React3.useState(readVolume);
   const [playing, setPlaying] = React3.useState(false);
+  const [loopMode, setLoopMode] = React3.useState(readLoopMode);
   const [error, setError] = React3.useState("");
   const [time, setTime] = React3.useState({ current: 0, duration: 0 });
   const audioRef = React3.useRef(null);
   const playingRef = React3.useRef(false);
+  const historyRef = React3.useRef([]);
   React3.useEffect(() => {
     playingRef.current = playing;
   }, [playing]);
   const track = BGM[index] || null;
+  React3.useEffect(() => {
+    try {
+      window.localStorage.setItem(MUSIC_LOOP_KEY, loopMode);
+    } catch (e) {
+    }
+    const audio = audioRef.current;
+    if (audio) audio.loop = loopMode === "single";
+  }, [loopMode]);
   React3.useEffect(() => {
     try {
       window.localStorage.setItem(STORAGE.musicTrack, String(index));
@@ -4085,6 +4129,11 @@ function MusicPlayer() {
     }
     const audio = audioRef.current;
     if (!audio) return;
+    setTime({ current: 0, duration: 0 });
+    try {
+      audio.currentTime = 0;
+    } catch (e) {
+    }
     try {
       audio.volume = volume;
       audio.load();
@@ -4140,11 +4189,69 @@ function MusicPlayer() {
     setPlaying(false);
   };
   const toggle = () => playing ? pause() : play();
+  const pickShuffle = (current) => {
+    if (BGM.length <= 1) return current;
+    let next = current;
+    let guard = 0;
+    while (next === current && guard < 24) {
+      next = Math.floor(Math.random() * BGM.length);
+      guard += 1;
+    }
+    return next;
+  };
   const step = (delta) => {
     if (BGM.length === 0) return;
     setError("");
+    if (loopMode === "shuffle") {
+      if (delta < 0 && historyRef.current.length > 0) {
+        setIndex(historyRef.current.pop());
+        return;
+      }
+      if (delta > 0) {
+        historyRef.current.push(index);
+        if (historyRef.current.length > 50) historyRef.current.shift();
+        setIndex(pickShuffle(index));
+        return;
+      }
+    }
     setIndex((prev) => (prev + delta + BGM.length) % BGM.length);
   };
+  const cycleLoop = () => {
+    setLoopMode((prev) => LOOP_MODES[(LOOP_MODES.indexOf(prev) + 1) % LOOP_MODES.length]);
+  };
+  const handleEnded = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (BGM.length === 0) {
+      setPlaying(false);
+      return;
+    }
+    if (loopMode === "single") {
+      try {
+        audio.currentTime = 0;
+      } catch (e) {
+      }
+      setTime({ current: 0, duration: audio.duration || 0 });
+      play();
+      return;
+    }
+    if (BGM.length === 1) {
+      try {
+        audio.currentTime = 0;
+      } catch (e) {
+      }
+      play();
+      return;
+    }
+    if (loopMode === "shuffle") {
+      historyRef.current.push(index);
+      if (historyRef.current.length > 50) historyRef.current.shift();
+      setIndex(pickShuffle(index));
+      return;
+    }
+    setIndex((prev) => (prev + 1) % BGM.length);
+  };
+  const loopMeta = LOOP_META[loopMode] || LOOP_META.list;
   return h3(
     "div",
     { className: "lmui-music" },
@@ -4157,7 +4264,7 @@ function MusicPlayer() {
         h3("span", { className: "lmui-rail__sectionTitle" }, UI_COPY.railMusic),
         h3("span", { className: "lmui-music__title" }, track.title)
       ),
-      h3("span", { className: "lmui-music__count" }, index + 1 + " / " + BGM.length)
+      h3("span", { className: "lmui-music__count", "data-lmui-loop": loopMode }, index + 1 + " / " + BGM.length + " · " + loopMeta.label)
     ),
     h3(
       "div",
@@ -4209,6 +4316,18 @@ function MusicPlayer() {
         h3(IconNext, null)
       ),
       h3(
+        "button",
+        {
+          type: "button",
+          className: "lmui-music__btn lmui-music__btn--loop",
+          "data-lmui-loop": loopMode,
+          title: "循环模式：" + loopMeta.label + "（点击切换）",
+          "aria-label": "循环模式：" + loopMeta.label + "，点击切换",
+          onClick: cycleLoop
+        },
+        h3("span", { className: "lmui-music__loopGlyph", "aria-hidden": "true" }, loopMeta.glyph)
+      ),
+      h3(
         "div",
         { className: "lmui-music__volume" },
         h3("input", {
@@ -4236,10 +4355,7 @@ function MusicPlayer() {
         const audio = event.currentTarget;
         setTime((prev) => Object.assign({}, prev, { duration: audio.duration || 0 }));
       },
-      onEnded: () => {
-        if (BGM.length > 1) step(1);
-        else setPlaying(false);
-      },
+      onEnded: handleEnded,
       onError: () => {
         setPlaying(false);
         setError("音频素材尚未就绪");
