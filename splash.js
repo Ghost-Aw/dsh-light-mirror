@@ -88,6 +88,8 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     bgMotion: true,
     // 背景动态（渐变/光晕/数据流/星点）
     /* 启动动画 */
+    /* 新会话页 Hero 标题（设置可改；空字符串回退默认） */
+    heroTitle: "封锁已至之境",
     splashEnabled: true,
     splashMode: "session",
     // session | daily | every
