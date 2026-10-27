@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>光之镜 · 天空岛 — 启动动画独立预览 v5</title>
+<!--
+  ============================================================================
+  光之镜 · 天空岛 — splash 独立预览（v5：深色光带 → 白星填充/抖动/爆发 → WebGL 转场）
+  ----------------------------------------------------------------------------
+  用途：不安装插件、不启动 Host，直接用浏览器打开本文件验证启动动画。
+  引用构建产物 ../splash.css 与 ../splash.js（先执行
+  `node build.mjs --only=splash`），自带深色终端主界面 mock，
+  用于验证 WebGL 转场后是否正确露出主界面、结束后是否释放页面。
+
+  时间轴（1×，总长 10.2s，无跳过键）：
+    0~3.0    深色光带场（竖直上浮光带，左右多中间少、整体中间凹陷）；语音①@1.4；
+             1.9 全白细长十字星浮现
+    3.0~5.6  深色自下而上填充十字星（clip 0→1）
+    5.6~6.3  高频抖动（40–60ms，±3–6%），语音②@5.2
+    6.3~7.6  爆发（放射光/RGB 色散/星点/环/虹彩羽状弧）→ 全屏白
+    7.9~9.1  WebGL 四阶段 glitch 转场（预热/拉伸/撕裂/稳定；y'=y+A*N、RGB x 偏移、分组 α）
+    9.4 揭开主界面，10.2 释放页面
+
+  调试参数（仅 file:// / localhost / ?lmdebug 生效）：
+    ?t=<秒> / ?freeze=<秒>   把时间轴 seek 到某一刻并冻结（确定性截图）
+    &at=0..1                 按总长比例指定；&hold=<秒> 真实播放到该秒后暂停
+    &play=1 / &mute=1 / &reduced=1 / &stats=1 / &finish=1
+
+  截图/QA：`node "lm-work/qa/v5-qa.mjs"`（真实播放 hold + 阶段截图 + 释放/reduced/pageErrors）
+  ============================================================================
+-->
+<link rel="stylesheet" href="../splash.css">
+<style>
+  /* ── mock 主界面：v2 终端（深色）风格，只用于 wipe 透出验证 ───────────── */
+  :root {
+    --m-void: #0b0a0e;
+    --m-void-2: #121116;
+    --m-void-3: #18161c;
+    --m-void-4: #1f1d24;
+    --m-line: #2a2831;
+    --m-line-2: #3a3742;
+    --m-white: #ededef;
+    --m-white-dim: #c8c8d6;
+    --m-text-2: #9a99a4;
+    --m-gold: #f3d295;
+    --m-serif: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", serif;
+    --m-sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    --m-mono: "Consolas", "SFMono-Regular", "Courier New", monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    overflow: hidden;
+    background: var(--m-void);
+    color: var(--m-white);
+    font-family: var(--m-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mock-shell {
+    display: flex;
+    height: 100vh;
+    min-height: 480px;
+  }
+
+  /* 侧栏 */
+  .mock-side {
+    width: 264px;
+    flex: 0 0 264px;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 18px 18px;
+    background: linear-gradient(180deg, #08070b 0%, #0d0c11 100%);
+    border-right: 1px solid var(--m-line);
+  }
+
+  .mock-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 6px 20px;
+    border-bottom: 1px solid rgba(237, 237, 239, 0.1);
+  }
+
+  .mock-mark {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(237, 237, 239, 0.22);
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 42%, rgba(243, 210, 149, 0.24) 0%, rgba(18, 17, 22, 0.9) 68%);
+    color: var(--m-white);
+  }
+
+  .mock-mark svg {
+    width: 22px;
+    height: 22px;
+    display: block;
+  }
+
+  .mock-name {
+    font-family: var(--m-serif);
+    font-size: 19px;
+    letter-spacing: 0.16em;
+    color: var(--m-white);
+  }
+
+  .mock-sub {
+    margin-top: 3px;
+    font-size: 8px;
+    letter-spacing: 0.42em;
+    color: var(--m-text-2);
+  }
+
+  .mock-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 18px 0;
+  }
+
+  .mock-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--m-text-2);
+  }
+
+  .mock-nav-item.is-active {
+    background: rgba(237, 237, 239, 0.06);
+    color: var(--m-white);
+    box-shadow: inset 0 0 0 1px rgba(237, 237, 239, 0.14);
+  }
+
+  .mock-nav-glyph {
+    width: 7px;
+    height: 7px;
+    rotate: 45deg;
+    border: 1px solid rgba(237, 237, 239, 0.5);
+    background: rgba(237, 237, 239, 0.08);
+  }
+
+  .mock-nav-item.is-active .mock-nav-glyph {
+    background: var(--m-white);
+    box-shadow: 0 0 8px rgba(237, 237, 239, 0.6);
+  }
+
+  .mock-side-foot {
+    margin-top: auto;
+    padding: 14px 8px 2px;
+    border-top: 1px solid rgba(237, 237, 239, 0.1);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--m-text-2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mock-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #8fb3a8;
+    box-shadow: 0 0 8px rgba(143, 179, 168, 0.8);
+  }
+
+  /* 主区 */
+  .mock-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: radial-gradient(120% 90% at 50% 0%, #17151b 0%, #0f0e13 52%, #0b0a0e 100%);
+  }
+
+  .mock-top {
+    height: 52px;
+    flex: 0 0 52px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 26px;
+    border-bottom: 1px solid rgba(237, 237, 239, 0.08);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    color: var(--m-text-2);
+  }
+
+  .mock-top-online {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    color: var(--m-white-dim);
+  }
+
+  .mock-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding-bottom: 7vh;
+  }
+
+  .mock-hero-mark {
+    width: 104px;
+    height: 104px;
+    display: grid;
+    place-items: center;
+    rotate: 45deg;
+    border: 1px solid rgba(237, 237, 239, 0.24);
+    background: radial-gradient(circle at 50% 42%, rgba(243, 210, 149, 0.2) 0%, rgba(20, 19, 25, 0.92) 70%);
+    box-shadow: 0 0 0 6px rgba(237, 237, 239, 0.03), 0 24px 70px rgba(0, 0, 0, 0.6),
+      inset 0 0 32px rgba(243, 210, 149, 0.12);
+    color: var(--m-white);
+  }
+
+  .mock-hero-mark svg {
+    width: 54px;
+    height: 54px;
+    display: block;
+    rotate: -45deg;
+  }
+
+  .mock-hero h1 {
+    margin: 10px 0 0;
+    font-family: var(--m-serif);
+    font-size: 38px;
+    font-weight: 400;
+    letter-spacing: 0.26em;
+    padding-left: 0.26em;
+    color: var(--m-white);
+  }
+
+  .mock-hero-sub {
+    font-size: 9px;
+    letter-spacing: 0.52em;
+    color: var(--m-text-2);
+  }
+
+  .mock-hero-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--m-text-2);
+  }
+
+  .mock-hero-link::before,
+  .mock-hero-link::after {
+    content: "";
+    width: 64px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(237, 237, 239, 0.4));
+  }
+
+  .mock-hero-link::after {
+    background: linear-gradient(90deg, rgba(237, 237, 239, 0.4), transparent);
+  }
+
+  .mock-composer-wrap {
+    padding: 0 26px 26px;
+  }
+
+  .mock-composer {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 60px;
+    padding: 0 18px;
+    border: 1px solid var(--m-line-2);
+    border-radius: 14px;
+    background: rgba(18, 17, 22, 0.9);
+    box-shadow: inset 0 1px 0 rgba(237, 237, 239, 0.04), 0 14px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .mock-composer-line {
+    flex: 1;
+    height: 10px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(237, 237, 239, 0.13) 0 38%, transparent 38%);
+  }
+
+  .mock-send {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #f4f2f5, #c8c8d6);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+
+  .mock-send::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    rotate: 45deg;
+    border-top: 1.6px solid #0b0a0e;
+    border-right: 1.6px solid #0b0a0e;
+  }
+
+  .mock-hint {
+    position: fixed;
+    left: 12px;
+    bottom: 10px;
+    z-index: 10;
+    padding: 5px 9px;
+    border: 1px solid rgba(237, 237, 239, 0.16);
+    border-radius: 4px;
+    background: rgba(11, 10, 14, 0.72);
+    font-family: var(--m-mono);
+    font-size: 9px;
+    color: rgba(200, 200, 214, 0.7);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <!-- mock DSH 主界面（wipe 后透出；结束后应恢复可交互） -->
+  <div class="mock-shell">
+    <aside class="mock-side">
+      <div class="mock-brand">
+        <span class="mock-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+            <circle cx="24" cy="24" r="20" opacity=".35"/>
+            <path d="M24 9v22M24 33c-4.5 0-8 3-8 6.5M24 33c4.5 0 8 3 8 6.5"/>
+            <circle cx="24" cy="15" r="2.6"/>
+          </svg>
+        </span>
+        <span>
+          <div class="mock-name">光之镜</div>
+          <div class="mock-sub">LIGHT MIRROR</div>
+        </span>
+      </div>
+      <nav class="mock-nav">
+        <div class="mock-nav-item is-active"><i class="mock-nav-glyph"></i>天空岛链接</div>
+        <div class="mock-nav-item"><i class="mock-nav-glyph"></i>观测</div>
+        <div class="mock-nav-item"><i class="mock-nav-glyph"></i>ONLINE</div>
+      </nav>
+      <div class="mock-side-foot"><i class="mock-dot"></i>天空岛链接 · ONLINE</div>
+    </aside>
+    <main class="mock-main">
+      <header class="mock-top">
+        <span>光之镜</span>
+        <span class="mock-top-online"><i class="mock-dot"></i>ONLINE</span>
+      </header>
+      <section class="mock-hero">
+        <div class="mock-hero-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+            <circle cx="24" cy="24" r="15" opacity=".8"/>
+            <path d="M24 6v13M24 31v11M6 24h13M31 24h11"/>
+            <path d="M13 13l5 5M35 13l-5 5M13 35l5-5M35 35l-5-5" opacity=".6"/>
+          </svg>
+        </div>
+        <h1>光之镜</h1>
+        <div class="mock-hero-sub">LIGHT MIRROR</div>
+        <div class="mock-hero-link">天空岛链接</div>
+      </section>
+      <div class="mock-composer-wrap">
+        <div class="mock-composer">
+          <div class="mock-composer-line"></div>
+          <div class="mock-send" aria-hidden="true"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="mock-hint">PREVIEW v3 · ?t=秒 / &amp;at=0..1 / &amp;hold=秒 / &amp;play=1 / &amp;mute=1 / &amp;reduced=1 / &amp;stats=1 / &amp;finish=1</div>
+
+  <!-- 预览侧配置（与 src/shared/content.js 的 DEFAULTS 等价；正常由 Host 注入） -->
+  <script>
+    window.__LIGHT_MIRROR_PREVIEW__ = true;
+    window.__LIGHT_MIRROR_BOOT__ = "preview";
+    window.__LIGHT_MIRROR_VERSION__ = "3.0.0";
+    window.__LIGHT_MIRROR__ = {
+      enabled: true,
+      uiMode: "auto",
+      frame: true,
+      stardust: true,
+      rail: true,
+      music: true,
+      mascot: true,
+      statusLine: true,
+      splashEnabled: true,
+      splashMode: "every",
+      voice: true,
+      voiceVolume: 0.85,
+      sfx: true,
+      sfxVolume: 0.5
+    };
+    /* 素材未产出前的构图自查兜底（仅 file:// 预览生效） */
+    window.__LIGHT_MIRROR_DEV_FALLBACK__ = {
+      sceneTerminal: "../../lm-work/selected/terminal/mirror-frame-full-187.7333.png",
+      sceneWide: "../../lm-work/selected/terminal/temple-mirror-185.6333.png",
+      paimonHolo: "../media/art/paimon-guide.png"
+    };
+  </script>
+  <script defer src="../splash.js"></script>
+</body>
+</html>

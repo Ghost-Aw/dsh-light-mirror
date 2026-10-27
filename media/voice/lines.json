@@ -1,0 +1,47 @@
+{
+  "source": "光之镜/原神7.2前瞻PV.mp4 (246.89s) · 分离人声 stem：原神7.2前瞻PV_vocals_karaoke_noreverb.wav（主唱 / 主对白）+ 原神7.2前瞻PV_vocals_other.wav（系统语音 / 次要对白）",
+  "model": "faster-whisper large-v3 + large-v3-turbo (CTranslate2 int8, CPU)；文本以 PV 硬字幕逐帧核对为准",
+  "lines": [
+    {
+      "id": "link",
+      "text": "正在链接天空岛",
+      "file": "line-01-link.mp3",
+      "start": 8.98,
+      "end": 11.16,
+      "duration": 2.42
+    },
+    {
+      "id": "welcome",
+      "text": "欢迎来到世界",
+      "file": "line-02-welcome.mp3",
+      "start": 21.7,
+      "end": 25.45,
+      "duration": 3.99
+    },
+    {
+      "id": "skyIsland",
+      "text": "天空岛欢迎你们",
+      "file": "line-03-skyisland.mp3",
+      "start": 229.38,
+      "end": 232.45,
+      "duration": 3.31
+    },
+    {
+      "id": "alert",
+      "text": "检测到外部目标",
+      "file": "line-04-alert.mp3",
+      "start": 183.98,
+      "end": 186.0,
+      "duration": 2.26
+    },
+    {
+      "id": "error",
+      "text": "检测到…错误…错误…",
+      "file": "line-05-error.mp3",
+      "start": 196.78,
+      "end": 200.3,
+      "duration": 3.76
+    }
+  ],
+  "notes": "start/end 为源 stem 内时间码（秒），duration 为 mp3 实际时长。全部：44.1kHz 单声道 mp3 96kbps、前后各 120ms 数字静音、10ms 淡入淡出（淡变位于人声起止处）、70Hz 高通、two-pass linear loudnorm I=-16 TP=-1.5 LRA=11（实测 I=-16.3~-16.4 LUFS，true peak -1.8~-2.3 dBFS，解码峰值≤0.812，无削波）。stem 归属：line-01 取自 vocals_other（该句在 PV 中重复两遍：8.9-11.1 与 11.9-14.0，取第一遍；karaoke 人声 stem 中该句偏弱）；line-02 取自 vocals_karaoke_noreverb；line-03 取自 vocals_other（karaoke 人声 stem 在 229-232s 为数字静音，系统语音整段在 vocals_other）；line-04/05 为额外找到的光之镜系统语音台词（可选使用）。"
+}

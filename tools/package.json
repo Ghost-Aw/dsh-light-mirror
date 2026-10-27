@@ -1,0 +1,10 @@
+{
+  "name": "light-mirror-tools",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Local build tooling for dsh-light-mirror (esbuild only).",
+  "dependencies": {
+    "esbuild": "^0.25.12"
+  }
+}

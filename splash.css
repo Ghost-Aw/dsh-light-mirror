@@ -1,0 +1,1426 @@
+﻿/* ============================================================================
+ * 鍏変箣闀?路 澶╃┖宀?鈥?splash v5 鏍峰紡
+ * ----------------------------------------------------------------------------
+ * 娣辫壊鍦烘櫙 + 涓嬩晶绔栫洿涓婃诞鍏夊甫锛堝乏鍙冲/涓棿灏戙€佹暣浣撲腑闂村嚬闄凤級
+ * 涓ぎ缁嗛暱鍗佸瓧鏄燂紙姝ｅ鸡涓嶈鍒欏缂橈級鈫?娣辫壊浠庝笅寰€涓婂～鍏?鈫?楂橀鎶栧姩 鈫? * 鏀惧皠鐖嗗彂锛圧GB 鑹叉暎/鏄熺偣/鐜?铏瑰僵缇界姸寮э級鈫?鍏ㄥ睆鐧?鈫?WebGL 鍥涢樁娈?glitch 杞満 鈫?涓荤晫闈? * ========================================================================== */
+
+/* 鈹€鈹€ 1. 椤甸潰澹?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+html.lm-lock,
+html.lm-lock body {
+  overflow: hidden !important;
+}
+
+html.lm-lock {
+  background: #0b0a0e;
+}
+
+#light-mirror-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 2147482999;
+  background: #0b0a0e;
+  opacity: 1;
+  pointer-events: none;
+}
+
+#light-mirror-root.lm-root {
+  --lm-void: #0b0a0e;
+  --lm-bg-1: #101018;
+  --lm-bg-2: #16151d;
+  --lm-bg-3: #1b1a22;
+  --lm-white: #ffffff;
+  --lm-white-soft: #eef2ff;
+  --lm-cyan: #a8c8e0;
+  --lm-pink: #e8b8cf;
+  --lm-gold: #f0dfbf;
+  --lm-serif: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", serif;
+  --lm-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --lm-mono: "Consolas", "SFMono-Regular", "Courier New", monospace;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  overflow: hidden;
+  background: var(--lm-void);
+  color: #eef2ff;
+  font-family: var(--lm-sans);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+#light-mirror-root.lm-root *,
+#light-mirror-root.lm-root *::before,
+#light-mirror-root.lm-root *::after {
+  box-sizing: border-box;
+}
+
+.lm-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--lm-bg-1);
+}
+
+/* 鈹€鈹€ 2. 娣辫壊鑳屾櫙 / 闆?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(120% 70% at 50% 78%, rgba(92, 94, 112, 0.2) 0%, rgba(22, 21, 29, 0) 62%),
+    linear-gradient(180deg, #101018 0%, #14131b 52%, #1b1a22 100%);
+}
+
+.lm-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image: radial-gradient(1.2px 1.2px at 12% 24%, rgba(226, 232, 248, 0.7), transparent 2px),
+    radial-gradient(1px 1px at 28% 63%, rgba(200, 210, 236, 0.6), transparent 1.8px),
+    radial-gradient(1.4px 1.4px at 44% 18%, rgba(240, 244, 255, 0.6), transparent 2.2px),
+    radial-gradient(1px 1px at 62% 38%, rgba(210, 220, 244, 0.55), transparent 1.8px),
+    radial-gradient(1.2px 1.2px at 76% 71%, rgba(230, 236, 252, 0.6), transparent 2px),
+    radial-gradient(1px 1px at 88% 22%, rgba(210, 220, 244, 0.55), transparent 1.8px),
+    radial-gradient(1px 1px at 52% 82%, rgba(240, 244, 255, 0.45), transparent 1.8px),
+    radial-gradient(1.2px 1.2px at 66% 54%, rgba(220, 228, 248, 0.5), transparent 2px);
+  animation: lm-stars-twinkle 6.4s ease-in-out infinite;
+}
+
+.lm-fog {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(46% 40% at 22% 82%, rgba(160, 172, 205, 0.14) 0%, transparent 70%),
+    radial-gradient(40% 34% at 78% 76%, rgba(198, 178, 196, 0.1) 0%, transparent 72%),
+    radial-gradient(60% 34% at 50% 92%, rgba(120, 132, 168, 0.1) 0%, transparent 76%);
+  
+  animation: lm-fog-breathe 9s ease-in-out infinite;
+}
+
+/* 鈹€鈹€ 3. 绔栫洿涓婃诞鍏夊甫锛堝乏鍙冲/涓棿灏戙€佹暣浣撲腑闂村嚬闄凤級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-bands {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 74%;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);
+}
+
+.lm-bands > i {
+  position: absolute;
+  bottom: 0;
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+  display: block;
+  border-radius: 50% / 6%;
+  background: linear-gradient(180deg, transparent 0%, var(--tint) 42%, rgba(255, 255, 255, 0.92) 74%, transparent 100%);
+  box-shadow: 0 0 14px rgba(220, 230, 250, 0.28), 0 0 40px rgba(180, 198, 235, 0.16);
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: lm-band-float var(--dur) var(--delay) ease-in-out infinite;
+}
+
+/* 鈹€鈹€ 4. 涓ぎ缁嗛暱鍗佸瓧鏄燂紙姝ｅ鸡涓嶈鍒欏缂橈級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-star-wrap {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  z-index: 7;
+  width: min(34vmin, 380px);
+  height: min(72vmin, 800px);
+  translate: -50% -50%;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lm-star-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220%;
+  height: 120%;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.42) 0%, rgba(214, 226, 250, 0.18) 32%, transparent 68%);
+  
+  animation: lm-star-glow 3.6s ease-in-out infinite;
+}
+
+.lm-star-base,
+.lm-star-fill,
+.lm-star-ghost {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.lm-star-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 涓夊眰鏄熶綋锛氬ぇ鏄燂紙妯＄硦+鍣尝瑁佽竟锛夆啋 涓槦 white锛堟寲绌哄ぇ鏄燂級鈫?灏忔槦 dark锛堢敓闀块儴鍒嗭級 */
+.lm-star-large {
+  fill: #ffffff;
+  opacity: 0.97;
+}
+
+.lm-star-medium {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.42)) drop-shadow(0 0 26px rgba(214, 226, 250, 0.28));
+}
+
+/* 娣辫壊閮ㄥ垎 = 涓ぎ灏忓崄瀛楁槦锛屼粠涓嬪線涓婄敓闀匡紙clip 杩涘害鐢?JS 璁剧疆 --clipPct=(1-p)*100%锛?*/
+.lm-star-fill {
+  clip-path: inset(var(--clipPct, 100%) 0 0 0);
+}
+
+.lm-star-small {
+  fill: #0d0c14;
+  filter: drop-shadow(0 0 10px rgba(9, 8, 14, 0.9));
+}
+
+/* RGB 鑹叉暎 ghost锛堢垎鍙?鎶栧姩鏃跺嚭鐜帮級 */
+.lm-star-ghost {
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.lm-star-ghost .lm-star-large,
+.lm-star-ghost .lm-star-medium {
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.lm-star-ghost-cyan {
+  color: #7fd8e8;
+}
+
+.lm-star-ghost-cyan .lm-star-large,
+.lm-star-ghost-cyan .lm-star-medium {
+  fill: rgba(127, 216, 232, 0.55);
+}
+
+.lm-star-ghost-pink {
+  color: #e88fd0;
+}
+
+.lm-star-ghost-pink .lm-star-large,
+.lm-star-ghost-pink .lm-star-medium {
+  fill: rgba(232, 143, 208, 0.5);
+}
+
+/* 鈹€鈹€ 5. 鐖嗗彂锛氭斁灏勫厜 / 鐜?/ 铏瑰僵缇界姸寮?/ 鏄熺偣 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-burst {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.lm-burst::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 170vmin;
+  height: 170vmin;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.96) 0%, rgba(255, 250, 242, 0.62) 20%, rgba(226, 236, 252, 0.26) 46%, transparent 72%);
+  
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.lm-bursting .lm-burst::before {
+  animation: lm-burst-core 1.4s ease-in both;
+}
+
+/* v6 涓夐樁娈典寒搴︽帶鍒讹細burst1/2 淇濇寔娣辫壊鑳屾櫙锛堝浘13/15锛夛紝burst3 鎵嶅揩閫熸彁浜埌鐧藉満 */
+.lm-burst1 .lm-burst::before {
+  animation: none;
+  opacity: 0.22;
+}
+
+.lm-burst2 .lm-burst::before {
+  animation: none;
+  opacity: 0.4;
+}
+
+.lm-burst1 .lm-glow {
+  opacity: 0.85;
+}
+
+.lm-burst2 .lm-glow {
+  opacity: 1;
+}
+
+.lm-burst3 .lm-glow {
+  opacity: 0.95;
+}
+
+.lm-burst3 .lm-burst::before {
+  animation: none;
+  opacity: 0.2;
+}
+
+.lm-burst3 .lm-star-glow {
+  animation: none;
+  opacity: 0.35;
+}
+
+.lm-burst1 .lm-star-glow,
+.lm-burst2 .lm-star-glow {
+  animation: none;
+}
+
+.lm-burst1 .lm-star-glow {
+  opacity: 0.3;
+}
+
+.lm-burst2 .lm-star-glow {
+  opacity: 0.45;
+}
+
+.lm-rays {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 240vmax;
+  height: 240vmax;
+  translate: -50% -50%;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 255, 255, 0.085) 0deg 1.4deg,
+    rgba(255, 255, 255, 0) 1.4deg 5.6deg,
+    rgba(224, 234, 255, 0.07) 5.6deg 7deg,
+    rgba(255, 255, 255, 0) 7deg 12.4deg
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 8%, rgba(0, 0, 0, 0.7) 22%, transparent 54%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0 8%, rgba(0, 0, 0, 0.7) 22%, transparent 54%);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.lm-rings {
+  position: absolute;
+  inset: 0;
+}
+
+.lm-rings > i {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 26vmin;
+  height: 26vmin;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 26px rgba(214, 226, 250, 0.28), inset 0 0 18px rgba(255, 255, 255, 0.18);
+  opacity: 0;
+}
+
+.lm-rings > i:nth-child(2) {
+  width: 42vmin;
+  height: 42vmin;
+  border-color: rgba(232, 184, 207, 0.4);
+  box-shadow: 0 0 30px rgba(232, 184, 207, 0.22);
+}
+
+.lm-rings > i:nth-child(3) {
+  width: 60vmin;
+  height: 60vmin;
+  border-color: rgba(168, 200, 224, 0.32);
+  box-shadow: 0 0 40px rgba(168, 200, 224, 0.18);
+}
+
+.lm-feather {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 190vmax;
+  height: 190vmax;
+  translate: -50% -50%;
+  background: conic-gradient(
+      from 12deg at 50% 50%,
+      rgba(168, 200, 224, 0.16) 0deg 8deg,
+      transparent 8deg 36deg,
+      rgba(232, 184, 207, 0.15) 36deg 46deg,
+      transparent 46deg 88deg,
+      rgba(240, 223, 191, 0.14) 88deg 98deg,
+      transparent 98deg 144deg,
+      rgba(200, 214, 232, 0.14) 144deg 158deg,
+      transparent 158deg 208deg,
+      rgba(232, 184, 207, 0.12) 208deg 224deg,
+      transparent 224deg 276deg,
+      rgba(168, 200, 224, 0.12) 276deg 290deg,
+      transparent 290deg 360deg
+    ),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 27px);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 12%, #000 26%, rgba(0, 0, 0, 0.7) 44%, transparent 66%);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 0 12%, #000 26%, rgba(0, 0, 0, 0.7) 44%, transparent 66%);
+  
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.lm-sparks {
+  position: absolute;
+  inset: 0;
+}
+
+.lm-sparks > i {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 22px rgba(200, 220, 250, 0.5);
+  opacity: 0;
+}
+
+/* 鈹€鈹€ 6. 鐧藉睆 / 鏂板満鏅?/ WebGL 杞満 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-newscene {
+  display: none;
+}
+
+/* 閫忔槑 WebGL 鐢诲竷锛氱櫧鍦烘挄瑁傚悗鐩存帴閫忓嚭涓嬫柟鐪熷疄涓荤晫闈紙DOM锛?*/
+.lm-webgl {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: transparent;
+}
+
+.lm-white {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lm-subtitle {
+  position: absolute;
+  left: 50%;
+  bottom: 8.4%;
+  z-index: 10;
+  translate: -50% 8px;
+  font-family: var(--lm-serif);
+  font-size: clamp(14px, 1.3vw, 19px);
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+  white-space: nowrap;
+  color: rgba(248, 250, 255, 0.95);
+  text-shadow: 0 0 22px rgba(0, 0, 0, 0.75), 0 0 40px rgba(210, 222, 245, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease, translate 0.7s ease;
+}
+
+.lm-subtitle.is-on {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+.lm-fail {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 30;
+  translate: -50% -50%;
+  padding: 10px 18px;
+  font-family: var(--lm-serif);
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  color: #eef2ff;
+  background: rgba(11, 10, 14, 0.8);
+  border: 1px solid rgba(220, 228, 248, 0.2);
+}
+
+.lm-fail[hidden] {
+  display: none;
+}
+
+.lm-debug {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 40;
+  padding: 6px 10px;
+  border: 1px solid rgba(168, 200, 224, 0.3);
+  background: rgba(0, 0, 0, 0.55);
+  font-family: var(--lm-mono);
+  font-size: 11px;
+  color: #c8d6e0;
+}
+
+/* 鈹€鈹€ 7. 鐘舵€佺被锛氬～鍏呭畬鎴?/ 鎶栧姩 / 鐧藉睆 / 杞満 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-star-on .lm-star-wrap {
+  animation: lm-star-in 1.5s ease-out both;
+}
+
+/* 鏄熺偣锛?8 涓笉鍚屾柟鍚戯紙鐖嗗彂鏃跺悜澶栭鏁ｏ級 */
+.lm-sparks > i:nth-child(1) {
+  --sx: -180px;
+  --sy: -120px;
+}
+.lm-sparks > i:nth-child(2) {
+  --sx: -120px;
+  --sy: -200px;
+}
+.lm-sparks > i:nth-child(3) {
+  --sx: -60px;
+  --sy: -260px;
+}
+.lm-sparks > i:nth-child(4) {
+  --sx: 40px;
+  --sy: -240px;
+}
+.lm-sparks > i:nth-child(5) {
+  --sx: 110px;
+  --sy: -180px;
+}
+.lm-sparks > i:nth-child(6) {
+  --sx: 190px;
+  --sy: -80px;
+}
+.lm-sparks > i:nth-child(7) {
+  --sx: 240px;
+  --sy: 20px;
+}
+.lm-sparks > i:nth-child(8) {
+  --sx: 200px;
+  --sy: 140px;
+}
+.lm-sparks > i:nth-child(9) {
+  --sx: 120px;
+  --sy: 220px;
+}
+.lm-sparks > i:nth-child(10) {
+  --sx: 40px;
+  --sy: 280px;
+}
+.lm-sparks > i:nth-child(11) {
+  --sx: -60px;
+  --sy: 260px;
+}
+.lm-sparks > i:nth-child(12) {
+  --sx: -140px;
+  --sy: 200px;
+}
+.lm-sparks > i:nth-child(13) {
+  --sx: -220px;
+  --sy: 100px;
+}
+.lm-sparks > i:nth-child(14) {
+  --sx: -260px;
+  --sy: -10px;
+}
+.lm-sparks > i:nth-child(15) {
+  --sx: -220px;
+  --sy: -160px;
+}
+.lm-sparks > i:nth-child(16) {
+  --sx: 260px;
+  --sy: -140px;
+}
+.lm-sparks > i:nth-child(17) {
+  --sx: 160px;
+  --sy: 260px;
+}
+.lm-sparks > i:nth-child(18) {
+  --sx: -160px;
+  --sy: 260px;
+}
+
+.lm-webgl.is-out {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.lm-star-wrap.lm-shaking {
+  filter: brightness(1.25) drop-shadow(0 0 26px rgba(255, 255, 255, 0.5));
+}
+
+.lm-star-wrap.lm-shaking .lm-star-fill {
+  filter: brightness(1.1);
+}
+
+.lm-shaking .lm-star-ghost {
+  opacity: 0.75;
+  animation: lm-ghost-shake 0.12s steps(2) infinite;
+}
+
+.lm-star-ghost-cyan {
+  translate: -4px 0;
+}
+
+.lm-star-ghost-pink {
+  translate: 4px 0;
+}
+
+.lm-bursting .lm-burst {
+  opacity: 1;
+}
+
+.lm-bursting .lm-star-wrap {
+  animation: lm-star-burst 1.4s ease-in both;
+}
+
+.lm-bursting .lm-star-fill {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.lm-bursting .lm-star-glow {
+  opacity: 1;
+  animation: lm-glow-burst 1.3s ease-out both;
+}
+
+.lm-bursting .lm-star-ghost {
+  opacity: 0.9;
+  animation: lm-ghost-burst 1.1s ease-out both;
+}
+
+.lm-bursting .lm-star-ghost-cyan {
+  translate: -10px 0;
+}
+
+.lm-bursting .lm-star-ghost-pink {
+  translate: 10px 0;
+}
+
+.lm-bursting .lm-rays {
+  animation: lm-rays-burst 1.4s ease-out both;
+}
+
+.lm-bursting .lm-rings > i:nth-child(1) {
+  animation: lm-ring-burst 1.2s 0.05s ease-out both;
+}
+
+.lm-bursting .lm-rings > i:nth-child(2) {
+  animation: lm-ring-burst 1.35s 0.18s ease-out both;
+}
+
+.lm-bursting .lm-rings > i:nth-child(3) {
+  animation: lm-ring-burst 1.5s 0.3s ease-out both;
+}
+
+.lm-bursting .lm-feather {
+  animation: lm-feather-burst 1.5s ease-out both;
+}
+
+.lm-bursting .lm-sparks > i {
+  animation: lm-spark-burst 1.1s ease-out both;
+}
+
+.lm-whiteout .lm-white {
+  opacity: 1 !important;
+  animation: none !important;
+  transition: opacity 0.22s ease;
+}
+
+.lm-bursting .lm-white {
+  animation: none;
+}
+
+/* 鐧藉満鍙湪 burst3锛?.2s 璧凤級蹇€熸彁浜紱burst1/2 淇濇寔娣辫壊鏀惧皠鍦洪潰 */
+.lm-burst3 .lm-white {
+  animation: lm-white-in 0.16s 0.24s ease-in both;
+}
+
+.lm-transitioning .lm-webgl {
+  display: block;
+}
+
+/* 杞満鏈熼棿璁╃敾甯冧笅鏂圭洿鎺ユ槸鐪熷疄涓荤晫闈細闅愯棌鐧借壊鍦烘櫙灞傦紝
+   鐢诲竷鐢ㄩ€忔槑 alpha 鎾曡锛岄湶鍑?DOM锛堣€屼笉鏄?splash 鑷繁鐨勮儗鏅級銆?*/
+#light-mirror-root.lm-root.lm-transitioning,
+#light-mirror-root.lm-root.lm-transitioning .lm-scene {
+  background: transparent !important;
+}
+
+/* 鍏抽敭锛欻ost 鐨勯灞忛粦鑹?veil 浣嶄簬 splash 鏍逛箣涓嬨€佺湡瀹?DOM 涔嬩笂銆?   杞満鎾曡鏃跺繀椤绘妸瀹冧篃闅愯棌锛屽惁鍒欓€忔槑鐢诲竷闇插嚭鐨勫彧鏄函榛?veil锛岃€屼笉鏄湡瀹炰富鐣岄潰銆?*/
+html.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-veil,
+html.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-root {
+  background: transparent !important;
+}
+
+html.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-veil {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+html.lm-lock:has(#light-mirror-root.lm-transitioning),
+html.lm-lock:has(#light-mirror-root.lm-transitioning) body {
+  background: transparent !important;
+}
+
+.lm-transitioning .lm-bg,
+.lm-transitioning .lm-fog,
+.lm-transitioning .lm-bands,
+.lm-transitioning .lm-star-wrap,
+.lm-transitioning .lm-burst,
+.lm-transitioning .lm-white {
+  opacity: 0 !important;
+  transition: opacity 0.12s linear;
+  pointer-events: none;
+}
+
+.lm-transitioning .lm-white {
+  opacity: 0;
+  animation: none;
+  transition: opacity 0.1s ease;
+}
+
+.lm-transitioning .lm-newscene {
+  opacity: 1;
+  z-index: 8;
+}
+
+#light-mirror-root.lm-root.lm-revealing,
+#light-mirror-root.lm-root.lm-revealing .lm-scene {
+  background: transparent !important;
+}
+
+#light-mirror-root.lm-root.lm-revealing .lm-scene {
+  opacity: 0;
+  transition: opacity 0.26s ease;
+}
+
+#light-mirror-root.lm-root.lm-revealing .lm-scene * {
+  animation-play-state: paused !important;
+}
+
+#light-mirror-root.lm-root.lm-revealing .lm-subtitle {
+  opacity: 0 !important;
+  transition: none !important;
+}
+
+#light-mirror-root.lm-root.lm-revealing .lm-webgl,
+#light-mirror-root.lm-root.lm-revealing .lm-newscene {
+  opacity: 0 !important;
+  transition: opacity 0.22s ease !important;
+}
+
+.lm-fallback-transition .lm-newscene {
+  opacity: 0;
+  animation: lm-fallback-fade 1.2s ease both;
+}
+
+.lm-fallback-transition .lm-white {
+  animation: lm-white-in 1.2s ease both;
+}
+
+.lm-frozen .lm-scene * {
+  animation-play-state: paused !important;
+}
+
+/* 鈹€鈹€ 8. reduced-motion 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+.lm-reduced .lm-scene * {
+  animation: none !important;
+}
+
+.lm-reduced .lm-star-wrap {
+  opacity: 1;
+}
+
+.lm-reduced .lm-bands > i {
+  opacity: 0.4;
+}
+
+.lm-reduced .lm-fog,
+.lm-reduced .lm-burst {
+  display: none;
+}
+
+.lm-reduced .lm-white {
+  transition: opacity 0.35s ease;
+}
+
+/* 鈹€鈹€ 9. 灏忓睆 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+@media (max-width: 780px) {
+  .lm-star-wrap {
+    width: min(44vmin, 300px);
+    height: min(66vmin, 560px);
+    top: 46%;
+  }
+
+  .lm-bands {
+    height: 62%;
+  }
+
+  .lm-subtitle {
+    bottom: 6.2%;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+  }
+
+  .lm-rays {
+    width: 200vmax;
+    height: 200vmax;
+  }
+
+  /* 窄屏：放射光带整体缩短，确保外端不顶到屏幕边缘 */
+  .lm-radials {
+    transform: scale(0.68);
+  }
+}
+
+@media (max-height: 560px) and (min-width: 781px) {
+  .lm-star-wrap {
+    height: 76vmin;
+  }
+}
+
+/* 鈹€鈹€ 10. keyframes 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+@keyframes lm-stars-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes lm-fog-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes lm-band-float {
+  0% {
+    transform: translateY(0) scaleY(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: var(--op);
+  }
+  55% {
+    opacity: calc(var(--op) * 0.8);
+  }
+  88% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-58vh) scaleY(1.15);
+    opacity: 0;
+  }
+}
+
+@keyframes lm-band-flicker {
+  0%,
+  100% {
+    filter: none;
+  }
+  50% {
+    filter: none;
+  }
+}
+
+@keyframes lm-burst-core {
+  0% {
+    opacity: 0;
+    scale: 0.45;
+  }
+  55% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  100% {
+    opacity: 1;
+    scale: 2.6;
+  }
+}
+
+@keyframes lm-ghost-burst {
+  0% {
+    opacity: 0.3;
+    scale: 1;
+  }
+  40% {
+    opacity: 1;
+    scale: 1.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+@keyframes lm-star-in {
+  0% {
+    opacity: 0;
+    scale: 0.82;
+    
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    filter: none;
+  }
+}
+
+@keyframes lm-star-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes lm-ghost-shake {
+  0% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes lm-star-burst {
+  0% {
+    scale: 1;
+    filter: brightness(1.2);
+  }
+  55% {
+    scale: 1.35;
+    filter: brightness(2.4) blur(2px);
+  }
+  100% {
+    scale: 2.1;
+    filter: brightness(4) blur(10px);
+  }
+}
+
+@keyframes lm-glow-burst {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(3.2);
+  }
+}
+
+@keyframes lm-rays-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1) rotate(9deg);
+  }
+}
+
+@keyframes lm-ring-burst {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+@keyframes lm-feather-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1.25) rotate(16deg);
+  }
+}
+
+@keyframes lm-spark-burst {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 0.4;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--sx, 0) var(--sy, 0);
+    scale: 1.2;
+  }
+}
+
+@keyframes lm-white-in {
+  0% {
+    opacity: 0;
+  }
+  55% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes lm-fallback-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+ * v6 鐖嗗彂娈碉細閿愯竟鏀惧皠鍏夊甫锛? 绮?+ 3 缁嗭級+ 搴曡‖ + 妯＄硦鍗佸瓧鏄熷厜鏅? *          burst2锛氱粏甯﹀彉绮?搴曡‖鍑虹幇/澶у渾鐜?鏇村绔栧厜鏉? *          burst3锛氬褰╁厜/绾㈤粍钃濆垎灞?褰╄壊鐐?涓嶈鍒欏厜鏅曪紙fallback 杈圭紭姗欑孩榛勬斁灏勫厜锛? * ========================================================================== */
+
+/* ── 合并后的整体提亮层（单元素多层渐变，非三块独立光晕）──────────────────
+ * 中心大范围柔光 + 左下/右下自屏幕外向内的大范围角光（角点最亮、向中心衰减）。
+ * 角光曲线来自 图13 左下角实测（`v6-fig13-corner-measure.json`）：
+ *   归一化亮度 r/R: 0→1, .17→.79, .29→.69, .48→.46, .63→.32, .75→.18, .98→.07
+ *   R ≈ 52vmin（1920 实测约 520px，×1600/1920≈433px≈48vmin，取 52vmin 略大以衔接全屏）
+ * 只动 opacity（0 → .85，0.6s 连续渐入），burst2/3 继续平滑升到 1。 */
+.lm-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    /* 左下角：角点最亮，自外向内衰减 */
+    radial-gradient(
+      circle 52vmin at 0% 100%,
+      rgba(255, 244, 230, 0.52) 0%,
+      rgba(255, 240, 224, 0.47) 10%,
+      rgba(255, 236, 218, 0.38) 20%,
+      rgba(255, 232, 214, 0.30) 32%,
+      rgba(255, 230, 212, 0.22) 46%,
+      rgba(255, 228, 210, 0.13) 62%,
+      rgba(255, 226, 208, 0.06) 78%,
+      rgba(255, 224, 206, 0.02) 92%,
+      transparent 100%
+    ),
+    /* 右下角：角点最亮，自外向内衰减 */
+    radial-gradient(
+      circle 50vmin at 100% 100%,
+      rgba(255, 242, 228, 0.46) 0%,
+      rgba(255, 238, 222, 0.41) 10%,
+      rgba(255, 234, 216, 0.33) 21%,
+      rgba(255, 230, 212, 0.26) 33%,
+      rgba(255, 228, 210, 0.19) 47%,
+      rgba(255, 226, 208, 0.11) 63%,
+      rgba(255, 224, 206, 0.05) 79%,
+      rgba(255, 222, 204, 0.02) 92%,
+      transparent 100%
+    ),
+    /* 中心大范围柔光（连续过渡，不是独立光斑） */
+    radial-gradient(
+      circle 70vmin at 50% 47%,
+      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 253, 249, 0.17) 24%,
+      rgba(255, 251, 245, 0.10) 44%,
+      rgba(255, 249, 242, 0.04) 66%,
+      transparent 100%
+    ),
+    /* 底部整体微亮，把两角与中心连成连续带 */
+    linear-gradient(0deg, rgba(255, 238, 224, 0.1) 0%, rgba(255, 236, 222, 0.04) 26%, transparent 52%);
+  mix-blend-mode: screen;
+  transition: opacity 0.6s ease;
+  will-change: opacity;
+}
+
+/* 鏃嬭浆瀹瑰櫒 + 6 鏉￠攼杈规斁灏勫厜甯?*/
+.lm-radials {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform-origin: 50% 47%;
+  animation: lm-radials-spin 7s linear infinite;
+}
+
+.lm-bursting .lm-radials {
+  opacity: 1;
+}
+
+.lm-radial {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: var(--l);
+  height: var(--w);
+  translate: -50% -50%;
+  rotate: var(--a);
+  scale: var(--sx, 0.8) var(--sy, 0.8);
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(255, 255, 255, 0.16) 1px,
+    #ffffff 2.2px,
+    #ffffff calc(100% - 2.2px),
+    rgba(255, 255, 255, 0.16) calc(100% - 1px),
+    transparent 100%
+  );
+  /* 中心亮、向外沿长度逐渐衰减到 0；横向锐边（1–2px 过渡） */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.08) 8%,
+    rgba(0, 0, 0, 0.45) 24%,
+    #000 50%,
+    rgba(0, 0, 0, 0.45) 76%,
+    rgba(0, 0, 0, 0.08) 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.08) 8%,
+    rgba(0, 0, 0, 0.45) 24%,
+    #000 50%,
+    rgba(0, 0, 0, 0.45) 76%,
+    rgba(0, 0, 0, 0.08) 92%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  transition: scale 0.45s ease, opacity 0.3s ease;
+  animation: lm-radial-in 0.5s ease-out both;
+}
+
+/* 底衬光带：同元素 ::before，更宽（2.2×）、略暗（opacity .25–.4） */
+.lm-radial::before {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 50%;
+  height: calc(var(--w) * 2.2);
+  translate: 0 -50%;
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(255, 255, 255, 0.7) 12%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.7) 88%,
+    transparent 100%
+  );
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 0.45s ease;
+}
+
+.lm-burst1 .lm-radial {
+  --sx: 0.8;
+  --sy: 0.8;
+}
+
+.lm-burst2 .lm-radial {
+  --sx: 1;
+  --sy: 1;
+}
+
+/* 第二阶段：细带变粗（横向 scale 2.2×，只动 transform） */
+.lm-burst2 .lm-radial--thin {
+  --sy: 2.2;
+}
+
+.lm-burst2 .lm-radial::before {
+  opacity: 0.32;
+}
+
+.lm-burst3 .lm-radial {
+  --sx: 1.1;
+  --sy: 1.1;
+}
+
+.lm-burst3 .lm-radial--thin {
+  --sy: 2.2;
+}
+
+.lm-burst3 .lm-radial::before {
+  opacity: 0.38;
+}
+
+/* 妯＄硦缁嗛暱鐧借壊鍗佸瓧鏄熷厜鏅曪紙鐩栧湪涓ぎ鏄熶箣涓婏紝浣嗕腑澶槦 z-index 鏇撮珮淇濇寔鏈€鍓嶏級 */
+.lm-burstcross {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 66vmin;
+  height: 138vmin;
+  translate: -50% -50%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.lm-burstcross-svg {
+  width: 100%;
+  height: 100%;
+  opacity: 0.92;
+}
+
+.lm-burst1 .lm-burstcross,
+.lm-burst2 .lm-burstcross,
+.lm-burst3 .lm-burstcross {
+  opacity: 0.9;
+  animation: lm-burstcross-grow 1.4s ease-out both, lm-burstcross-spin 9s linear infinite;
+}
+
+/* burst 鏈熼澶栦笂娴珫鍏夋潯 */
+.lm-rise {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lm-rise > i {
+  position: absolute;
+  bottom: -2%;
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+  display: block;
+  border-radius: 50% / 5%;
+  background: linear-gradient(180deg, transparent 0%, rgba(220, 232, 255, 0.55) 40%, rgba(255, 255, 255, 0.95) 82%, transparent 100%);
+  box-shadow: 0 0 12px rgba(230, 240, 255, 0.35);
+  
+  mix-blend-mode: screen;
+  animation: lm-band-float var(--dur) var(--delay) infinite;
+}
+
+.lm-bursting .lm-rise {
+  opacity: 0.9;
+}
+
+/* 澶氬僵鍏夛紙burst3锛夛細绾㈤粍钃濆垎灞?+ 褰╄壊鐐?+ 涓嶈鍒欏厜鏅?*/
+.lm-dots {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image: radial-gradient(2px 2px at 12% 22%, rgba(255, 214, 140, 0.95), transparent 3px),
+    radial-gradient(2px 2px at 24% 68%, rgba(255, 120, 90, 0.9), transparent 3px),
+    radial-gradient(1.6px 1.6px at 36% 32%, rgba(255, 255, 255, 0.95), transparent 3px),
+    radial-gradient(2px 2px at 48% 76%, rgba(140, 210, 255, 0.9), transparent 3px),
+    radial-gradient(1.6px 1.6px at 58% 18%, rgba(255, 220, 120, 0.9), transparent 3px),
+    radial-gradient(2px 2px at 66% 58%, rgba(255, 150, 190, 0.9), transparent 3px),
+    radial-gradient(1.4px 1.4px at 74% 34%, rgba(180, 230, 255, 0.9), transparent 3px),
+    radial-gradient(2px 2px at 82% 72%, rgba(255, 190, 120, 0.9), transparent 3px),
+    radial-gradient(1.6px 1.6px at 90% 26%, rgba(255, 255, 255, 0.9), transparent 3px),
+    radial-gradient(1.8px 1.8px at 18% 84%, rgba(255, 170, 120, 0.85), transparent 3px),
+    radial-gradient(1.5px 1.5px at 44% 12%, rgba(255, 230, 170, 0.85), transparent 3px),
+    radial-gradient(1.8px 1.8px at 88% 88%, rgba(255, 140, 120, 0.85), transparent 3px);
+  mix-blend-mode: screen;
+  animation: lm-dots-twinkle 1.6s ease-in-out infinite;
+}
+
+.lm-burst3 .lm-dots {
+  opacity: 1;
+}
+
+.lm-iri {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 118vmax;
+  height: 118vmax;
+  translate: -50% -50%;
+  opacity: 0;
+  background: conic-gradient(
+      from 24deg at 50% 50%,
+      rgba(255, 92, 64, 0.34) 0deg 28deg,
+      rgba(255, 196, 96, 0.3) 28deg 62deg,
+      rgba(255, 240, 160, 0.26) 62deg 96deg,
+      rgba(120, 214, 255, 0.28) 96deg 150deg,
+      rgba(110, 150, 255, 0.24) 150deg 198deg,
+      rgba(255, 120, 210, 0.28) 198deg 252deg,
+      rgba(255, 92, 64, 0.3) 252deg 300deg,
+      rgba(255, 180, 110, 0.26) 300deg 360deg
+    ),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 186, 120, 0.24) 26%, transparent 58%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 18%, rgba(0, 0, 0, 0.85) 34%, transparent 64%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0 18%, rgba(0, 0, 0, 0.85) 34%, transparent 64%);
+  
+  mix-blend-mode: screen;
+  animation: lm-iri-spin 6s linear infinite;
+  transition: opacity 0.35s ease;
+}
+
+.lm-burst3 .lm-iri {
+  opacity: 1;
+}
+
+/* burst3 fallback锛氬睆骞曡竟缂樺ぇ閲忔/绾?榛勬ā绯婃斁灏勫厜甯︼紙鏈夌矖鏈夌粏锛?*/
+.lm-edge {
+  position: absolute;
+  inset: -12%;
+  opacity: 0;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 47%,
+    rgba(255, 148, 66, 0.42) 0deg 1.4deg,
+    rgba(255, 148, 66, 0) 1.4deg 4.6deg,
+    rgba(255, 92, 64, 0.34) 4.6deg 5.8deg,
+    rgba(255, 92, 64, 0) 5.8deg 9.4deg,
+    rgba(255, 214, 120, 0.36) 9.4deg 10.6deg,
+    rgba(255, 214, 120, 0) 10.6deg 14.2deg
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 47%, transparent 0 30%, rgba(0, 0, 0, 0.55) 48%, #000 66%, #000 100%);
+  mask-image: radial-gradient(circle at 50% 47%, transparent 0 30%, rgba(0, 0, 0, 0.55) 48%, #000 66%, #000 100%);
+  
+  mix-blend-mode: screen;
+  transition: opacity 0.35s ease;
+}
+
+.lm-burst3 .lm-edge {
+  opacity: 1;
+}
+
+/* burst 鏈熸棫鏁村睆鍏夋檿鍑忓急锛岃閿愯竟鍏夊甫鎴愪负涓昏 */
+.lm-burst1 .lm-rays,
+.lm-burst2 .lm-rays {
+  opacity: 0.15;
+}
+
+.lm-burst1 .lm-feather,
+.lm-burst2 .lm-feather {
+  opacity: 0.5;
+}
+
+.lm-burst2 .lm-rings > i:nth-child(1) {
+  animation-duration: 1.5s;
+}
+
+.lm-burst2 .lm-rings > i:nth-child(2) {
+  animation-duration: 1.6s;
+}
+
+.lm-burst2 .lm-rings > i:nth-child(3) {
+  animation-duration: 1.7s;
+}
+
+@keyframes lm-radials-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes lm-radial-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lm-burstcross-grow {
+  0% {
+    scale: 0.5;
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.85;
+  }
+  100% {
+    scale: 1.55;
+    opacity: 0.9;
+  }
+}
+
+@keyframes lm-burstcross-spin {
+  from {
+    rotate: -10deg;
+  }
+  to {
+    rotate: 14deg;
+  }
+}
+
+@keyframes lm-iri-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes lm-dots-twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+
+
+
+

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>光之镜 · 天空岛 — 主界面预览 v2</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      #mock-root {
+        height: 100%;
+      }
+      #mock-boot {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font: 13px/1.6 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: #9a99a4;
+        background: #0b0a0e;
+        z-index: 9999;
+      }
+      #mock-errors {
+        position: fixed;
+        left: 12px;
+        bottom: 12px;
+        z-index: 10000;
+        max-width: min(720px, 60vw);
+        max-height: 40vh;
+        overflow: auto;
+        display: none;
+        padding: 8px 10px;
+        border: 1px solid #c97a7a;
+        border-radius: 8px;
+        background: rgba(11, 10, 14, 0.96);
+        color: #e8a0a0;
+        font: 11px/1.5 "SF Mono", Consolas, monospace;
+        white-space: pre-wrap;
+      }
+      #mock-errors[data-has-error="1"] {
+        display: block;
+      }
+    </style>
+
+    <!-- 预览用 React（本地 vendor，可直接双击打开，不走网络） -->
+    <script src="../../lm-work/qa/vendor/react.production.min.js"></script>
+    <script src="../../lm-work/qa/vendor/react-dom.production.min.js"></script>
+
+    <!-- 最小 ModuleLoader 桩：捕获 client.js 的 factory，由 ui-preview.js 驱动真实组件 -->
+    <script>
+      window.__ModuleLoader__ = {
+        load: function (definition) {
+          window.__LMUI_MODULE__ = definition
+        },
+      }
+    </script>
+
+    <!-- 真实构建产物（node build.mjs --only=client 生成；请勿手改） -->
+    <script src="../client.js"></script>
+
+    <!-- 预览适配层：mock ctx / theme / slots / fetch + DSH 侧栏与设置面板 mock -->
+    <script src="ui-preview.js"></script>
+  </head>
+  <body>
+    <div id="mock-root"></div>
+    <div id="mock-boot">正在加载「光之镜」预览…（若长时间停留，请先运行 node build.mjs --only=client）</div>
+    <div id="mock-errors"></div>
+  </body>
+</html>

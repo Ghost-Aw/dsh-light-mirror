@@ -1,0 +1,130 @@
+{
+ "source": "PV 63.8333s（图4 倒计时场景；镜头静止，静态层取 61.4–66.4s temporal mean）",
+ "size": [
+  1920,
+  1080
+ ],
+ "layers": {
+  "base": {
+   "file": "fig4-base.webp",
+   "note": "背景+3D物体+地面；时间码/校准线/字幕已清；≤250KB"
+  },
+  "object": {
+   "file": "fig4-object.webp",
+   "bbox": [
+    560,
+    230,
+    1344,
+    954
+   ],
+   "note": "3D 多面体本体 alpha，边缘 8px 柔化；timecode/校准线/字幕区已避空"
+  },
+  "edgelight": {
+   "file": "fig4-edgelight.webp",
+   "bbox": [
+    520,
+    190,
+    1384,
+    994
+   ],
+   "note": "边缘光/呼吸（screen，CSS 2–5s 随机呼吸）"
+  },
+  "columns": {
+   "file": "fig4-columns.webp",
+   "x": [
+    143,
+    215,
+    706,
+    1618,
+    1628,
+    1877
+   ],
+   "widths": [
+    12,
+    13,
+    9,
+    7,
+    10,
+    19
+   ],
+   "y_range": "10%–90%",
+   "note": "竖向光柱 alpha（0.3–1.0s 随机闪烁，screen）"
+  },
+  "stars": {
+   "file": "fig4-stars.webp",
+   "note": "星点 alpha（1.43s 闪烁；61–466 个/帧）"
+  },
+  "dataflow": {
+   "file": "fig4-dataflow.webp",
+   "note": "竖向点列（点距≈7px），常驻无位移，靠明灭"
+  },
+  "timecode": {
+   "file": "fig4-timecode.webp",
+   "bbox": [
+    633,
+    491,
+    1257,
+    588
+   ],
+   "calibration_line_y": 538,
+   "nodes_x": [
+    75,
+    206,
+    312,
+    413,
+    480,
+    550,
+    617,
+    704,
+    770,
+    871,
+    928,
+    989,
+    1047,
+    1150,
+    1210,
+    1302,
+    1374,
+    1440,
+    1506,
+    1572,
+    1654,
+    1714,
+    1844
+   ],
+   "note": "仅校准线+菱形节点；数字字形建议 UI 自绘（避免字形复刻）"
+  }
+ },
+ "crt": {
+  "period_px": 3.0,
+  "note": "CSS repeating-linear-gradient（α .02–.05），不导出"
+ },
+ "usage": "base 为底；columns/stars/dataflow/edgelight 用 screen/alpha 叠加并做 CSS 闪烁/呼吸；object 供视差/高亮特效（base 已含物体，勿重复叠加满不透明）",
+ "compare": {
+  "mad_vs_pv_frame": 2.89,
+  "p95": 16.5,
+  "note": "排除 timecode/校准线/字幕区；目标 ±5%（≈≤12.8/255）"
+ },
+ "review": {
+  "by": "anomaly-analyst",
+  "verdict": "PASS（可冻结）",
+  "my_metric": {
+   "mad": 3.01,
+   "p95": 16.2,
+   "mad_without_object_layer": 2.89
+  },
+  "regions": {
+   "bg": "0.51–1.89",
+   "right_bg": 1.18,
+   "object": 8.46
+  },
+  "notes": [
+   "合成时不要叠加独立 fig4-object（base 已含物体本体，再叠会变亮）",
+   "object 独立使用时建议羽化扩到 20–30px",
+   "timecode 只做校准线+节点，数字字形由 UI 自绘",
+   "若将来需要 3D 物体独立视差/呼吸：一次性出「30px 羽化 fig4-object + 去物体 fig4-base」两个配套文件（单出 object 会与现 base 冲突）；analyst 届时复核。"
+  ],
+  "frozen": true,
+  "frozen_at": "2026-10-26（analyst 确认：图4 素材与 192s 序列均 PASS，不再改动）"
+ }
+}

@@ -1,0 +1,11 @@
+# dsh-light-mirror bundle patch
+#
+# 把本插件的 Host 半侧挂进当前 profile 的配置树；Web 半侧由 package.json 的
+# dsh.client 声明，Host 会自动组装 client bundle，这里不用写。
+#
+# 安装（由 plugin_manager install_bundle 或 dsh plugin add 完成）：
+#   dsh plugin --profile web add link:E:/Program Files/DSH/1017/light-mirror
+# 并确保 profile package.json 的 dsh.profile.bundles 含 "dsh-light-mirror"。
+- insert:
+    - id: light-mirror
+      name: 'dsh-light-mirror'

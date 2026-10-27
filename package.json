@@ -1,0 +1,75 @@
+{
+    "name":  "dsh-light-mirror",
+    "version":  "3.0.0",
+    "description":  "光之镜 · 天空岛 —— DeepSeek Harness 主题/启动动画插件：深色启动动画（光带/十字星/爆发/白场撕裂转场）、双模式主界面（终端/神殿）、程序绘制动态背景、观测栏、五档品牌图案。",
+    "license":  "MIT",
+    "type":  "module",
+    "keywords":  [
+                     "dsh",
+                     "dsh-plugin",
+                     "deepseek-harness",
+                     "deepseek-harness-plugin",
+                     "theme",
+                     "startup",
+                     "splash",
+                     "light-mirror",
+                     "sky-island"
+                 ],
+    "main":  "./index.js",
+    "exports":  {
+                    ".":  "./index.js",
+                    "./client":  "./client.js",
+                    "./package.json":  "./package.json",
+                    "./icon":  "./media/art/icon.svg",
+                    "./locale/*.json":  "./locale/*.json"
+                },
+    "files":  [
+                  "index.js",
+                  "client.js",
+                  "splash.js",
+                  "splash.css",
+                  "build.mjs",
+                  "src",
+                  "preview",
+                  "media",
+                  "locale",
+                  "cordis.patch.yml",
+                  "scripts",
+                  "README.md",
+                  "DESIGN.md",
+                  "LICENSE"
+              ],
+    "dsh":  {
+                "bundle":  {
+                               "patch":  "./cordis.patch.yml"
+                           },
+                "client":  {
+                               "platform":  "web",
+                               "immediately":  true,
+                               "inject":  [
+                                              "@deepseek-ai/dsh-client-ui-conversation"
+                                          ]
+                           }
+            },
+    "peerDependencies":  {
+                             "@deepseek-ai/cordis":  "\u003e=4.0.0-rc \u003c5"
+                         },
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "scripts":  {
+                    "build":  "node build.mjs",
+                    "build:client":  "node build.mjs --only=client",
+                    "build:splash":  "node build.mjs --only=splash",
+                    "check":  "node scripts/check-package.mjs",
+                    "test":  "node scripts/test-host.mjs \u0026\u0026 node scripts/test-client.mjs \u0026\u0026 node scripts/check-package.mjs"
+                },
+    "repository":  {
+                       "type":  "git",
+                       "url":  "https://github.com/Ghost-Aw/dsh-light-mirror.git"
+                   },
+    "homepage":  "https://github.com/Ghost-Aw/dsh-light-mirror",
+    "bugs":  {
+                 "url":  "https://github.com/Ghost-Aw/dsh-light-mirror/issues"
+             }
+}

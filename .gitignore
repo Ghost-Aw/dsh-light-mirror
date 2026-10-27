@@ -1,0 +1,9 @@
+node_modules/
+tools/node_modules/
+lm-build/
+media/photo/*.tmp
+*.log
+preview/shots/
+lm-work/
+*.tmp
+*.bak
