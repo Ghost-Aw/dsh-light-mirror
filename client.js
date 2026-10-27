@@ -4110,6 +4110,7 @@ function MusicPlayer() {
   const audioRef = React3.useRef(null);
   const playingRef = React3.useRef(false);
   const historyRef = React3.useRef([]);
+  const autoplayRef = React3.useRef(false);
   React3.useEffect(() => {
     playingRef.current = playing;
   }, [playing]);
@@ -4139,7 +4140,8 @@ function MusicPlayer() {
       audio.load();
     } catch (e) {
     }
-    if (playingRef.current) {
+    if (playingRef.current || autoplayRef.current) {
+      autoplayRef.current = false;
       const result = audio.play();
       if (result && typeof result.catch === "function") {
         result.catch(() => {
@@ -4244,11 +4246,13 @@ function MusicPlayer() {
       return;
     }
     if (loopMode === "shuffle") {
+      autoplayRef.current = true;
       historyRef.current.push(index);
       if (historyRef.current.length > 50) historyRef.current.shift();
       setIndex(pickShuffle(index));
       return;
     }
+    autoplayRef.current = true;
     setIndex((prev) => (prev + 1) % BGM.length);
   };
   const loopMeta = LOOP_META[loopMode] || LOOP_META.list;

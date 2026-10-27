@@ -850,6 +850,7 @@ function MusicPlayer() {
   const audioRef = React.useRef(null)
   const playingRef = React.useRef(false)
   const historyRef = React.useRef([])
+  const autoplayRef = React.useRef(false)
 
   React.useEffect(() => {
     playingRef.current = playing
@@ -890,7 +891,8 @@ function MusicPlayer() {
     } catch (e) {
       /* noop */
     }
-    if (playingRef.current) {
+    if (playingRef.current || autoplayRef.current) {
+      autoplayRef.current = false
       const result = audio.play()
       if (result && typeof result.catch === 'function') {
         result.catch(() => {
@@ -1010,11 +1012,13 @@ function MusicPlayer() {
       return
     }
     if (loopMode === 'shuffle') {
+      autoplayRef.current = true
       historyRef.current.push(index)
       if (historyRef.current.length > 50) historyRef.current.shift()
       setIndex(pickShuffle(index))
       return
     }
+    autoplayRef.current = true
     setIndex((prev) => (prev + 1) % BGM.length)
   }
 
