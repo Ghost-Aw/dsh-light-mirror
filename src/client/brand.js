@@ -345,10 +345,11 @@ function HeroMark(props) {
 }
 
 function BrandName() {
+  const displayName = '⌈' + UI_COPY.brandName + '⌋'
   return h(
     'span',
     { className: 'lmui-brand-name', 'data-lmui-brand-name': '' },
-    h('span', { className: 'lmui-brand-name__main' }, UI_COPY.brandName),
+    h('span', { className: 'lmui-brand-name__main' }, displayName),
     h('span', { className: 'lmui-brand-name__sub' }, UI_COPY.brandSub),
   )
 }

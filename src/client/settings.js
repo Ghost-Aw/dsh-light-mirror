@@ -22,6 +22,11 @@ import {
   UI_COPY,
   VERSION,
 } from '../shared/content.js'
+import {
+  HERO_TITLE_DEFAULT,
+  normalizeHeroTitle,
+  writeStoredHeroTitle,
+} from './heroTitle.js'
 
 const React =
   ReactNS && typeof ReactNS.createElement === 'function'
@@ -68,6 +73,8 @@ export function normalizeConfig(input) {
       out[key] = value
     }
   }
+  /* Hero 标题（Host DEFAULTS 未含，localStorage 持久化兜底） */
+  out.heroTitle = normalizeHeroTitle(src.heroTitle)
   return out
 }
 
@@ -264,8 +271,34 @@ function SelectRow(props) {
   )
 }
 
-function RangeRow(props) {
-  const min = Number(props.min)
+function TextRow(props) {
+  return h(
+    Row,
+    { label: props.label, hint: props.hint },
+    h(
+      'div',
+      { className: 'lmui-textWrap' },
+      h('input', {
+        type: 'text',
+        className: 'lmui-text',
+        value: props.value === undefined || props.value === null ? '' : String(props.value),
+        placeholder: props.placeholder || '',
+        maxLength: props.maxLength || 40,
+        'aria-label': props.label,
+        onChange: (event) => props.onChange(event.target.value),
+      }),
+      props.onReset
+        ? h(
+            'button',
+            { type: 'button', className: 'lmui-text__reset', onClick: props.onReset },
+            props.resetLabel || '恢复原文',
+          )
+        : null,
+    ),
+  )
+}
+
+function RangeRow(props) {  const min = Number(props.min)
   const max = Number(props.max)
   const value = Number(props.value)
   const span = Number.isFinite(max - min) && max > min ? max - min : 1
@@ -369,6 +402,9 @@ function MirrorSettings(props) {
 
   const commit = (patch) => {
     if (!draft) return
+    if (patch && Object.prototype.hasOwnProperty.call(patch, 'heroTitle')) {
+      writeStoredHeroTitle(patch.heroTitle)
+    }
     const next = normalizeConfig(Object.assign({}, draft, patch))
     setDraft(next)
     setNotice('')
@@ -378,6 +414,7 @@ function MirrorSettings(props) {
 
   const save = () => {
     if (!draft || busy) return
+    if (typeof draft.heroTitle === 'string') writeStoredHeroTitle(draft.heroTitle)
     setBusy(true)
     setNotice('')
     setError('')
@@ -394,6 +431,7 @@ function MirrorSettings(props) {
 
   const reset = () => {
     if (busy) return
+    writeStoredHeroTitle(null)
     setBusy(true)
     setNotice('')
     setError('')
@@ -475,6 +513,16 @@ function MirrorSettings(props) {
         value: draft.uiMode,
         options: UI_MODE_OPTIONS,
         onChange: (v) => commit({ uiMode: v }),
+      }),
+      h(TextRow, {
+        label: '空会话标题',
+        hint: '新会话页大标题，默认「封锁已至之境」；清空或用「恢复原文」则显示宿主原文「探索未至之境」。',
+        value: draft.heroTitle,
+        placeholder: HERO_TITLE_DEFAULT,
+        maxLength: 40,
+        onChange: (v) => commit({ heroTitle: v }),
+        onReset: () => commit({ heroTitle: '' }),
+        resetLabel: '恢复原文',
       }),
       h(SelectRow, {
         label: '品牌图案',

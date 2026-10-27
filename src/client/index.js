@@ -26,6 +26,8 @@ import {
 } from '../shared/content.js'
 import { DECOR_CSS, SETTINGS_CSS } from './styles.js'
 import { createThemeController } from './theme.js'
+import { createDomPatches } from './dompatches.js'
+import { normalizeHeroTitle } from './heroTitle.js'
 import { registerBrand } from './brand.js'
 import { registerDecor } from './decor.js'
 import { registerRail } from './rail.js'
@@ -89,6 +91,9 @@ export function normalizeConfig(input) {
       out[key] = value
     }
   }
+  /* 空会话 Hero 标题：DEFAULTS 未含该字段（Host 侧未加 key），
+     由 heroTitle.js 做 localStorage 持久化兜底。 */
+  out.heroTitle = normalizeHeroTitle(src.heroTitle)
   return out
 }
 
@@ -191,6 +196,13 @@ export function apply(ctx) {
       keep(() => background.dispose())
     } catch (e) {
       /* 背景失败不影响主要主题 */
+    }
+    try {
+      /* 权限三档文案 + 空会话 Hero 标题（MutationObserver 补宿主 DOM） */
+      const domPatches = createDomPatches(store)
+      keep(() => domPatches.dispose())
+    } catch (e) {
+      /* DOM 文案补丁失败不影响主要主题 */
     }
   }
 

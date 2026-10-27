@@ -554,6 +554,18 @@ body {
   border-bottom: 0.5px solid var(--dsw-alias-border-l1);
 }
 .mock-header__left, .mock-header__right { display: flex; align-items: center; gap: 10px; }
+.mock-perm { position: relative; }
+.mock-perm summary { list-style: none; cursor: pointer; }
+.mock-perm summary::-webkit-details-marker { display: none; }
+.mock-perm__menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 1200;
+  display: flex; flex-direction: column; gap: 2px; min-width: 160px; padding: 6px;
+  border: 0.5px solid var(--dsw-alias-border-l1); border-radius: var(--dsw-radius-md);
+  background: var(--dsw-alias-bg-layer-2); box-shadow: var(--dsw-elevation-prominent);
+  color: var(--dsw-alias-label-primary); font-size: 12.5px;
+}
+.mock-perm__menu .iWlSmW_optionLabelText { padding: 5px 8px; border-radius: 6px; }
+.mock-perm__menu .iWlSmW_optionLabelText:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .mock-tabs {
   flex: none; height: 42px; display: flex; align-items: flex-end; gap: 22px;
   padding: 0 24px; border-bottom: 1px solid var(--dsw-alias-border-l2);
@@ -782,7 +794,16 @@ html[data-lmui-scheme="light"][data-lmui-composer="off"] .mock-composer {
           'header',
           { className: 'mock-header' },
           h('div', { className: 'mock-header__left' }, h('span', null, '新会话'), h('span', { className: 'mock-chip' }, '工作区 · 光之镜')),
-          h('div', { className: 'mock-header__right' }, h('span', { className: 'mock-chip' }, 'deepseek-chat'), h('span', { className: 'mock-chip' }, '默认权限')),
+          h('div', { className: 'mock-header__right' }, h('span', { className: 'mock-chip' }, 'deepseek-chat'),
+          h('details', { className: 'mock-perm' },
+            h('summary', { className: 'mock-chip iWlSmW_trigger' }, h('span', { className: 'iWlSmW_triggerLabel' }, '完全权限')),
+            h('div', { className: 'mock-perm__menu' },
+              h('span', { className: 'iWlSmW_optionLabelText' }, '仅可查看'),
+              h('span', { className: 'iWlSmW_optionLabelText' }, '工作区内修改'),
+              h('span', { className: 'iWlSmW_optionLabelText' }, '完全权限'),
+            ),
+          ),
+        ),
         ),
         h(
           'div',
@@ -798,7 +819,7 @@ html[data-lmui-scheme="light"][data-lmui-composer="off"] .mock-composer {
           h(
             'div',
             { className: 'mock-hero__head' },
-            h('h1', { className: 'mock-hero__title' }, '今天想做什么？'),
+            h('h1', { className: 'mock-hero__title' }, '探索未至之境'),
             h('span', { className: 'pXSMma_previewBadge mock-preview-badge' }, '预览版'),
           ),
           h('p', { className: 'mock-hero__sub' }, '镜面会记住每一个愿望。'),

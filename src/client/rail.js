@@ -709,6 +709,16 @@ function PaimonHolo(props) {
   const [sourceKind, setSourceKind] = React.useState('')
   const entry = sources[sourceIndex]
   const src = entry ? entry.url : ''
+  const isLine = /paimon-line-/.test(String(src))
+  const fx = React.useMemo(
+    () => ({
+      scan: (7 + Math.random() * 3).toFixed(2) + 's',
+      ghostA: (8 + Math.random() * 6).toFixed(2) + 's',
+      ghostB: (8 + Math.random() * 6).toFixed(2) + 's',
+      bar: (11 + Math.random() * 5).toFixed(2) + 's',
+    }),
+    [src],
+  )
   const variantLabel = (() => {
     const item = (UI_COPY.paimonVariants || []).find((pair) => pair[0] === variant)
     return item ? item[1] : '派蒙'
@@ -739,10 +749,20 @@ function PaimonHolo(props) {
         className: 'lmui-paimon',
         'data-lmui-paimon': variant,
         'data-lmui-paimon-source': loaded ? sourceKind : '',
-        'data-lmui-paimon-line': /paimon-line-/.test(String(src)) ? '1' : '0',
-        style: /paimon-line-/.test(String(src))
-          ? { '--lmui-paimon-mask': 'url("' + src + '")' }
-          : undefined,
+        'data-lmui-paimon-line': isLine ? '1' : '0',
+        style: Object.assign(
+          {},
+          isLine ? { '--lmui-paimon-mask': 'url("' + src + '")' } : {},
+          src
+            ? {
+                '--lmui-paimon-img': 'url("' + src + '")',
+                '--lmui-scan-cycle': fx.scan,
+                '--lmui-glitch-cycle-a': fx.ghostA,
+                '--lmui-glitch-cycle-b': fx.ghostB,
+                '--lmui-glitch-bar-cycle': fx.bar,
+              }
+            : {},
+        ),
         'aria-hidden': 'true',
       },
       loaded ? null : h(PaimonPlaceholder, null),
@@ -767,6 +787,13 @@ function PaimonHolo(props) {
             },
           })
         : null,
+      src
+        ? h('span', { className: 'lmui-paimon__ghost lmui-paimon__ghost--a', 'aria-hidden': 'true' })
+        : null,
+      src
+        ? h('span', { className: 'lmui-paimon__ghost lmui-paimon__ghost--b', 'aria-hidden': 'true' })
+        : null,
+      src ? h('span', { className: 'lmui-paimon__glitchBar', 'aria-hidden': 'true' }) : null,
       h('div', { className: 'lmui-paimon__scan', 'aria-hidden': 'true' }),
     ),
   )

@@ -1696,6 +1696,101 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
     drop-shadow(0 1px 2px rgba(29, 28, 32, 0.16)) !important;
 }
 
+/* ── v9 派蒙间歇扫描线 + 间歇 glitch（纯 transform/opacity/背景位置）──── */
+.lmui-paimon__scan {
+  z-index: 3;
+  opacity: 0;
+  animation: lmui-paimon-scan var(--lmui-scan-cycle, 9s) linear infinite;
+}
+@keyframes lmui-paimon-scan {
+  0%, 84% { opacity: 0; background-position: 0 0; }
+  86% { opacity: 0.55; background-position: 0 8px; }
+  87% { opacity: 0.22; background-position: 0 16px; }
+  88% { opacity: 0.6; background-position: 0 4px; }
+  89% { opacity: 0.18; background-position: 0 12px; }
+  90% { opacity: 0.5; background-position: 0 2px; }
+  91% { opacity: 0.25; background-position: 0 18px; }
+  92%, 100% { opacity: 0; background-position: 0 0; }
+}
+/* glitch 重影：同线稿背景，横向切片错位 + RGB 红蓝 ±2px 边；每 8–14s 一次 */
+.lmui-paimon__ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  background-image: var(--lmui-paimon-img);
+  background-repeat: no-repeat;
+  background-size: auto 100%;
+  background-position: center bottom;
+  mix-blend-mode: screen;
+  filter: drop-shadow(2px 0 0 rgba(255, 64, 96, 0.55))
+    drop-shadow(-2px 0 0 rgba(64, 160, 255, 0.5));
+  animation-name: lmui-paimon-glitch-a;
+  animation-duration: var(--lmui-glitch-cycle-a, 11s);
+  animation-timing-function: steps(1, end);
+  animation-iteration-count: infinite;
+}
+.lmui-paimon__ghost--b {
+  animation-name: lmui-paimon-glitch-b;
+  animation-duration: var(--lmui-glitch-cycle-a, 11s);
+  animation-delay: 0.05s;
+}
+.lmui-paimon[data-lmui-paimon="guide"] .lmui-paimon__ghost {
+  top: -2px;
+  scale: 2.15;
+  transform-origin: 50% 0%;
+}
+.lmui-paimon[data-lmui-paimon="paimon2"] .lmui-paimon__ghost {
+  top: -24px;
+  scale: 1.6;
+  transform-origin: 50% 0%;
+}
+.lmui-paimon[data-lmui-paimon="emoji"] .lmui-paimon__ghost {
+  inset: 34px 0 auto;
+  height: 128px;
+  scale: 1.8;
+  transform-origin: 50% 50%;
+  background-position: center center;
+}
+@keyframes lmui-paimon-glitch-a {
+  0%, 84%, 100% { opacity: 0; translate: 0 0; clip-path: inset(0 0 0 0); }
+  85% { opacity: 0.55; translate: -3px 0; clip-path: inset(16% 0 58% 0); }
+  86% { opacity: 0.32; translate: 3px 0; clip-path: inset(55% 0 20% 0); }
+  87% { opacity: 0.5; translate: -2px 0; clip-path: inset(4% 0 76% 0); }
+  88% { opacity: 0.28; translate: 2px 0; clip-path: inset(68% 0 8% 0); }
+  89%, 100% { opacity: 0; translate: 0 0; }
+}
+@keyframes lmui-paimon-glitch-b {
+  0%, 86%, 100% { opacity: 0; translate: 0 0; clip-path: inset(0 0 0 0); }
+  87% { opacity: 0.4; translate: 2px 0; clip-path: inset(30% 0 44% 0); }
+  88% { opacity: 0.55; translate: -2px 0; clip-path: inset(8% 0 68% 0); }
+  89% { opacity: 0.25; translate: 3px 0; clip-path: inset(62% 0 12% 0); }
+  90%, 100% { opacity: 0; translate: 0 0; }
+}
+/* 偶发亮带 */
+.lmui-paimon__glitchBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38%;
+  z-index: 2;
+  height: 2px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.5) 38%,
+    rgba(255, 100, 150, 0.4) 58%, transparent 100%);
+  mix-blend-mode: screen;
+  animation: lmui-paimon-glitch-bar var(--lmui-glitch-bar-cycle, 13s) linear infinite;
+}
+@keyframes lmui-paimon-glitch-bar {
+  0%, 90%, 100% { opacity: 0; translate: 0 0; }
+  91% { opacity: 0.5; translate: 0 0; }
+  92% { opacity: 0.22; translate: 0 18px; }
+  93% { opacity: 0.42; translate: 0 -14px; }
+  94%, 100% { opacity: 0; translate: 0 0; }
+}
+
 /* ── 降低动效 ───────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .lmui-decor *,
@@ -1703,10 +1798,16 @@ html[data-lmui-scheme="light"] .lmui-mark__layer[data-lmui-shape="new-color"] .l
   .lmui-statusline,
   .lmui-paimon__img,
   .lmui-paimon__fallback,
+  .lmui-paimon__scan,
+  .lmui-paimon__ghost,
+  .lmui-paimon__glitchBar,
   .lmui-bg * {
     animation: none !important;
     transition: none !important;
   }
+  .lmui-paimon__scan,
+  .lmui-paimon__ghost,
+  .lmui-paimon__glitchBar { opacity: 0 !important; }
   .lmui-rail { transition: opacity 0.01s linear !important; }
 }
 `;
@@ -1808,6 +1909,44 @@ var SETTINGS_CSS = String.raw`
   flex: none;
 }
 .lmui-check:disabled { cursor: default; opacity: 0.45; }
+.lmui-textWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 260px;
+  max-width: 100%;
+}
+.lmui-text {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 0.5px solid var(--dsw-alias-border-l3);
+  border-radius: var(--dsw-radius-sm);
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.lmui-text:focus-visible {
+  border-color: var(--dsw-alias-label-secondary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-label-primary) 16%, transparent);
+}
+.lmui-text__reset {
+  flex: none;
+  height: 30px;
+  padding: 0 9px;
+  border: 0.5px solid var(--dsw-alias-border-l3);
+  border-radius: var(--dsw-radius-sm);
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.lmui-text__reset:hover { background: var(--dsw-alias-interactive-bg-hover); }
 .lmui-select {
   min-width: 168px;
   max-width: 100%;
@@ -2198,6 +2337,202 @@ function createThemeController(ctx, store) {
   };
 }
 
+// src/client/heroTitle.js
+var HERO_TITLE_DEFAULT = "封锁已至之境";
+var HERO_TITLE_STORAGE = "light-mirror:heroTitle";
+var HERO_TITLE_MAX = 40;
+function readStoredHeroTitle() {
+  try {
+    const value = window.localStorage.getItem(HERO_TITLE_STORAGE);
+    return value === null ? null : value;
+  } catch (e) {
+    return null;
+  }
+}
+function writeStoredHeroTitle(value) {
+  try {
+    if (typeof value === "string") window.localStorage.setItem(HERO_TITLE_STORAGE, value);
+    else window.localStorage.removeItem(HERO_TITLE_STORAGE);
+  } catch (e) {
+  }
+}
+function normalizeHeroTitle(value) {
+  let raw = value;
+  if (raw === void 0) raw = readStoredHeroTitle();
+  if (raw === null || raw === void 0) return HERO_TITLE_DEFAULT;
+  if (typeof raw !== "string") return HERO_TITLE_DEFAULT;
+  const text = raw.trim();
+  if (text === "") return "";
+  return text.slice(0, HERO_TITLE_MAX);
+}
+
+// src/client/dompatches.js
+var PERMISSION_MAP = {
+  仅可查看: "天之御使",
+  工作区内修改: "生死时空",
+  完全权限: "理之大权"
+};
+var PERMISSION_SELECTOR = '[class*="_triggerLabel"],[class*="_optionLabelText"],[class*="_selector"]';
+var HERO_SELECTOR = '[data-phase="hero"] h1,[data-phase="hero"] [class*="_titleGroup"] > span:first-child,.mock-hero__title';
+function textNodesOf(root) {
+  const out = [];
+  if (!root || typeof document === "undefined") return out;
+  const walker = document.createTreeWalker(
+    root,
+    4
+    /* NodeFilter.SHOW_TEXT */
+  );
+  let node = walker.nextNode();
+  while (node) {
+    out.push(node);
+    node = walker.nextNode();
+  }
+  return out;
+}
+function replaceNodeText(node, next) {
+  const current = node.nodeValue || "";
+  const leading = (current.match(/^\s*/) || [""])[0];
+  const trailing = (current.match(/\s*$/) || [""])[0];
+  const replacement = leading + next + trailing;
+  if (node.nodeValue !== replacement) node.nodeValue = replacement;
+}
+function createDomPatches(store) {
+  let disposed = false;
+  let raf = 0;
+  let observer = null;
+  let storeOff = null;
+  const permissionOriginals = /* @__PURE__ */ new Map();
+  const knownHeadings = /* @__PURE__ */ new WeakSet();
+  function readConfig2() {
+    try {
+      return store && typeof store.get === "function" ? store.get() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function applyPermissions() {
+    if (disposed) return;
+    const roots = document.querySelectorAll(PERMISSION_SELECTOR);
+    for (let i = 0; i < roots.length; i += 1) {
+      const nodes = textNodesOf(roots[i]);
+      for (let k = 0; k < nodes.length; k += 1) {
+        const node = nodes[k];
+        if (!node.isConnected) continue;
+        const raw = node.nodeValue || "";
+        const trimmed = raw.trim();
+        const mapped = PERMISSION_MAP[trimmed];
+        if (!mapped) continue;
+        if (!permissionOriginals.has(node)) permissionOriginals.set(node, raw);
+        replaceNodeText(node, mapped);
+      }
+    }
+  }
+  function restorePermissions() {
+    permissionOriginals.forEach((original, node) => {
+      try {
+        if (node.isConnected && node.nodeValue !== original) node.nodeValue = original;
+      } catch (e) {
+      }
+    });
+    permissionOriginals.clear();
+  }
+  function applyHeroTitle() {
+    if (disposed) return;
+    const cfg = readConfig2();
+    const desired = cfg && typeof cfg.heroTitle === "string" ? cfg.heroTitle : HERO_TITLE_DEFAULT;
+    const headings = document.querySelectorAll(HERO_SELECTOR);
+    for (let i = 0; i < headings.length; i += 1) {
+      const heading = headings[i];
+      if (!heading || heading.nodeType !== 1) continue;
+      const nodes = textNodesOf(heading);
+      if (nodes.length === 0) continue;
+      const textNode = nodes.find((n) => (n.nodeValue || "").trim() !== "") || nodes[0];
+      const current = (heading.textContent || "").trim();
+      if (desired === "") {
+        const original = heading.getAttribute("data-lmui-hero-original");
+        if (original && current !== original) replaceNodeText(textNode, original);
+        continue;
+      }
+      if (!knownHeadings.has(heading) || !heading.getAttribute("data-lmui-hero-original")) {
+        heading.setAttribute("data-lmui-hero-original", current);
+        knownHeadings.add(heading);
+      }
+      if (current !== desired) {
+        replaceNodeText(textNode, desired);
+        for (let k = 0; k < nodes.length; k += 1) {
+          if (nodes[k] !== textNode && (nodes[k].nodeValue || "").trim() !== "") nodes[k].nodeValue = "";
+        }
+      }
+    }
+  }
+  function applyAll() {
+    if (disposed) return;
+    const cfg = readConfig2();
+    if (!cfg || cfg.enabled !== true) return;
+    applyPermissions();
+    applyHeroTitle();
+  }
+  function schedule() {
+    if (disposed || raf) return;
+    raf = window.requestAnimationFrame(() => {
+      raf = 0;
+      applyAll();
+    });
+  }
+  try {
+    observer = new window.MutationObserver(schedule);
+    observer.observe(document.documentElement, {
+      subtree: true,
+      childList: true,
+      characterData: true
+    });
+  } catch (e) {
+    observer = null;
+  }
+  if (store && typeof store.subscribe === "function") {
+    storeOff = store.subscribe(schedule);
+  }
+  applyAll();
+  return {
+    sync: schedule,
+    dispose() {
+      disposed = true;
+      if (raf) {
+        try {
+          window.cancelAnimationFrame(raf);
+        } catch (e) {
+        }
+        raf = 0;
+      }
+      if (observer) {
+        try {
+          observer.disconnect();
+        } catch (e) {
+        }
+        observer = null;
+      }
+      if (typeof storeOff === "function") {
+        try {
+          storeOff();
+        } catch (e) {
+        }
+        storeOff = null;
+      }
+      restorePermissions();
+      const headings = document.querySelectorAll(HERO_SELECTOR);
+      for (let i = 0; i < headings.length; i += 1) {
+        const heading = headings[i];
+        const original = heading.getAttribute && heading.getAttribute("data-lmui-hero-original");
+        if (original === null || original === void 0) continue;
+        const nodes = textNodesOf(heading);
+        const textNode = nodes.find((n) => (n.nodeValue || "").trim() !== "") || nodes[0];
+        if (textNode) replaceNodeText(textNode, original);
+        heading.removeAttribute("data-lmui-hero-original");
+      }
+    }
+  };
+}
+
 // src/client/brand.js
 var ReactNS = __toESM(require("react"), 1);
 
@@ -2496,10 +2831,11 @@ function HeroMark(props) {
   });
 }
 function BrandName() {
+  const displayName = "⌈" + UI_COPY.brandName + "⌋";
   return h(
     "span",
     { className: "lmui-brand-name", "data-lmui-brand-name": "" },
-    h("span", { className: "lmui-brand-name__main" }, UI_COPY.brandName),
+    h("span", { className: "lmui-brand-name__main" }, displayName),
     h("span", { className: "lmui-brand-name__sub" }, UI_COPY.brandSub)
   );
 }
@@ -3214,6 +3550,16 @@ function PaimonHolo(props) {
   const [sourceKind, setSourceKind] = React3.useState("");
   const entry = sources[sourceIndex];
   const src = entry ? entry.url : "";
+  const isLine = /paimon-line-/.test(String(src));
+  const fx = React3.useMemo(
+    () => ({
+      scan: (7 + Math.random() * 3).toFixed(2) + "s",
+      ghostA: (8 + Math.random() * 6).toFixed(2) + "s",
+      ghostB: (8 + Math.random() * 6).toFixed(2) + "s",
+      bar: (11 + Math.random() * 5).toFixed(2) + "s"
+    }),
+    [src]
+  );
   const variantLabel = (() => {
     const item = (UI_COPY.paimonVariants || []).find((pair) => pair[0] === variant);
     return item ? item[1] : "派蒙";
@@ -3242,8 +3588,18 @@ function PaimonHolo(props) {
         className: "lmui-paimon",
         "data-lmui-paimon": variant,
         "data-lmui-paimon-source": loaded ? sourceKind : "",
-        "data-lmui-paimon-line": /paimon-line-/.test(String(src)) ? "1" : "0",
-        style: /paimon-line-/.test(String(src)) ? { "--lmui-paimon-mask": 'url("' + src + '")' } : void 0,
+        "data-lmui-paimon-line": isLine ? "1" : "0",
+        style: Object.assign(
+          {},
+          isLine ? { "--lmui-paimon-mask": 'url("' + src + '")' } : {},
+          src ? {
+            "--lmui-paimon-img": 'url("' + src + '")',
+            "--lmui-scan-cycle": fx.scan,
+            "--lmui-glitch-cycle-a": fx.ghostA,
+            "--lmui-glitch-cycle-b": fx.ghostB,
+            "--lmui-glitch-bar-cycle": fx.bar
+          } : {}
+        ),
         "aria-hidden": "true"
       },
       loaded ? null : h3(PaimonPlaceholder, null),
@@ -3266,6 +3622,9 @@ function PaimonHolo(props) {
           setSourceIndex((prev) => prev + 1);
         }
       }) : null,
+      src ? h3("span", { className: "lmui-paimon__ghost lmui-paimon__ghost--a", "aria-hidden": "true" }) : null,
+      src ? h3("span", { className: "lmui-paimon__ghost lmui-paimon__ghost--b", "aria-hidden": "true" }) : null,
+      src ? h3("span", { className: "lmui-paimon__glitchBar", "aria-hidden": "true" }) : null,
       h3("div", { className: "lmui-paimon__scan", "aria-hidden": "true" })
     )
   );
@@ -3648,6 +4007,7 @@ function normalizeConfig(input) {
       out[key] = value;
     }
   }
+  out.heroTitle = normalizeHeroTitle(src.heroTitle);
   return out;
 }
 function httpError(res) {
@@ -3817,6 +4177,30 @@ function SelectRow(props) {
     )
   );
 }
+function TextRow(props) {
+  return h4(
+    Row,
+    { label: props.label, hint: props.hint },
+    h4(
+      "div",
+      { className: "lmui-textWrap" },
+      h4("input", {
+        type: "text",
+        className: "lmui-text",
+        value: props.value === void 0 || props.value === null ? "" : String(props.value),
+        placeholder: props.placeholder || "",
+        maxLength: props.maxLength || 40,
+        "aria-label": props.label,
+        onChange: (event) => props.onChange(event.target.value)
+      }),
+      props.onReset ? h4(
+        "button",
+        { type: "button", className: "lmui-text__reset", onClick: props.onReset },
+        props.resetLabel || "恢复原文"
+      ) : null
+    )
+  );
+}
 function RangeRow(props) {
   const min = Number(props.min);
   const max = Number(props.max);
@@ -3902,6 +4286,9 @@ function MirrorSettings(props) {
   }, [load]);
   const commit = (patch) => {
     if (!draft) return;
+    if (patch && Object.prototype.hasOwnProperty.call(patch, "heroTitle")) {
+      writeStoredHeroTitle(patch.heroTitle);
+    }
     const next = normalizeConfig(Object.assign({}, draft, patch));
     setDraft(next);
     setNotice("");
@@ -3910,6 +4297,7 @@ function MirrorSettings(props) {
   };
   const save = () => {
     if (!draft || busy) return;
+    if (typeof draft.heroTitle === "string") writeStoredHeroTitle(draft.heroTitle);
     setBusy(true);
     setNotice("");
     setError("");
@@ -3922,6 +4310,7 @@ function MirrorSettings(props) {
   };
   const reset = () => {
     if (busy) return;
+    writeStoredHeroTitle(null);
     setBusy(true);
     setNotice("");
     setError("");
@@ -3988,6 +4377,16 @@ function MirrorSettings(props) {
         value: draft.uiMode,
         options: UI_MODE_OPTIONS,
         onChange: (v) => commit({ uiMode: v })
+      }),
+      h4(TextRow, {
+        label: "空会话标题",
+        hint: "新会话页大标题，默认「封锁已至之境」；清空或用「恢复原文」则显示宿主原文「探索未至之境」。",
+        value: draft.heroTitle,
+        placeholder: HERO_TITLE_DEFAULT,
+        maxLength: 40,
+        onChange: (v) => commit({ heroTitle: v }),
+        onReset: () => commit({ heroTitle: "" }),
+        resetLabel: "恢复原文"
       }),
       h4(SelectRow, {
         label: "品牌图案",
@@ -4820,6 +5219,7 @@ function normalizeConfig2(input) {
       out[key] = value;
     }
   }
+  out.heroTitle = normalizeHeroTitle(src.heroTitle);
   return out;
 }
 function createStore(initial) {
@@ -4897,6 +5297,11 @@ function apply(ctx) {
     try {
       const background = createBackgroundController(store);
       keep(() => background.dispose());
+    } catch (e) {
+    }
+    try {
+      const domPatches = createDomPatches(store);
+      keep(() => domPatches.dispose());
     } catch (e) {
     }
   }
