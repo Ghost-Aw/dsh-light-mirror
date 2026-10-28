@@ -1054,8 +1054,6 @@ html[data-lmui-scheme="light"] .lmui-rail__surface::after {
 html[data-lmui-composer="on"] [data-composer-card] {
   background-color: var(--lmui-composer-fill) !important;
   background-image: none !important;
-  backdrop-filter: blur(16px) saturate(118%);
-  -webkit-backdrop-filter: blur(16px) saturate(118%);
   box-shadow: inset 0 0 0 1px var(--lmui-composer-hairline), 0 12px 32px rgba(0, 0, 0, 0.14) !important;
 }
 html[data-lmui-scheme="dark"] {
@@ -1375,21 +1373,17 @@ html[data-lmui-scheme="light"] {
    合成层，hover 只重绘按钮区域。 */
 [data-composer-card] button[class*="_primary"] {
   position: relative;
-  isolation: isolate;
-  transform: translateZ(0);
-  will-change: box-shadow, background-color;
   background-image: linear-gradient(135deg, var(--lmui-irid-a) 0%, var(--lmui-irid-b) 52%, var(--lmui-irid-c) 100%) !important;
   background-color: transparent !important;
   color: var(--lmui-irid-ink) !important;
   border: none !important;
   box-shadow: 0.6px 0 0 rgba(255, 64, 96, 0.4), -0.6px 0 0 rgba(64, 128, 255, 0.4),
     inset 0 0 0 0.5px var(--lmui-irid-border);
-  transition: box-shadow 0.15s var(--lmui-ease), background-color 0.15s var(--lmui-ease);
 }
 [data-composer-card] button[class*="_primary"]:hover:not(:disabled) {
+  /* v14: 悬停不再触发任何合成层/滤镜变化，避免主体闪烁 */
   box-shadow: 0.6px 0 0 rgba(255, 64, 96, 0.4), -0.6px 0 0 rgba(64, 128, 255, 0.4),
-    inset 0 0 0 0.5px var(--lmui-irid-border), inset 0 0 12px rgba(255, 255, 255, 0.18),
-    0 0 10px rgba(232, 233, 236, 0.2);
+    inset 0 0 0 0.5px var(--lmui-irid-border);
 }
 [data-composer-card] button[class*="_primary"] path,
 [data-composer-card] button[class*="_primary"] svg {

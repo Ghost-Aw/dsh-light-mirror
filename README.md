@@ -80,6 +80,8 @@ dsh plugin --profile web add link:C:/path/to/light-mirror
 
 方式二/三同样需要在 `bundles` 中追加 `"dsh-light-mirror"`。
 
+> **桌面端（DSH Desktop）说明**：desktop profile 由 Electron 应用独占管理，`dsh plugin --profile desktop add ...` 会报 `profile "desktop" is managed exclusively by the Electron application`。请在**桌面端 设置 → 插件**中安装（GitHub 地址 / 本地目录），或让 Agent 通过插件管理接口把 `link:E:/.../light-mirror` 装入 desktop profile；装好后重启 DSH Desktop。web profile 则继续使用上面的 CLI 方式。
+
 卸载：`dsh plugin --profile web remove dsh-light-mirror`，并从 `bundles` 中移除包名。
 ### 如何看到启动动画 / 立即预览
 
