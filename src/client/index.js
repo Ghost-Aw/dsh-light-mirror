@@ -28,6 +28,8 @@ import { DECOR_CSS, SETTINGS_CSS } from './styles.js'
 import { createThemeController } from './theme.js'
 import { createDomPatches } from './dompatches.js'
 import { createWhaleIndicator } from './whale.js'
+/* 启动动画运行时 + 样式打进 client bundle：桌面端 Host 注入/鉴权不可用时由客户端自行启动。 */
+import './splashRuntime.js'
 import { normalizeHeroTitle, normalizeThinkingLabel } from './heroTitle.js'
 import { registerBrand } from './brand.js'
 import { registerDecor } from './decor.js'

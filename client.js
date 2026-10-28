@@ -2992,6 +2992,1556 @@ function createWhaleIndicator() {
   };
 }
 
+// src/splash/styles.css
+var styles_default = '/* ============================================================================\n * 鍏変箣闀?路 澶╃┖宀?鈥?splash v5 鏍峰紡\n * ----------------------------------------------------------------------------\n * 娣辫壊鍦烘櫙 + 涓嬩晶绔栫洿涓婃诞鍏夊甫锛堝乏鍙冲/涓棿灏戙€佹暣浣撲腑闂村嚬闄凤級\n * 涓ぎ缁嗛暱鍗佸瓧鏄燂紙姝ｅ鸡涓嶈鍒欏缂橈級鈫?娣辫壊浠庝笅寰€涓婂～鍏?鈫?楂橀鎶栧姩 鈫? * 鏀惧皠鐖嗗彂锛圧GB 鑹叉暎/鏄熺偣/鐜?铏瑰僵缇界姸寮э級鈫?鍏ㄥ睆鐧?鈫?WebGL 鍥涢樁娈?glitch 杞満 鈫?涓荤晫闈? * ========================================================================== */\n\n/* 鈹€鈹€ 1. 椤甸潰澹?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\nhtml.lm-lock,\nhtml.lm-lock body {\n  overflow: hidden !important;\n}\n\nhtml.lm-lock {\n  background: #0b0a0e;\n}\n\n#light-mirror-veil {\n  position: fixed;\n  inset: 0;\n  z-index: 2147482999;\n  background: #0b0a0e;\n  opacity: 1;\n  pointer-events: none;\n}\n\n#light-mirror-root.lm-root {\n  --lm-void: #0b0a0e;\n  --lm-bg-1: #101018;\n  --lm-bg-2: #16151d;\n  --lm-bg-3: #1b1a22;\n  --lm-white: #ffffff;\n  --lm-white-soft: #eef2ff;\n  --lm-cyan: #a8c8e0;\n  --lm-pink: #e8b8cf;\n  --lm-gold: #f0dfbf;\n  --lm-serif: "Songti SC", "STSong", "SimSun", "Source Han Serif SC", "Noto Serif CJK SC", serif;\n  --lm-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;\n  --lm-mono: "Consolas", "SFMono-Regular", "Courier New", monospace;\n  position: fixed;\n  inset: 0;\n  z-index: 2147483000;\n  overflow: hidden;\n  background: var(--lm-void);\n  color: #eef2ff;\n  font-family: var(--lm-sans);\n  -webkit-font-smoothing: antialiased;\n  user-select: none;\n  -webkit-user-select: none;\n  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);\n}\n\n#light-mirror-root.lm-root *,\n#light-mirror-root.lm-root *::before,\n#light-mirror-root.lm-root *::after {\n  box-sizing: border-box;\n}\n\n.lm-scene {\n  position: absolute;\n  inset: 0;\n  overflow: hidden;\n  isolation: isolate;\n  background: var(--lm-bg-1);\n}\n\n/* 鈹€鈹€ 2. 娣辫壊鑳屾櫙 / 闆?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-bg {\n  position: absolute;\n  inset: 0;\n  z-index: 0;\n  background: radial-gradient(120% 70% at 50% 78%, rgba(92, 94, 112, 0.2) 0%, rgba(22, 21, 29, 0) 62%),\n    linear-gradient(180deg, #101018 0%, #14131b 52%, #1b1a22 100%);\n}\n\n.lm-bg::after {\n  content: "";\n  position: absolute;\n  inset: 0;\n  opacity: 0.55;\n  background-image: radial-gradient(1.2px 1.2px at 12% 24%, rgba(226, 232, 248, 0.7), transparent 2px),\n    radial-gradient(1px 1px at 28% 63%, rgba(200, 210, 236, 0.6), transparent 1.8px),\n    radial-gradient(1.4px 1.4px at 44% 18%, rgba(240, 244, 255, 0.6), transparent 2.2px),\n    radial-gradient(1px 1px at 62% 38%, rgba(210, 220, 244, 0.55), transparent 1.8px),\n    radial-gradient(1.2px 1.2px at 76% 71%, rgba(230, 236, 252, 0.6), transparent 2px),\n    radial-gradient(1px 1px at 88% 22%, rgba(210, 220, 244, 0.55), transparent 1.8px),\n    radial-gradient(1px 1px at 52% 82%, rgba(240, 244, 255, 0.45), transparent 1.8px),\n    radial-gradient(1.2px 1.2px at 66% 54%, rgba(220, 228, 248, 0.5), transparent 2px);\n  animation: lm-stars-twinkle 6.4s ease-in-out infinite;\n}\n\n.lm-fog {\n  position: absolute;\n  inset: 0;\n  z-index: 1;\n  pointer-events: none;\n  background: radial-gradient(46% 40% at 22% 82%, rgba(160, 172, 205, 0.14) 0%, transparent 70%),\n    radial-gradient(40% 34% at 78% 76%, rgba(198, 178, 196, 0.1) 0%, transparent 72%),\n    radial-gradient(60% 34% at 50% 92%, rgba(120, 132, 168, 0.1) 0%, transparent 76%);\n  \n  animation: lm-fog-breathe 9s ease-in-out infinite;\n}\n\n/* 鈹€鈹€ 3. 绔栫洿涓婃诞鍏夊甫锛堝乏鍙冲/涓棿灏戙€佹暣浣撲腑闂村嚬闄凤級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-bands {\n  position: absolute;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  z-index: 2;\n  height: 74%;\n  overflow: hidden;\n  pointer-events: none;\n  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);\n  mask-image: linear-gradient(180deg, transparent 0%, #000 26%, #000 100%);\n}\n\n.lm-bands > i {\n  position: absolute;\n  bottom: 0;\n  left: var(--x);\n  width: var(--w);\n  height: var(--h);\n  display: block;\n  border-radius: 50% / 6%;\n  background: linear-gradient(180deg, transparent 0%, var(--tint) 42%, rgba(255, 255, 255, 0.92) 74%, transparent 100%);\n  box-shadow: 0 0 14px rgba(220, 230, 250, 0.28), 0 0 40px rgba(180, 198, 235, 0.16);\n  opacity: 0;\n  mix-blend-mode: screen;\n  animation: lm-band-float var(--dur) var(--delay) ease-in-out infinite;\n}\n\n/* 鈹€鈹€ 4. 涓ぎ缁嗛暱鍗佸瓧鏄燂紙姝ｅ鸡涓嶈鍒欏缂橈級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-star-wrap {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  z-index: 7;\n  width: min(34vmin, 380px);\n  height: min(72vmin, 800px);\n  translate: -50% -50%;\n  transform-origin: 50% 50%;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.lm-star-glow {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  width: 220%;\n  height: 120%;\n  translate: -50% -50%;\n  background: radial-gradient(circle, rgba(255, 255, 255, 0.42) 0%, rgba(214, 226, 250, 0.18) 32%, transparent 68%);\n  \n  animation: lm-star-glow 3.6s ease-in-out infinite;\n}\n\n.lm-star-base,\n.lm-star-fill,\n.lm-star-ghost {\n  position: absolute;\n  inset: 0;\n  display: block;\n}\n\n.lm-star-svg {\n  position: absolute;\n  inset: 0;\n  width: 100%;\n  height: 100%;\n  overflow: visible;\n}\n\n/* 涓夊眰鏄熶綋锛氬ぇ鏄燂紙妯＄硦+鍣尝瑁佽竟锛夆啋 涓槦 white锛堟寲绌哄ぇ鏄燂級鈫?灏忔槦 dark锛堢敓闀块儴鍒嗭級 */\n.lm-star-large {\n  fill: #ffffff;\n  opacity: 0.97;\n}\n\n.lm-star-medium {\n  fill: #ffffff;\n  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.42)) drop-shadow(0 0 26px rgba(214, 226, 250, 0.28));\n}\n\n/* 娣辫壊閮ㄥ垎 = 涓ぎ灏忓崄瀛楁槦锛屼粠涓嬪線涓婄敓闀匡紙clip 杩涘害鐢?JS 璁剧疆 --clipPct=(1-p)*100%锛?*/\n.lm-star-fill {\n  clip-path: inset(var(--clipPct, 100%) 0 0 0);\n}\n\n.lm-star-small {\n  fill: #0d0c14;\n  filter: drop-shadow(0 0 10px rgba(9, 8, 14, 0.9));\n}\n\n/* RGB 鑹叉暎 ghost锛堢垎鍙?鎶栧姩鏃跺嚭鐜帮級 */\n.lm-star-ghost {\n  opacity: 0;\n  mix-blend-mode: screen;\n}\n\n.lm-star-ghost .lm-star-large,\n.lm-star-ghost .lm-star-medium {\n  filter: drop-shadow(0 0 10px currentColor);\n}\n\n.lm-star-ghost-cyan {\n  color: #7fd8e8;\n}\n\n.lm-star-ghost-cyan .lm-star-large,\n.lm-star-ghost-cyan .lm-star-medium {\n  fill: rgba(127, 216, 232, 0.55);\n}\n\n.lm-star-ghost-pink {\n  color: #e88fd0;\n}\n\n.lm-star-ghost-pink .lm-star-large,\n.lm-star-ghost-pink .lm-star-medium {\n  fill: rgba(232, 143, 208, 0.5);\n}\n\n/* 鈹€鈹€ 5. 鐖嗗彂锛氭斁灏勫厜 / 鐜?/ 铏瑰僵缇界姸寮?/ 鏄熺偣 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-burst {\n  position: absolute;\n  inset: 0;\n  z-index: 6;\n  pointer-events: none;\n  opacity: 0;\n}\n\n.lm-burst::before {\n  content: "";\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 170vmin;\n  height: 170vmin;\n  translate: -50% -50%;\n  background: radial-gradient(circle, rgba(255, 255, 255, 0.96) 0%, rgba(255, 250, 242, 0.62) 20%, rgba(226, 236, 252, 0.26) 46%, transparent 72%);\n  \n  mix-blend-mode: screen;\n  opacity: 0;\n}\n\n.lm-bursting .lm-burst::before {\n  animation: lm-burst-core 1.4s ease-in both;\n}\n\n/* v6 涓夐樁娈典寒搴︽帶鍒讹細burst1/2 淇濇寔娣辫壊鑳屾櫙锛堝浘13/15锛夛紝burst3 鎵嶅揩閫熸彁浜埌鐧藉満 */\n.lm-burst1 .lm-burst::before {\n  animation: none;\n  opacity: 0.22;\n}\n\n.lm-burst2 .lm-burst::before {\n  animation: none;\n  opacity: 0.4;\n}\n\n.lm-burst1 .lm-glow {\n  opacity: 0.85;\n}\n\n.lm-burst2 .lm-glow {\n  opacity: 1;\n}\n\n.lm-burst3 .lm-glow {\n  opacity: 0.95;\n}\n\n.lm-burst3 .lm-burst::before {\n  animation: none;\n  opacity: 0.2;\n}\n\n.lm-burst3 .lm-star-glow {\n  animation: none;\n  opacity: 0.35;\n}\n\n.lm-burst1 .lm-star-glow,\n.lm-burst2 .lm-star-glow {\n  animation: none;\n}\n\n.lm-burst1 .lm-star-glow {\n  opacity: 0.3;\n}\n\n.lm-burst2 .lm-star-glow {\n  opacity: 0.45;\n}\n\n.lm-rays {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 240vmax;\n  height: 240vmax;\n  translate: -50% -50%;\n  background: repeating-conic-gradient(\n    from 0deg at 50% 50%,\n    rgba(255, 255, 255, 0.085) 0deg 1.4deg,\n    rgba(255, 255, 255, 0) 1.4deg 5.6deg,\n    rgba(224, 234, 255, 0.07) 5.6deg 7deg,\n    rgba(255, 255, 255, 0) 7deg 12.4deg\n  );\n  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 8%, rgba(0, 0, 0, 0.7) 22%, transparent 54%);\n  mask-image: radial-gradient(circle at 50% 50%, #000 0 8%, rgba(0, 0, 0, 0.7) 22%, transparent 54%);\n  mix-blend-mode: screen;\n  opacity: 0;\n}\n\n.lm-rings {\n  position: absolute;\n  inset: 0;\n}\n\n.lm-rings > i {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 26vmin;\n  height: 26vmin;\n  translate: -50% -50%;\n  border-radius: 50%;\n  border: 1.5px solid rgba(255, 255, 255, 0.6);\n  box-shadow: 0 0 26px rgba(214, 226, 250, 0.28), inset 0 0 18px rgba(255, 255, 255, 0.18);\n  opacity: 0;\n}\n\n.lm-rings > i:nth-child(2) {\n  width: 42vmin;\n  height: 42vmin;\n  border-color: rgba(232, 184, 207, 0.4);\n  box-shadow: 0 0 30px rgba(232, 184, 207, 0.22);\n}\n\n.lm-rings > i:nth-child(3) {\n  width: 60vmin;\n  height: 60vmin;\n  border-color: rgba(168, 200, 224, 0.32);\n  box-shadow: 0 0 40px rgba(168, 200, 224, 0.18);\n}\n\n.lm-feather {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 190vmax;\n  height: 190vmax;\n  translate: -50% -50%;\n  background: conic-gradient(\n      from 12deg at 50% 50%,\n      rgba(168, 200, 224, 0.16) 0deg 8deg,\n      transparent 8deg 36deg,\n      rgba(232, 184, 207, 0.15) 36deg 46deg,\n      transparent 46deg 88deg,\n      rgba(240, 223, 191, 0.14) 88deg 98deg,\n      transparent 98deg 144deg,\n      rgba(200, 214, 232, 0.14) 144deg 158deg,\n      transparent 158deg 208deg,\n      rgba(232, 184, 207, 0.12) 208deg 224deg,\n      transparent 224deg 276deg,\n      rgba(168, 200, 224, 0.12) 276deg 290deg,\n      transparent 290deg 360deg\n    ),\n    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 27px);\n  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 12%, #000 26%, rgba(0, 0, 0, 0.7) 44%, transparent 66%);\n  mask-image: radial-gradient(circle at 50% 50%, transparent 0 12%, #000 26%, rgba(0, 0, 0, 0.7) 44%, transparent 66%);\n  \n  mix-blend-mode: screen;\n  opacity: 0;\n}\n\n.lm-sparks {\n  position: absolute;\n  inset: 0;\n}\n\n.lm-sparks > i {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 4px;\n  height: 4px;\n  border-radius: 50%;\n  background: #ffffff;\n  box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 22px rgba(200, 220, 250, 0.5);\n  opacity: 0;\n}\n\n/* 鈹€鈹€ 6. 鐧藉睆 / 鏂板満鏅?/ WebGL 杞満 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-newscene {\n  display: none;\n}\n\n/* 閫忔槑 WebGL 鐢诲竷锛氱櫧鍦烘挄瑁傚悗鐩存帴閫忓嚭涓嬫柟鐪熷疄涓荤晫闈紙DOM锛?*/\n.lm-webgl {\n  position: absolute;\n  inset: 0;\n  z-index: 8;\n  width: 100%;\n  height: 100%;\n  display: none;\n  background: transparent;\n}\n\n.lm-white {\n  position: absolute;\n  inset: 0;\n  z-index: 9;\n  background: #ffffff;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.lm-subtitle {\n  position: absolute;\n  left: 50%;\n  bottom: 8.4%;\n  z-index: 10;\n  translate: -50% 8px;\n  font-family: var(--lm-serif);\n  font-size: clamp(14px, 1.3vw, 19px);\n  letter-spacing: 0.3em;\n  padding-left: 0.3em;\n  white-space: nowrap;\n  color: rgba(248, 250, 255, 0.95);\n  text-shadow: 0 0 22px rgba(0, 0, 0, 0.75), 0 0 40px rgba(210, 222, 245, 0.25);\n  opacity: 0;\n  pointer-events: none;\n  transition: opacity 0.7s ease, translate 0.7s ease;\n}\n\n.lm-subtitle.is-on {\n  opacity: 1;\n  translate: -50% 0;\n}\n\n.lm-fail {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  z-index: 30;\n  translate: -50% -50%;\n  padding: 10px 18px;\n  font-family: var(--lm-serif);\n  font-size: 15px;\n  letter-spacing: 0.2em;\n  color: #eef2ff;\n  background: rgba(11, 10, 14, 0.8);\n  border: 1px solid rgba(220, 228, 248, 0.2);\n}\n\n.lm-fail[hidden] {\n  display: none;\n}\n\n.lm-debug {\n  position: absolute;\n  left: 12px;\n  bottom: 12px;\n  z-index: 40;\n  padding: 6px 10px;\n  border: 1px solid rgba(168, 200, 224, 0.3);\n  background: rgba(0, 0, 0, 0.55);\n  font-family: var(--lm-mono);\n  font-size: 11px;\n  color: #c8d6e0;\n}\n\n/* 鈹€鈹€ 7. 鐘舵€佺被锛氬～鍏呭畬鎴?/ 鎶栧姩 / 鐧藉睆 / 杞満 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-star-on .lm-star-wrap {\n  animation: lm-star-in 1.5s ease-out both;\n}\n\n/* 鏄熺偣锛?8 涓笉鍚屾柟鍚戯紙鐖嗗彂鏃跺悜澶栭鏁ｏ級 */\n.lm-sparks > i:nth-child(1) {\n  --sx: -180px;\n  --sy: -120px;\n}\n.lm-sparks > i:nth-child(2) {\n  --sx: -120px;\n  --sy: -200px;\n}\n.lm-sparks > i:nth-child(3) {\n  --sx: -60px;\n  --sy: -260px;\n}\n.lm-sparks > i:nth-child(4) {\n  --sx: 40px;\n  --sy: -240px;\n}\n.lm-sparks > i:nth-child(5) {\n  --sx: 110px;\n  --sy: -180px;\n}\n.lm-sparks > i:nth-child(6) {\n  --sx: 190px;\n  --sy: -80px;\n}\n.lm-sparks > i:nth-child(7) {\n  --sx: 240px;\n  --sy: 20px;\n}\n.lm-sparks > i:nth-child(8) {\n  --sx: 200px;\n  --sy: 140px;\n}\n.lm-sparks > i:nth-child(9) {\n  --sx: 120px;\n  --sy: 220px;\n}\n.lm-sparks > i:nth-child(10) {\n  --sx: 40px;\n  --sy: 280px;\n}\n.lm-sparks > i:nth-child(11) {\n  --sx: -60px;\n  --sy: 260px;\n}\n.lm-sparks > i:nth-child(12) {\n  --sx: -140px;\n  --sy: 200px;\n}\n.lm-sparks > i:nth-child(13) {\n  --sx: -220px;\n  --sy: 100px;\n}\n.lm-sparks > i:nth-child(14) {\n  --sx: -260px;\n  --sy: -10px;\n}\n.lm-sparks > i:nth-child(15) {\n  --sx: -220px;\n  --sy: -160px;\n}\n.lm-sparks > i:nth-child(16) {\n  --sx: 260px;\n  --sy: -140px;\n}\n.lm-sparks > i:nth-child(17) {\n  --sx: 160px;\n  --sy: 260px;\n}\n.lm-sparks > i:nth-child(18) {\n  --sx: -160px;\n  --sy: 260px;\n}\n\n.lm-webgl.is-out {\n  opacity: 0;\n  transition: opacity 0.22s ease;\n}\n\n.lm-star-wrap.lm-shaking {\n  filter: brightness(1.25) drop-shadow(0 0 26px rgba(255, 255, 255, 0.5));\n}\n\n.lm-star-wrap.lm-shaking .lm-star-fill {\n  filter: brightness(1.1);\n}\n\n.lm-shaking .lm-star-ghost {\n  opacity: 0.75;\n  animation: lm-ghost-shake 0.12s steps(2) infinite;\n}\n\n.lm-star-ghost-cyan {\n  translate: -4px 0;\n}\n\n.lm-star-ghost-pink {\n  translate: 4px 0;\n}\n\n.lm-bursting .lm-burst {\n  opacity: 1;\n}\n\n.lm-bursting .lm-star-wrap {\n  animation: lm-star-burst 1.4s ease-in both;\n}\n\n.lm-bursting .lm-star-fill {\n  opacity: 0;\n  transition: opacity 0.35s ease;\n}\n\n.lm-bursting .lm-star-glow {\n  opacity: 1;\n  animation: lm-glow-burst 1.3s ease-out both;\n}\n\n.lm-bursting .lm-star-ghost {\n  opacity: 0.9;\n  animation: lm-ghost-burst 1.1s ease-out both;\n}\n\n.lm-bursting .lm-star-ghost-cyan {\n  translate: -10px 0;\n}\n\n.lm-bursting .lm-star-ghost-pink {\n  translate: 10px 0;\n}\n\n.lm-bursting .lm-rays {\n  animation: lm-rays-burst 1.4s ease-out both;\n}\n\n.lm-bursting .lm-rings > i:nth-child(1) {\n  animation: lm-ring-burst 1.2s 0.05s ease-out both;\n}\n\n.lm-bursting .lm-rings > i:nth-child(2) {\n  animation: lm-ring-burst 1.35s 0.18s ease-out both;\n}\n\n.lm-bursting .lm-rings > i:nth-child(3) {\n  animation: lm-ring-burst 1.5s 0.3s ease-out both;\n}\n\n.lm-bursting .lm-feather {\n  animation: lm-feather-burst 1.5s ease-out both;\n}\n\n.lm-bursting .lm-sparks > i {\n  animation: lm-spark-burst 1.1s ease-out both;\n}\n\n.lm-whiteout .lm-white {\n  opacity: 1 !important;\n  animation: none !important;\n  transition: opacity 0.22s ease;\n}\n\n.lm-bursting .lm-white {\n  animation: none;\n}\n\n/* 鐧藉満鍙湪 burst3锛?.2s 璧凤級蹇€熸彁浜紱burst1/2 淇濇寔娣辫壊鏀惧皠鍦洪潰 */\n.lm-burst3 .lm-white {\n  animation: lm-white-in 0.16s 0.24s ease-in both;\n}\n\n.lm-transitioning .lm-webgl {\n  display: block;\n}\n\n/* 杞満鏈熼棿璁╃敾甯冧笅鏂圭洿鎺ユ槸鐪熷疄涓荤晫闈細闅愯棌鐧借壊鍦烘櫙灞傦紝\n   鐢诲竷鐢ㄩ€忔槑 alpha 鎾曡锛岄湶鍑?DOM锛堣€屼笉鏄?splash 鑷繁鐨勮儗鏅級銆?*/\n#light-mirror-root.lm-root.lm-transitioning,\n#light-mirror-root.lm-root.lm-transitioning .lm-scene {\n  background: transparent !important;\n}\n\n/* 鍏抽敭锛欻ost 鐨勯灞忛粦鑹?veil 浣嶄簬 splash 鏍逛箣涓嬨€佺湡瀹?DOM 涔嬩笂銆?   杞満鎾曡鏃跺繀椤绘妸瀹冧篃闅愯棌锛屽惁鍒欓€忔槑鐢诲竷闇插嚭鐨勫彧鏄函榛?veil锛岃€屼笉鏄湡瀹炰富鐣岄潰銆?*/\nhtml.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-veil,\nhtml.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-root {\n  background: transparent !important;\n}\n\nhtml.lm-lock:has(#light-mirror-root.lm-transitioning) #light-mirror-veil {\n  display: none !important;\n  opacity: 0 !important;\n}\n\nhtml.lm-lock:has(#light-mirror-root.lm-transitioning),\nhtml.lm-lock:has(#light-mirror-root.lm-transitioning) body {\n  background: transparent !important;\n}\n\n.lm-transitioning .lm-bg,\n.lm-transitioning .lm-fog,\n.lm-transitioning .lm-bands,\n.lm-transitioning .lm-star-wrap,\n.lm-transitioning .lm-burst,\n.lm-transitioning .lm-white {\n  opacity: 0 !important;\n  transition: opacity 0.12s linear;\n  pointer-events: none;\n}\n\n.lm-transitioning .lm-white {\n  opacity: 0;\n  animation: none;\n  transition: opacity 0.1s ease;\n}\n\n.lm-transitioning .lm-newscene {\n  opacity: 1;\n  z-index: 8;\n}\n\n#light-mirror-root.lm-root.lm-revealing,\n#light-mirror-root.lm-root.lm-revealing .lm-scene {\n  background: transparent !important;\n}\n\n#light-mirror-root.lm-root.lm-revealing .lm-scene {\n  opacity: 0;\n  transition: opacity 0.26s ease;\n}\n\n#light-mirror-root.lm-root.lm-revealing .lm-scene * {\n  animation-play-state: paused !important;\n}\n\n#light-mirror-root.lm-root.lm-revealing .lm-subtitle {\n  opacity: 0 !important;\n  transition: none !important;\n}\n\n#light-mirror-root.lm-root.lm-revealing .lm-webgl,\n#light-mirror-root.lm-root.lm-revealing .lm-newscene {\n  opacity: 0 !important;\n  transition: opacity 0.22s ease !important;\n}\n\n.lm-fallback-transition .lm-newscene {\n  opacity: 0;\n  animation: lm-fallback-fade 1.2s ease both;\n}\n\n.lm-fallback-transition .lm-white {\n  animation: lm-white-in 1.2s ease both;\n}\n\n.lm-frozen .lm-scene * {\n  animation-play-state: paused !important;\n}\n\n/* 鈹€鈹€ 8. reduced-motion 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n.lm-reduced .lm-scene * {\n  animation: none !important;\n}\n\n.lm-reduced .lm-star-wrap {\n  opacity: 1;\n}\n\n.lm-reduced .lm-bands > i {\n  opacity: 0.4;\n}\n\n.lm-reduced .lm-fog,\n.lm-reduced .lm-burst {\n  display: none;\n}\n\n.lm-reduced .lm-white {\n  transition: opacity 0.35s ease;\n}\n\n/* 鈹€鈹€ 9. 灏忓睆 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n@media (max-width: 780px) {\n  .lm-star-wrap {\n    width: min(44vmin, 300px);\n    height: min(66vmin, 560px);\n    top: 46%;\n  }\n\n  .lm-bands {\n    height: 62%;\n  }\n\n  .lm-subtitle {\n    bottom: 6.2%;\n    font-size: 13px;\n    letter-spacing: 0.2em;\n  }\n\n  .lm-rays {\n    width: 200vmax;\n    height: 200vmax;\n  }\n\n  /* 窄屏：放射光带整体缩短，确保外端不顶到屏幕边缘 */\n  .lm-radials {\n    transform: scale(0.68);\n  }\n}\n\n@media (max-height: 560px) and (min-width: 781px) {\n  .lm-star-wrap {\n    height: 76vmin;\n  }\n}\n\n/* 鈹€鈹€ 10. keyframes 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */\n\n@keyframes lm-stars-twinkle {\n  0%,\n  100% {\n    opacity: 0.4;\n  }\n  50% {\n    opacity: 0.75;\n  }\n}\n\n@keyframes lm-fog-breathe {\n  0%,\n  100% {\n    opacity: 0.7;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 1;\n    transform: scale(1.03);\n  }\n}\n\n@keyframes lm-band-float {\n  0% {\n    transform: translateY(0) scaleY(0.7);\n    opacity: 0;\n  }\n  12% {\n    opacity: var(--op);\n  }\n  55% {\n    opacity: calc(var(--op) * 0.8);\n  }\n  88% {\n    opacity: 0;\n  }\n  100% {\n    transform: translateY(-58vh) scaleY(1.15);\n    opacity: 0;\n  }\n}\n\n@keyframes lm-band-flicker {\n  0%,\n  100% {\n    filter: none;\n  }\n  50% {\n    filter: none;\n  }\n}\n\n@keyframes lm-burst-core {\n  0% {\n    opacity: 0;\n    scale: 0.45;\n  }\n  55% {\n    opacity: 1;\n    scale: 1.15;\n  }\n  100% {\n    opacity: 1;\n    scale: 2.6;\n  }\n}\n\n@keyframes lm-ghost-burst {\n  0% {\n    opacity: 0.3;\n    scale: 1;\n  }\n  40% {\n    opacity: 1;\n    scale: 1.5;\n  }\n  100% {\n    opacity: 0;\n    scale: 2.4;\n  }\n}\n\n@keyframes lm-star-in {\n  0% {\n    opacity: 0;\n    scale: 0.82;\n    \n  }\n  22% {\n    opacity: 1;\n  }\n  100% {\n    opacity: 1;\n    scale: 1;\n    filter: none;\n  }\n}\n\n@keyframes lm-star-glow {\n  0%,\n  100% {\n    opacity: 0.6;\n    transform: scale(1);\n  }\n  50% {\n    opacity: 1;\n    transform: scale(1.06);\n  }\n}\n\n@keyframes lm-ghost-shake {\n  0% {\n    opacity: 0.55;\n  }\n  100% {\n    opacity: 0.85;\n  }\n}\n\n@keyframes lm-star-burst {\n  0% {\n    scale: 1;\n    filter: brightness(1.2);\n  }\n  55% {\n    scale: 1.35;\n    filter: brightness(2.4) blur(2px);\n  }\n  100% {\n    scale: 2.1;\n    filter: brightness(4) blur(10px);\n  }\n}\n\n@keyframes lm-glow-burst {\n  0% {\n    opacity: 0.6;\n    transform: scale(1);\n  }\n  60% {\n    opacity: 1;\n    transform: scale(1.6);\n  }\n  100% {\n    opacity: 1;\n    transform: scale(3.2);\n  }\n}\n\n@keyframes lm-rays-burst {\n  0% {\n    opacity: 0;\n    transform: scale(0.4) rotate(0deg);\n  }\n  35% {\n    opacity: 0.9;\n  }\n  100% {\n    opacity: 1;\n    transform: scale(1.1) rotate(9deg);\n  }\n}\n\n@keyframes lm-ring-burst {\n  0% {\n    opacity: 0;\n    scale: 0.5;\n  }\n  30% {\n    opacity: 0.85;\n  }\n  100% {\n    opacity: 0;\n    scale: 2.4;\n  }\n}\n\n@keyframes lm-feather-burst {\n  0% {\n    opacity: 0;\n    transform: scale(0.5) rotate(0deg);\n  }\n  40% {\n    opacity: 0.9;\n  }\n  100% {\n    opacity: 0.7;\n    transform: scale(1.25) rotate(16deg);\n  }\n}\n\n@keyframes lm-spark-burst {\n  0% {\n    opacity: 0;\n    translate: 0 0;\n    scale: 0.4;\n  }\n  30% {\n    opacity: 1;\n  }\n  100% {\n    opacity: 0;\n    translate: var(--sx, 0) var(--sy, 0);\n    scale: 1.2;\n  }\n}\n\n@keyframes lm-white-in {\n  0% {\n    opacity: 0;\n  }\n  55% {\n    opacity: 0.55;\n  }\n  100% {\n    opacity: 1;\n  }\n}\n\n@keyframes lm-fallback-fade {\n  0% {\n    opacity: 0;\n  }\n  100% {\n    opacity: 1;\n  }\n}\n\n/* ============================================================================\n * v6 鐖嗗彂娈碉細閿愯竟鏀惧皠鍏夊甫锛? 绮?+ 3 缁嗭級+ 搴曡‖ + 妯＄硦鍗佸瓧鏄熷厜鏅? *          burst2锛氱粏甯﹀彉绮?搴曡‖鍑虹幇/澶у渾鐜?鏇村绔栧厜鏉? *          burst3锛氬褰╁厜/绾㈤粍钃濆垎灞?褰╄壊鐐?涓嶈鍒欏厜鏅曪紙fallback 杈圭紭姗欑孩榛勬斁灏勫厜锛? * ========================================================================== */\n\n/* ── 合并后的整体提亮层（单元素多层渐变，非三块独立光晕）──────────────────\n * 中心大范围柔光 + 左下/右下自屏幕外向内的大范围角光（角点最亮、向中心衰减）。\n * 角光曲线来自 图13 左下角实测（`v6-fig13-corner-measure.json`）：\n *   归一化亮度 r/R: 0→1, .17→.79, .29→.69, .48→.46, .63→.32, .75→.18, .98→.07\n *   R ≈ 52vmin（1920 实测约 520px，×1600/1920≈433px≈48vmin，取 52vmin 略大以衔接全屏）\n * 只动 opacity（0 → .85，0.6s 连续渐入），burst2/3 继续平滑升到 1。 */\n.lm-glow {\n  position: absolute;\n  inset: 0;\n  z-index: 1;\n  opacity: 0;\n  pointer-events: none;\n  background:\n    /* 左下角：角点最亮，自外向内衰减 */\n    radial-gradient(\n      circle 52vmin at 0% 100%,\n      rgba(255, 244, 230, 0.52) 0%,\n      rgba(255, 240, 224, 0.47) 10%,\n      rgba(255, 236, 218, 0.38) 20%,\n      rgba(255, 232, 214, 0.30) 32%,\n      rgba(255, 230, 212, 0.22) 46%,\n      rgba(255, 228, 210, 0.13) 62%,\n      rgba(255, 226, 208, 0.06) 78%,\n      rgba(255, 224, 206, 0.02) 92%,\n      transparent 100%\n    ),\n    /* 右下角：角点最亮，自外向内衰减 */\n    radial-gradient(\n      circle 50vmin at 100% 100%,\n      rgba(255, 242, 228, 0.46) 0%,\n      rgba(255, 238, 222, 0.41) 10%,\n      rgba(255, 234, 216, 0.33) 21%,\n      rgba(255, 230, 212, 0.26) 33%,\n      rgba(255, 228, 210, 0.19) 47%,\n      rgba(255, 226, 208, 0.11) 63%,\n      rgba(255, 224, 206, 0.05) 79%,\n      rgba(255, 222, 204, 0.02) 92%,\n      transparent 100%\n    ),\n    /* 中心大范围柔光（连续过渡，不是独立光斑） */\n    radial-gradient(\n      circle 70vmin at 50% 47%,\n      rgba(255, 255, 255, 0.24) 0%,\n      rgba(255, 253, 249, 0.17) 24%,\n      rgba(255, 251, 245, 0.10) 44%,\n      rgba(255, 249, 242, 0.04) 66%,\n      transparent 100%\n    ),\n    /* 底部整体微亮，把两角与中心连成连续带 */\n    linear-gradient(0deg, rgba(255, 238, 224, 0.1) 0%, rgba(255, 236, 222, 0.04) 26%, transparent 52%);\n  mix-blend-mode: screen;\n  transition: opacity 0.6s ease;\n  will-change: opacity;\n}\n\n/* 鏃嬭浆瀹瑰櫒 + 6 鏉￠攼杈规斁灏勫厜甯?*/\n.lm-radials {\n  position: absolute;\n  inset: 0;\n  opacity: 0;\n  transform-origin: 50% 47%;\n  animation: lm-radials-spin 7s linear infinite;\n}\n\n.lm-bursting .lm-radials {\n  opacity: 1;\n}\n\n.lm-radial {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: var(--l);\n  height: var(--w);\n  translate: -50% -50%;\n  rotate: var(--a);\n  scale: var(--sx, 0.8) var(--sy, 0.8);\n  background: linear-gradient(\n    180deg,\n    transparent 0,\n    rgba(255, 255, 255, 0.16) 1px,\n    #ffffff 2.2px,\n    #ffffff calc(100% - 2.2px),\n    rgba(255, 255, 255, 0.16) calc(100% - 1px),\n    transparent 100%\n  );\n  /* 中心亮、向外沿长度逐渐衰减到 0；横向锐边（1–2px 过渡） */\n  -webkit-mask-image: linear-gradient(\n    90deg,\n    transparent 0%,\n    rgba(0, 0, 0, 0.08) 8%,\n    rgba(0, 0, 0, 0.45) 24%,\n    #000 50%,\n    rgba(0, 0, 0, 0.45) 76%,\n    rgba(0, 0, 0, 0.08) 92%,\n    transparent 100%\n  );\n  mask-image: linear-gradient(\n    90deg,\n    transparent 0%,\n    rgba(0, 0, 0, 0.08) 8%,\n    rgba(0, 0, 0, 0.45) 24%,\n    #000 50%,\n    rgba(0, 0, 0, 0.45) 76%,\n    rgba(0, 0, 0, 0.08) 92%,\n    transparent 100%\n  );\n  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);\n  mix-blend-mode: screen;\n  will-change: transform, opacity;\n  transition: scale 0.45s ease, opacity 0.3s ease;\n  animation: lm-radial-in 0.5s ease-out both;\n}\n\n/* 底衬光带：同元素 ::before，更宽（2.2×）、略暗（opacity .25–.4） */\n.lm-radial::before {\n  content: "";\n  position: absolute;\n  left: -2%;\n  right: -2%;\n  top: 50%;\n  height: calc(var(--w) * 2.2);\n  translate: 0 -50%;\n  background: linear-gradient(\n    180deg,\n    transparent 0,\n    rgba(255, 255, 255, 0.7) 12%,\n    rgba(255, 255, 255, 0.5) 50%,\n    rgba(255, 255, 255, 0.7) 88%,\n    transparent 100%\n  );\n  opacity: 0;\n  mix-blend-mode: screen;\n  transition: opacity 0.45s ease;\n}\n\n.lm-burst1 .lm-radial {\n  --sx: 0.8;\n  --sy: 0.8;\n}\n\n.lm-burst2 .lm-radial {\n  --sx: 1;\n  --sy: 1;\n}\n\n/* 第二阶段：细带变粗（横向 scale 2.2×，只动 transform） */\n.lm-burst2 .lm-radial--thin {\n  --sy: 2.2;\n}\n\n.lm-burst2 .lm-radial::before {\n  opacity: 0.32;\n}\n\n.lm-burst3 .lm-radial {\n  --sx: 1.1;\n  --sy: 1.1;\n}\n\n.lm-burst3 .lm-radial--thin {\n  --sy: 2.2;\n}\n\n.lm-burst3 .lm-radial::before {\n  opacity: 0.38;\n}\n\n/* 妯＄硦缁嗛暱鐧借壊鍗佸瓧鏄熷厜鏅曪紙鐩栧湪涓ぎ鏄熶箣涓婏紝浣嗕腑澶槦 z-index 鏇撮珮淇濇寔鏈€鍓嶏級 */\n.lm-burstcross {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 66vmin;\n  height: 138vmin;\n  translate: -50% -50%;\n  opacity: 0;\n  mix-blend-mode: screen;\n  pointer-events: none;\n}\n\n.lm-burstcross-svg {\n  width: 100%;\n  height: 100%;\n  opacity: 0.92;\n}\n\n.lm-burst1 .lm-burstcross,\n.lm-burst2 .lm-burstcross,\n.lm-burst3 .lm-burstcross {\n  opacity: 0.9;\n  animation: lm-burstcross-grow 1.4s ease-out both, lm-burstcross-spin 9s linear infinite;\n}\n\n/* burst 鏈熼澶栦笂娴珫鍏夋潯 */\n.lm-rise {\n  position: absolute;\n  inset: 0;\n  opacity: 0;\n  pointer-events: none;\n}\n\n.lm-rise > i {\n  position: absolute;\n  bottom: -2%;\n  left: var(--x);\n  width: var(--w);\n  height: var(--h);\n  display: block;\n  border-radius: 50% / 5%;\n  background: linear-gradient(180deg, transparent 0%, rgba(220, 232, 255, 0.55) 40%, rgba(255, 255, 255, 0.95) 82%, transparent 100%);\n  box-shadow: 0 0 12px rgba(230, 240, 255, 0.35);\n  \n  mix-blend-mode: screen;\n  animation: lm-band-float var(--dur) var(--delay) infinite;\n}\n\n.lm-bursting .lm-rise {\n  opacity: 0.9;\n}\n\n/* 澶氬僵鍏夛紙burst3锛夛細绾㈤粍钃濆垎灞?+ 褰╄壊鐐?+ 涓嶈鍒欏厜鏅?*/\n.lm-dots {\n  position: absolute;\n  inset: 0;\n  opacity: 0;\n  background-image: radial-gradient(2px 2px at 12% 22%, rgba(255, 214, 140, 0.95), transparent 3px),\n    radial-gradient(2px 2px at 24% 68%, rgba(255, 120, 90, 0.9), transparent 3px),\n    radial-gradient(1.6px 1.6px at 36% 32%, rgba(255, 255, 255, 0.95), transparent 3px),\n    radial-gradient(2px 2px at 48% 76%, rgba(140, 210, 255, 0.9), transparent 3px),\n    radial-gradient(1.6px 1.6px at 58% 18%, rgba(255, 220, 120, 0.9), transparent 3px),\n    radial-gradient(2px 2px at 66% 58%, rgba(255, 150, 190, 0.9), transparent 3px),\n    radial-gradient(1.4px 1.4px at 74% 34%, rgba(180, 230, 255, 0.9), transparent 3px),\n    radial-gradient(2px 2px at 82% 72%, rgba(255, 190, 120, 0.9), transparent 3px),\n    radial-gradient(1.6px 1.6px at 90% 26%, rgba(255, 255, 255, 0.9), transparent 3px),\n    radial-gradient(1.8px 1.8px at 18% 84%, rgba(255, 170, 120, 0.85), transparent 3px),\n    radial-gradient(1.5px 1.5px at 44% 12%, rgba(255, 230, 170, 0.85), transparent 3px),\n    radial-gradient(1.8px 1.8px at 88% 88%, rgba(255, 140, 120, 0.85), transparent 3px);\n  mix-blend-mode: screen;\n  animation: lm-dots-twinkle 1.6s ease-in-out infinite;\n}\n\n.lm-burst3 .lm-dots {\n  opacity: 1;\n}\n\n.lm-iri {\n  position: absolute;\n  left: 50%;\n  top: 47%;\n  width: 118vmax;\n  height: 118vmax;\n  translate: -50% -50%;\n  opacity: 0;\n  background: conic-gradient(\n      from 24deg at 50% 50%,\n      rgba(255, 92, 64, 0.34) 0deg 28deg,\n      rgba(255, 196, 96, 0.3) 28deg 62deg,\n      rgba(255, 240, 160, 0.26) 62deg 96deg,\n      rgba(120, 214, 255, 0.28) 96deg 150deg,\n      rgba(110, 150, 255, 0.24) 150deg 198deg,\n      rgba(255, 120, 210, 0.28) 198deg 252deg,\n      rgba(255, 92, 64, 0.3) 252deg 300deg,\n      rgba(255, 180, 110, 0.26) 300deg 360deg\n    ),\n    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 186, 120, 0.24) 26%, transparent 58%);\n  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0 18%, rgba(0, 0, 0, 0.85) 34%, transparent 64%);\n  mask-image: radial-gradient(circle at 50% 50%, #000 0 18%, rgba(0, 0, 0, 0.85) 34%, transparent 64%);\n  \n  mix-blend-mode: screen;\n  animation: lm-iri-spin 6s linear infinite;\n  transition: opacity 0.35s ease;\n}\n\n.lm-burst3 .lm-iri {\n  opacity: 1;\n}\n\n/* burst3 fallback锛氬睆骞曡竟缂樺ぇ閲忔/绾?榛勬ā绯婃斁灏勫厜甯︼紙鏈夌矖鏈夌粏锛?*/\n.lm-edge {\n  position: absolute;\n  inset: -12%;\n  opacity: 0;\n  background: repeating-conic-gradient(\n    from 0deg at 50% 47%,\n    rgba(255, 148, 66, 0.42) 0deg 1.4deg,\n    rgba(255, 148, 66, 0) 1.4deg 4.6deg,\n    rgba(255, 92, 64, 0.34) 4.6deg 5.8deg,\n    rgba(255, 92, 64, 0) 5.8deg 9.4deg,\n    rgba(255, 214, 120, 0.36) 9.4deg 10.6deg,\n    rgba(255, 214, 120, 0) 10.6deg 14.2deg\n  );\n  -webkit-mask-image: radial-gradient(circle at 50% 47%, transparent 0 30%, rgba(0, 0, 0, 0.55) 48%, #000 66%, #000 100%);\n  mask-image: radial-gradient(circle at 50% 47%, transparent 0 30%, rgba(0, 0, 0, 0.55) 48%, #000 66%, #000 100%);\n  \n  mix-blend-mode: screen;\n  transition: opacity 0.35s ease;\n}\n\n.lm-burst3 .lm-edge {\n  opacity: 1;\n}\n\n/* burst 鏈熸棫鏁村睆鍏夋檿鍑忓急锛岃閿愯竟鍏夊甫鎴愪负涓昏 */\n.lm-burst1 .lm-rays,\n.lm-burst2 .lm-rays {\n  opacity: 0.15;\n}\n\n.lm-burst1 .lm-feather,\n.lm-burst2 .lm-feather {\n  opacity: 0.5;\n}\n\n.lm-burst2 .lm-rings > i:nth-child(1) {\n  animation-duration: 1.5s;\n}\n\n.lm-burst2 .lm-rings > i:nth-child(2) {\n  animation-duration: 1.6s;\n}\n\n.lm-burst2 .lm-rings > i:nth-child(3) {\n  animation-duration: 1.7s;\n}\n\n@keyframes lm-radials-spin {\n  from {\n    rotate: 0deg;\n  }\n  to {\n    rotate: 360deg;\n  }\n}\n\n@keyframes lm-radial-in {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes lm-burstcross-grow {\n  0% {\n    scale: 0.5;\n    opacity: 0;\n  }\n  40% {\n    opacity: 0.85;\n  }\n  100% {\n    scale: 1.55;\n    opacity: 0.9;\n  }\n}\n\n@keyframes lm-burstcross-spin {\n  from {\n    rotate: -10deg;\n  }\n  to {\n    rotate: 14deg;\n  }\n}\n\n@keyframes lm-iri-spin {\n  from {\n    rotate: 0deg;\n  }\n  to {\n    rotate: 360deg;\n  }\n}\n\n@keyframes lm-dots-twinkle {\n  0%,\n  100% {\n    opacity: 0.75;\n  }\n  50% {\n    opacity: 1;\n  }\n}\n\n\n\n\n\r\n';
+
+// src/client/splashCss.js
+var STYLE_ID = "light-mirror-splash-inline";
+function injectSplashCss() {
+  try {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = STYLE_ID;
+    style.dataset.lmuiSplashInline = "1";
+    style.textContent = styles_default;
+    (document.head || document.documentElement).appendChild(style);
+  } catch (error) {
+  }
+}
+injectSplashCss();
+
+// src/splash/dom.js
+function resolveUrl(path) {
+  if (typeof path !== "string") return "";
+  if (window.location.protocol !== "file:") return path;
+  return path.replace(/^\/light-mirror\//, "../");
+}
+function devFallback(key) {
+  try {
+    const map = window.__LIGHT_MIRROR_DEV_FALLBACK__;
+    if (map && typeof map === "object" && typeof map[key] === "string") return map[key];
+  } catch (error) {
+  }
+  return "";
+}
+function mountImage(img) {
+  if (!img) return;
+  const chain = [];
+  const primary = img.getAttribute("data-src") || "";
+  if (primary) chain.push(resolveUrl(primary));
+  const dev = img.getAttribute("data-dev-fallback") || "";
+  if (dev) chain.push(resolveUrl(dev));
+  if (!chain.length) return;
+  let index = 0;
+  const next = function() {
+    if (index >= chain.length) {
+      img.style.display = "none";
+      return;
+    }
+    img.src = chain[index];
+    index += 1;
+  };
+  img.addEventListener("load", function() {
+    img.classList.add("is-loaded");
+  });
+  img.addEventListener("error", next);
+  next();
+}
+function slenderStarPath(scale, wobbleAmp, seed) {
+  const cx = 100;
+  const cy = 180;
+  const waist = 3.2;
+  const innerY = 46;
+  const pts = [
+    [100, 6],
+    [cx + waist, cy - innerY],
+    [136, 180],
+    [cx + waist, cy + innerY],
+    [100, 354],
+    [cx - waist, cy + innerY],
+    [64, 180],
+    [cx - waist, cy - innerY]
+  ];
+  let s = seed || 1;
+  const rand2 = function() {
+    s = s * 16807 % 2147483647;
+    return s / 2147483647;
+  };
+  const out = [];
+  for (let i = 0; i < pts.length; i += 1) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    const steps = 7;
+    for (let k = 0; k < steps; k += 1) {
+      const t = k / steps;
+      let x = a[0] + (b[0] - a[0]) * t;
+      let y = a[1] + (b[1] - a[1]) * t;
+      if (wobbleAmp > 0) {
+        const nx = -(b[1] - a[1]);
+        const ny = b[0] - a[0];
+        const len = Math.hypot(nx, ny) || 1;
+        const off = Math.sin(t * Math.PI * 3 + rand2() * 6.283) * wobbleAmp;
+        x += nx / len * off;
+        y += ny / len * off;
+      }
+      out.push([cx + (x - cx) * scale, cy + (y - cy) * scale]);
+    }
+  }
+  let d = "M" + out[0][0].toFixed(2) + "," + out[0][1].toFixed(2);
+  for (let i = 1; i < out.length; i += 1) d += "L" + out[i][0].toFixed(2) + "," + out[i][1].toFixed(2);
+  return d + "Z";
+}
+function starBaseSvg() {
+  const large = slenderStarPath(1, 2.2, 11);
+  const medium = slenderStarPath(0.52, 0, 11);
+  return '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmStarEdge" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="4.6" result="b"/><feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="b" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/></filter><mask id="lmStarCut"><rect x="0" y="0" width="200" height="360" fill="#fff"/><path d="' + medium + '" fill="#000"/></mask></defs><path class="lm-star-large" d="' + large + '" filter="url(#lmStarEdge)" mask="url(#lmStarCut)"/><path class="lm-star-medium" d="' + medium + '"/></svg>';
+}
+function starFillSvg() {
+  const small = slenderStarPath(0.27, 0, 11);
+  return '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path class="lm-star-small" d="' + small + '"/></svg>';
+}
+function bandsHtml() {
+  const list = [];
+  const count = 22;
+  let s = 7;
+  const rand2 = function() {
+    s = s * 16807 % 2147483647;
+    return s / 2147483647;
+  };
+  for (let i = 0; i < count; i += 1) {
+    const side = rand2() > 0.5 ? 1 : -1;
+    const u = Math.pow(rand2(), 0.55);
+    const xPct = 50 + side * u * 48;
+    const edge = Math.abs(xPct - 50) / 50;
+    const dip = 0.28 + 0.72 * Math.pow(edge, 0.8);
+    const h5 = (0.12 + rand2() * 0.3) * (0.6 + 1.1 * dip);
+    const w = 2 + rand2() * 10;
+    const delay = -rand2() * 9;
+    const dur = 5 + rand2() * 7;
+    const op = 0.26 + rand2() * 0.5;
+    const warm = rand2() < 0.3;
+    const tint = warm ? "rgba(255,226,200,0.9)" : "rgba(214,226,255,0.9)";
+    list.push(
+      '<i style="--x:' + xPct.toFixed(2) + "%;--h:" + (h5 * 100).toFixed(1) + "%;--w:" + w.toFixed(1) + "px;--delay:" + delay.toFixed(2) + "s;--dur:" + dur.toFixed(2) + "s;--op:" + op.toFixed(2) + ";--tint:" + tint + '"></i>'
+    );
+  }
+  return list.join("");
+}
+function radialsHtml() {
+  const defs = [
+    { cls: "thick", a: 60, len: 80, w: 52 },
+    { cls: "thick", a: 178, len: 122, w: 48 },
+    { cls: "thick", a: 298, len: 82, w: 50 },
+    { cls: "thin", a: 145, len: 108, w: 8 },
+    { cls: "thin", a: 234, len: 92, w: 7 },
+    { cls: "thin", a: 326, len: 112, w: 7.5 }
+  ];
+  return defs.map(function(d) {
+    return '<i class="lm-radial lm-radial--' + d.cls + '" style="--a:' + d.a + "deg;--l:" + d.len + "vmax;--w:" + d.w + 'px"></i>';
+  }).join("");
+}
+function riseHtml() {
+  const list = [];
+  let s = 31;
+  const rand2 = function() {
+    s = s * 16807 % 2147483647;
+    return s / 2147483647;
+  };
+  for (let i = 0; i < 6; i += 1) {
+    const x = 8 + rand2() * 84;
+    const h5 = 18 + rand2() * 34;
+    const w = 1.5 + rand2() * 4;
+    const delay = -rand2() * 2;
+    const dur = 0.9 + rand2() * 1.2;
+    list.push(
+      '<i style="--x:' + x.toFixed(1) + "%;--h:" + h5.toFixed(1) + "%;--w:" + w.toFixed(1) + "px;--delay:" + delay.toFixed(2) + "s;--dur:" + dur.toFixed(2) + 's"></i>'
+    );
+  }
+  return list.join("");
+}
+function burstCrossSvg() {
+  const d = slenderStarPath(1.55, 0, 23);
+  return '<svg class="lm-burstcross-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="22"/></filter></defs><path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>';
+}
+function buildScene(root, cfg, debug) {
+  root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-base">' + starBaseSvg() + '</div><div class="lm-star-fill">' + starFillSvg() + '</div><div class="lm-star-ghost lm-star-ghost-cyan">' + starBaseSvg() + '</div><div class="lm-star-ghost lm-star-ghost-pink">' + starBaseSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
+  const q = function(sel) {
+    return root.querySelector(sel);
+  };
+  const qa = function(sel) {
+    return Array.prototype.slice.call(root.querySelectorAll(sel));
+  };
+  const ui = {
+    root,
+    scene: q(".lm-scene"),
+    bands: qa(".lm-bands > i"),
+    starWrap: q(".lm-star-wrap"),
+    starBase: q(".lm-star-base"),
+    starFill: q(".lm-star-fill"),
+    burst: q(".lm-burst"),
+    rings: qa(".lm-rings > i"),
+    feather: q(".lm-feather"),
+    sparks: qa(".lm-sparks > i"),
+    newScene: q(".lm-newscene"),
+    webgl: q(".lm-webgl"),
+    white: q(".lm-white"),
+    subtitle: q(".lm-subtitle"),
+    debug: null
+  };
+  mountImage(ui.newScene);
+  if (debug && debug.stats) {
+    const dbg = document.createElement("div");
+    dbg.className = "lm-debug";
+    ui.scene.appendChild(dbg);
+    ui.debug = dbg;
+  }
+  ui.setSubtitle = function(text) {
+    if (text) {
+      ui.subtitle.textContent = text;
+      ui.subtitle.classList.add("is-on");
+    } else {
+      ui.subtitle.classList.remove("is-on");
+    }
+  };
+  ui.setFill = function(progress) {
+    const p = Math.max(0, Math.min(1, Number(progress) || 0));
+    const clip = ((1 - p) * 100).toFixed(2) + "%";
+    ui.starFill.style.setProperty("--clipPct", clip);
+    ui.starWrap.style.setProperty("--fill", p.toFixed(4));
+  };
+  ui.setShake = function(scale, scaleX) {
+    ui.starWrap.style.transform = "scale(" + Number(scale).toFixed(4) + "," + Number(scaleX).toFixed(4) + ")";
+  };
+  ui.setBurst = function(on) {
+    root.classList.toggle("lm-bursting", !!on);
+  };
+  ui.setBurstPhase = function(phase) {
+    const p = Math.max(0, Math.min(3, Number(phase) || 0));
+    root.classList.toggle("lm-bursting", p > 0);
+    root.classList.toggle("lm-burst1", p === 1);
+    root.classList.toggle("lm-burst2", p === 2);
+    root.classList.toggle("lm-burst3", p === 3);
+    if (p > 0 && !root.classList.contains("lm-bursting")) root.classList.add("lm-bursting");
+  };
+  ui.setWhite = function(on) {
+    root.classList.toggle("lm-whiteout", !!on);
+  };
+  ui.setTransition = function(on) {
+    root.classList.toggle("lm-transitioning", !!on);
+  };
+  ui.domCount = function() {
+    return root.querySelectorAll("*").length + 1;
+  };
+  if (debug && debug.stats && ui.debug) {
+    ui.debug.hidden = false;
+    ui.debug.textContent = "nodes " + ui.domCount();
+  }
+  return ui;
+}
+
+// src/splash/util.js
+var MEDIA_PREFIX2 = "/light-mirror/media/";
+function resolveMedia2(url) {
+  try {
+    if (typeof url === "string" && window.location && window.location.protocol === "file:" && url.indexOf(MEDIA_PREFIX2) === 0) {
+      return "../media/" + url.slice(MEDIA_PREFIX2.length);
+    }
+  } catch (error) {
+  }
+  return url;
+}
+function clampNumber(value, lo, hi, dflt) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return dflt;
+  return Math.min(hi, Math.max(lo, n));
+}
+
+// src/splash/audio.js
+function safe(fn) {
+  try {
+    fn();
+  } catch (error) {
+  }
+}
+function createAudio(cfg) {
+  const sfxOn = cfg.sfx !== false;
+  const voiceOn = cfg.voice !== false;
+  const sfxVolume = clampNumber(cfg.sfxVolume, 0, 1, 0.5);
+  const voiceVolume = clampNumber(cfg.voiceVolume, 0, 1, 0.85);
+  const state = {
+    ctx: null,
+    master: null,
+    noise: null,
+    disposed: false,
+    voiceCache: {},
+    spoken: {}
+  };
+  function ctx() {
+    if (state.disposed) return null;
+    if (state.ctx) return state.ctx;
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    try {
+      state.ctx = new Ctor();
+      const master = state.ctx.createGain();
+      master.gain.value = sfxVolume * 0.72;
+      master.connect(state.ctx.destination);
+      state.master = master;
+      const length = Math.floor(state.ctx.sampleRate * 1.4);
+      const buffer = state.ctx.createBuffer(1, length, state.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < length; i += 1) data[i] = Math.random() * 2 - 1;
+      state.noise = buffer;
+    } catch (error) {
+      state.ctx = null;
+    }
+    return state.ctx;
+  }
+  function running() {
+    return !!(state.ctx && state.ctx.state === "running" && state.master);
+  }
+  function resume() {
+    safe(function() {
+      const ac = ctx();
+      if (ac && ac.state === "suspended") ac.resume().catch(function() {
+      });
+    });
+  }
+  function now() {
+    const ac = state.ctx;
+    return ac ? ac.currentTime + 0.012 : 0;
+  }
+  function tone(freq, options) {
+    if (!sfxOn || !running()) return;
+    const o = options || {};
+    const ac = state.ctx;
+    const t0 = now() + (o.delay || 0);
+    const dur = o.dur || 0.5;
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = o.type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    if (o.slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.slideTo), t0 + dur);
+    if (o.detune) osc.detune.value = o.detune;
+    const peak = Math.max(1e-4, (o.gain == null ? 0.1 : o.gain) * sfxVolume);
+    gain.gain.setValueAtTime(1e-4, t0);
+    gain.gain.exponentialRampToValueAtTime(peak, t0 + (o.attack || 0.02));
+    gain.gain.exponentialRampToValueAtTime(1e-4, t0 + dur);
+    osc.connect(gain);
+    gain.connect(state.master);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.05);
+  }
+  function noise(options) {
+    if (!sfxOn || !running() || !state.noise) return;
+    const o = options || {};
+    const ac = state.ctx;
+    const t0 = now() + (o.delay || 0);
+    const dur = o.dur || 0.4;
+    const src = ac.createBufferSource();
+    src.buffer = state.noise;
+    const filter = ac.createBiquadFilter();
+    filter.type = o.filter || "bandpass";
+    filter.frequency.setValueAtTime(o.freq || 900, t0);
+    if (o.freqTo) filter.frequency.exponentialRampToValueAtTime(Math.max(40, o.freqTo), t0 + dur);
+    filter.Q.value = o.q == null ? 1 : o.q;
+    const gain = ac.createGain();
+    const peak = Math.max(1e-4, (o.gain == null ? 0.08 : o.gain) * sfxVolume);
+    gain.gain.setValueAtTime(1e-4, t0);
+    gain.gain.exponentialRampToValueAtTime(peak, t0 + (o.attack || 0.04));
+    gain.gain.exponentialRampToValueAtTime(1e-4, t0 + dur);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(state.master);
+    src.start(t0);
+    src.stop(t0 + dur + 0.05);
+  }
+  const sfx = {
+    /** 黑场低鸣（0.0s） */
+    hum: function() {
+      tone(46, { type: "sine", dur: 1.6, gain: 0.13, slideTo: 62, attack: 0.35 });
+      tone(92, { type: "sine", dur: 1.2, gain: 0.04, attack: 0.4 });
+      noise({ dur: 1.4, gain: 0.03, filter: "lowpass", freq: 200, freqTo: 480, q: 0.6 });
+    },
+    /** 终端帧淡入 / 中央金光出现（1.2s） */
+    bloom: function() {
+      tone(392, { type: "sine", dur: 2.4, gain: 0.05, attack: 0.3 });
+      tone(587.33, { type: "sine", dur: 2.6, gain: 0.03, attack: 0.4, delay: 0.08 });
+      tone(880, { type: "sine", dur: 2.2, gain: 0.018, attack: 0.5, delay: 0.16 });
+      noise({ dur: 2.2, gain: 0.02, filter: "highpass", freq: 2600, q: 0.5 });
+    },
+    /** 光雨升起 / 金光增强（4.5s） */
+    lift: function() {
+      noise({ dur: 0.9, gain: 0.04, filter: "bandpass", freq: 520, freqTo: 2800, q: 0.8 });
+      tone(659.25, { type: "sine", dur: 1.4, gain: 0.03, attack: 0.2 });
+    },
+    /** 链接状态行（8.6s） */
+    status: function(index) {
+      const base = 740 + (index || 0) * 110;
+      tone(base, { type: "triangle", dur: 0.18, gain: 0.035, attack: 6e-3 });
+      tone(base * 1.5, { type: "sine", dur: 0.3, gain: 0.016, attack: 0.01, delay: 0.02 });
+    },
+    /** 五光白过曝（10.4s） */
+    overexpose: function() {
+      noise({ dur: 1.2, gain: 0.11, filter: "bandpass", freq: 700, freqTo: 5200, q: 0.6, attack: 0.06 });
+      tone(523.25, { type: "sine", dur: 1.5, gain: 0.06, attack: 0.05 });
+      tone(783.99, { type: "sine", dur: 1.6, gain: 0.04, attack: 0.08, delay: 0.06 });
+      tone(1046.5, { type: "sine", dur: 1.4, gain: 0.022, attack: 0.1, delay: 0.12 });
+    },
+    /** 镜面 wipe 打开（10.55s） */
+    wipe: function() {
+      noise({ dur: 0.9, gain: 0.05, filter: "lowpass", freq: 1400, freqTo: 120, q: 0.7 });
+      tone(392, { type: "sine", dur: 1.2, gain: 0.045, attack: 0.01 });
+      tone(587.33, { type: "sine", dur: 1.3, gain: 0.028, attack: 0.02, delay: 0.05 });
+      noise({ dur: 0.8, gain: 0.02, filter: "highpass", freq: 5600, q: 0.6, delay: 0.12 });
+    }
+  };
+  function tts(text) {
+    if (!voiceOn || state.disposed) return;
+    safe(function() {
+      const synth = window.speechSynthesis;
+      if (!synth || typeof window.SpeechSynthesisUtterance !== "function") return;
+      const utter = new window.SpeechSynthesisUtterance(text);
+      utter.lang = "zh-CN";
+      utter.rate = 0.94;
+      utter.pitch = 0.98;
+      utter.volume = Math.min(1, voiceVolume);
+      synth.speak(utter);
+    });
+  }
+  function voice(key) {
+    if (!voiceOn || state.disposed) return;
+    const line = VOICE_LINES[key];
+    if (!line || !line.src) return;
+    if (state.spoken[key]) return;
+    state.spoken[key] = true;
+    safe(function() {
+      let audio = state.voiceCache[key];
+      if (!audio) {
+        audio = new Audio();
+        audio.preload = "auto";
+        audio.volume = Math.min(1, voiceVolume);
+        audio.src = resolveMedia2(line.src);
+        state.voiceCache[key] = audio;
+      }
+      const promise = audio.play();
+      if (promise && typeof promise.catch === "function") {
+        promise.catch(function() {
+          if (!audio || audio.error || audio.networkState === 3) tts(line.text);
+        });
+      }
+      audio.addEventListener(
+        "error",
+        function() {
+          tts(line.text);
+          state.voiceCache[key] = null;
+        },
+        { once: true }
+      );
+    });
+  }
+  function unlock() {
+    resume();
+  }
+  function dispose() {
+    state.disposed = true;
+    safe(function() {
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    });
+    Object.keys(state.voiceCache).forEach(function(key) {
+      const audio = state.voiceCache[key];
+      if (audio) {
+        audio.pause();
+        try {
+          audio.removeAttribute("src");
+          audio.load();
+        } catch (error) {
+        }
+      }
+    });
+    state.voiceCache = {};
+    safe(function() {
+      if (state.ctx && state.ctx.state !== "closed") state.ctx.close();
+    });
+    state.ctx = null;
+    state.master = null;
+    state.noise = null;
+  }
+  return { sfx, voice, unlock, resume, dispose };
+}
+
+// src/splash/stages.js
+var TIMELINE = {
+  total: 10.2,
+  voiceLinkAt: 1.4,
+  starAt: 1.9,
+  fillStart: 3,
+  fillEnd: 5.6,
+  shakeStart: 5.6,
+  shakeEnd: 6.3,
+  voiceWelcomeAt: 5.2,
+  burstAt: 6.3,
+  whiteFullAt: 7.6,
+  transitionStart: 7.9,
+  transitionEnd: 9.1,
+  revealAt: 9.4,
+  totalEnd: 10.2
+};
+var REDUCED_TIMELINE = {
+  total: 4.2,
+  starAt: 0.3,
+  revealAt: 1.8,
+  totalEnd: 4.2
+};
+var BURST_PHASES = {
+  burst1At: 6.3,
+  burst2At: 6.85,
+  burst3At: 7.2,
+  whiteFullAt: 7.6
+};
+function burstPhaseAt(t) {
+  if (t >= BURST_PHASES.burst3At) return 3;
+  if (t >= BURST_PHASES.burst2At) return 2;
+  if (t >= BURST_PHASES.burst1At) return 1;
+  return 0;
+}
+function clamp01(v) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return 0;
+  return Math.min(1, Math.max(0, n));
+}
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+function createDirector(opts) {
+  const root = opts.root;
+  const ui = opts.ui;
+  const audio = opts.audio;
+  const transition = opts.transition;
+  const reduced = !!opts.reduced;
+  const debug = opts.debug || {};
+  const timeline = reduced ? REDUCED_TIMELINE : TIMELINE;
+  const total = timeline.total;
+  let timers = [];
+  let intervals = [];
+  let raf = 0;
+  let finished = false;
+  let frozen = false;
+  let stageRunning = false;
+  function later(fn, seconds) {
+    const id = window.setTimeout(function() {
+      removeTimer(id);
+      if (finished || frozen) return;
+      try {
+        fn();
+      } catch (error) {
+        if (window.console && console.warn) console.warn("[light-mirror] splash step failed", error);
+      }
+    }, Math.max(0, seconds * 1e3));
+    timers.push(id);
+    return id;
+  }
+  function removeTimer(id) {
+    const index = timers.indexOf(id);
+    if (index >= 0) timers.splice(index, 1);
+  }
+  function clearAll() {
+    timers.forEach(function(id) {
+      window.clearTimeout(id);
+    });
+    timers = [];
+    intervals.forEach(function(id) {
+      window.clearInterval(id);
+    });
+    intervals = [];
+    if (raf) window.cancelAnimationFrame(raf);
+    raf = 0;
+  }
+  function showSubtitle(key, hold) {
+    const line = VOICE_LINES[key];
+    ui.setSubtitle(line ? line.text : "");
+    later(function() {
+      ui.setSubtitle("");
+    }, hold);
+  }
+  function markLive() {
+    if (!root.classList.contains("lm-live-scene")) root.classList.add("lm-live-scene");
+    root.dataset.playAt = root.dataset.playAt || String(Math.round(performance.now()));
+  }
+  function startFillAnimation() {
+    const t0 = performance.now();
+    const duration = (TIMELINE.fillEnd - TIMELINE.fillStart) * 1e3;
+    const tick = function() {
+      if (finished || frozen) return;
+      const p = clamp01((performance.now() - t0) / duration);
+      ui.setFill(easeInOut(p));
+      if (p < 1) raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+  }
+  function cleanupShake() {
+    if (ui.starWrap) ui.starWrap.classList.remove("lm-shaking");
+    if (ui.starFill) ui.starFill.classList.remove("lm-shaking");
+  }
+  function shakeLoop() {
+    if (!ui.starWrap) return;
+    ui.starWrap.classList.add("lm-shaking");
+    if (ui.starFill) ui.starFill.classList.add("lm-shaking");
+    let steps = 0;
+    const totalSteps = Math.round((TIMELINE.shakeEnd - TIMELINE.shakeStart) * 1e3 / 50);
+    const id = window.setInterval(function() {
+      if (finished || frozen) return;
+      steps += 1;
+      const jitter = function() {
+        return 1 + (Math.random() * 2 - 1) * 0.06;
+      };
+      ui.setShake(jitter(), jitter());
+      if (steps >= totalSteps) {
+        window.clearInterval(id);
+        const index = intervals.indexOf(id);
+        if (index >= 0) intervals.splice(index, 1);
+        ui.setShake(1, 1);
+        cleanupShake();
+      }
+    }, 50);
+    intervals.push(id);
+  }
+  function startTransition() {
+    ui.setWhite(false);
+    ui.setTransition(true);
+    if (!transition) return;
+    if (!transition.supported) {
+      root.classList.add("lm-fallback-transition");
+      return;
+    }
+    if (transition.resize) transition.resize();
+    if (transition.setNewImage && ui.newScene) transition.setNewImage(ui.newScene);
+    const t0 = performance.now();
+    const duration = (TIMELINE.transitionEnd - TIMELINE.transitionStart) * 1e3;
+    let ticks = 0;
+    const tick = function() {
+      ticks += 1;
+      root.dataset.transTicks = String(ticks);
+      root.dataset.transFlags = (frozen ? "F" : "") + (finished ? "X" : "") + "/" + timers.length;
+      if (finished || frozen) return;
+      const elapsed = performance.now() - t0;
+      const p = clamp01(elapsed / duration);
+      root.dataset.transitionP = p.toFixed(3) + "/" + elapsed.toFixed(0) + "ms";
+      try {
+        transition.render(p, elapsed / 1e3);
+      } catch (error) {
+        root.dataset.transitionError = String(error && error.message || error);
+      }
+      if (p < 1) raf = window.requestAnimationFrame(tick);
+    };
+    raf = window.requestAnimationFrame(tick);
+  }
+  function reveal() {
+    if (opts.onRevealStart) {
+      try {
+        opts.onRevealStart();
+      } catch (error) {
+      }
+    }
+    root.classList.add("lm-revealing");
+    if (transition && transition.supported && ui.webgl) {
+      ui.webgl.classList.add("is-out");
+    }
+    if (ui.newScene) ui.newScene.style.opacity = "0";
+  }
+  function playNormal() {
+    audio.sfx.hum();
+    later(function() {
+      audio.sfx.bloom();
+    }, 0.8);
+    later(function() {
+      root.classList.add("lm-star-on");
+      if (ui.starWrap) ui.starWrap.style.opacity = "1";
+    }, TIMELINE.starAt);
+    later(function() {
+      showSubtitle("link", 2.6);
+      audio.voice("link");
+    }, TIMELINE.voiceLinkAt);
+    later(function() {
+      ui.setFill(0);
+      startFillAnimation();
+    }, TIMELINE.fillStart);
+    later(function() {
+      ui.setFill(1);
+      shakeLoop();
+    }, TIMELINE.shakeStart);
+    later(function() {
+      showSubtitle("welcome", 3.9);
+      audio.voice("welcome");
+    }, TIMELINE.voiceWelcomeAt);
+    later(function() {
+      ui.setBurstPhase(1);
+      audio.sfx.overexpose();
+    }, BURST_PHASES.burst1At);
+    later(function() {
+      ui.setBurstPhase(2);
+    }, BURST_PHASES.burst2At);
+    later(function() {
+      ui.setBurstPhase(3);
+    }, BURST_PHASES.burst3At);
+    later(function() {
+      ui.setWhite(true);
+    }, TIMELINE.whiteFullAt);
+    later(function() {
+      root.dataset.stepTransition = "1";
+      startTransition();
+      audio.sfx.wipe();
+    }, TIMELINE.transitionStart);
+    later(function() {
+      root.dataset.stepReveal = "1";
+      reveal();
+    }, TIMELINE.revealAt);
+    later(function() {
+      finish("done");
+    }, TIMELINE.totalEnd);
+  }
+  function playReduced() {
+    root.classList.add("lm-reduced");
+    ui.setFill(1);
+    if (ui.starWrap) ui.starWrap.style.opacity = "1";
+    later(function() {
+      showSubtitle("link", 1.4);
+    }, 0.2);
+    later(function() {
+      ui.setWhite(true);
+    }, 1.2);
+    later(function() {
+      reveal();
+    }, REDUCED_TIMELINE.revealAt);
+    later(function() {
+      finish("done");
+    }, REDUCED_TIMELINE.totalEnd);
+  }
+  function play() {
+    if (stageRunning || finished) return;
+    stageRunning = true;
+    markLive();
+    if (reduced) {
+      playReduced();
+      return;
+    }
+    playNormal();
+  }
+  function applyStateAt(t) {
+    if (t >= TIMELINE.starAt) {
+      root.classList.add("lm-star-on");
+      if (ui.starWrap) ui.starWrap.style.opacity = "1";
+    }
+    if (t >= TIMELINE.fillStart && t < TIMELINE.shakeStart) {
+      ui.setFill(easeInOut(clamp01((t - TIMELINE.fillStart) / (TIMELINE.fillEnd - TIMELINE.fillStart))));
+    }
+    if (t >= TIMELINE.shakeStart && t < TIMELINE.burstAt) {
+      ui.setFill(1);
+      const step = Math.floor((t - TIMELINE.shakeStart) / 0.05);
+      const seed = Math.sin(step * 12.9898) * 43758.5453;
+      const j1 = 1 + ((seed - Math.floor(seed)) * 2 - 1) * 0.05;
+      ui.setShake(j1, 2 - j1);
+      if (ui.starWrap) ui.starWrap.classList.add("lm-shaking");
+    } else if (ui.starWrap) {
+      ui.setShake(1, 1);
+      ui.starWrap.classList.remove("lm-shaking");
+    }
+    ui.setBurstPhase(burstPhaseAt(t));
+    if (t >= TIMELINE.whiteFullAt) ui.setWhite(true);
+    if (t >= TIMELINE.transitionStart && transition && transition.supported) {
+      ui.setTransition(true);
+      const duration = TIMELINE.transitionEnd - TIMELINE.transitionStart;
+      const p = clamp01((t - TIMELINE.transitionStart) / duration);
+      if (transition.resize) transition.resize();
+      if (transition.setNewImage && ui.newScene) transition.setNewImage(ui.newScene);
+      transition.render(p, p * duration);
+    } else if (t >= TIMELINE.transitionStart && transition && !transition.supported) {
+      ui.setTransition(true);
+      root.classList.add("lm-fallback-transition");
+    }
+    if (t >= TIMELINE.revealAt) reveal();
+  }
+  function jumpDebug(seconds) {
+    if (stageRunning || finished) return false;
+    stageRunning = true;
+    markLive();
+    const t = Math.min(total, Math.max(0, Number(seconds) || 0));
+    if (reduced) {
+      root.classList.add("lm-reduced");
+      if (t >= REDUCED_TIMELINE.revealAt) reveal();
+      freezeAt(t);
+      return true;
+    }
+    applyStateAt(t);
+    freezeAt(t);
+    return true;
+  }
+  function seekTo(seconds) {
+    if (!stageRunning) return jumpDebug(seconds);
+    if (!frozen) return false;
+    const t = Math.min(total, Math.max(0, Number(seconds) || 0));
+    if (reduced) {
+      if (t >= REDUCED_TIMELINE.revealAt) reveal();
+      return true;
+    }
+    applyStateAt(t);
+    if (opts.onFreeze) {
+      try {
+        opts.onFreeze(t * 1e3);
+      } catch (error) {
+      }
+    }
+    return true;
+  }
+  function freezeAt(t) {
+    if (frozen || finished) return;
+    frozen = true;
+    root.dataset.freeze = "1";
+    clearAll();
+    root.classList.add("lm-frozen");
+    try {
+      void root.getBoundingClientRect();
+      const animations = document.getAnimations ? document.getAnimations() : [];
+      animations.forEach(function(animation) {
+        try {
+          animation.pause();
+          animation.currentTime = Math.max(0, t * 1e3);
+        } catch (error) {
+        }
+      });
+    } catch (error) {
+    }
+    if (opts.onFreeze) {
+      try {
+        opts.onFreeze(t * 1e3);
+      } catch (error) {
+      }
+    }
+  }
+  function holdAt(seconds) {
+    if (reduced) return;
+    later(function() {
+      if (frozen || finished) return;
+      frozen = true;
+      clearAll();
+      root.classList.add("lm-frozen");
+      if (opts.onFreeze) opts.onFreeze(seconds * 1e3);
+    }, Math.max(0, seconds));
+  }
+  function finish(reason) {
+    if (finished) return;
+    finished = true;
+    clearAll();
+    if (transition) {
+      try {
+        transition.dispose();
+      } catch (error) {
+      }
+    }
+    if (opts.onFinish) opts.onFinish(reason || "done");
+  }
+  function dispose() {
+    finished = true;
+    frozen = true;
+    clearAll();
+    if (transition) {
+      try {
+        transition.dispose();
+      } catch (error) {
+      }
+    }
+  }
+  return {
+    play,
+    jumpDebug,
+    seekTo,
+    holdAt,
+    finish,
+    dispose,
+    total,
+    reduced,
+    timeline,
+    isFinished: function() {
+      return finished;
+    },
+    isFrozen: function() {
+      return frozen;
+    }
+  };
+}
+
+// src/splash/webgl.js
+var VERT = [
+  "attribute vec2 a_pos;",
+  "varying vec2 v_uv;",
+  "void main() {",
+  "  v_uv = a_pos * 0.5 + 0.5;",
+  "  gl_Position = vec4(a_pos, 0.0, 1.0);",
+  "}"
+].join("\n");
+var FRAG = [
+  "precision highp float;",
+  "varying vec2 v_uv;",
+  "uniform vec2 u_res;",
+  "uniform float u_p;",
+  "uniform float u_t;",
+  "float hash(float n) { return fract(sin(n) * 43758.5453123); }",
+  "void main() {",
+  "  vec2 uv = v_uv;",
+  "  float p = clamp(u_p, 0.0, 1.0);",
+  "  float px = uv.x * u_res.x;",
+  "  float pre = 1.0 - smoothstep(0.0, 0.15, p);",
+  "  float stretch = smoothstep(0.10, 0.32, p) * (1.0 - smoothstep(0.74, 0.98, p));",
+  "  float tear = smoothstep(0.32, 0.58, p) * (1.0 - smoothstep(0.86, 1.0, p));",
+  "  /* 全高竖条：每条有随机宽度与随机显露起点；覆盖从 100% 逐渐收窄，",
+  "     竖条贯穿整个画面高度（alpha 只与 x 有关），不做上下分段。 */",
+  "  float cellW = mix(5.0, 52.0, hash(floor(px / 13.0)));",
+  "  float cell = floor(px / cellW);",
+  "  float lp = fract(px / cellW);",
+  "  float r1 = hash(cell * 1.37 + 2.1);",
+  "  float r2 = hash(cell * 2.71 + 7.3);",
+  "  float startP = 0.16 + r1 * 0.58;",
+  "  float local = clamp((p - startP) / 0.24, 0.0, 1.0);",
+  "  local = local * local * (3.0 - 2.0 * local);",
+  "  /* 目标残留比例：大部分条完全消失，少数保留成最终场景的细光柱 */",
+  "  float targetW = (r2 > 0.86 ? mix(0.10, 0.28, hash(cell * 5.9)) : 0.0);",
+  "  float barW = mix(1.0, targetW, local);",
+  "  /* 边缘轻微纵向不规则（正弦扰动边界 x，不切断竖条） */",
+  "  float wobble = (sin(uv.y * 7.0 + r1 * 6.283) * 0.018 + sin(uv.y * 23.0 + r2 * 6.283) * 0.008) * (0.5 + 0.5 * tear);",
+  "  float center = 0.5 + (r2 - 0.5) * 0.10;",
+  "  float halfW = max(0.0, barW) * 0.5;",
+  "  float d = abs(lp - center + wobble);",
+  "  float aa = 0.012 + 0.02 * stretch;",
+  "  float bar = 1.0 - smoothstep(halfW - aa, halfW + aa, d);",
+  "  /* 细光柱/拉丝：竖向拉伸感来自条内的长条亮暗纹理（全高） */",
+  "  float streak = 0.5 + 0.5 * sin(uv.y * 41.0 + r1 * 6.283 + u_t * 3.0);",
+  "  streak *= 0.5 + 0.5 * sin(uv.y * 9.0 - r2 * 4.0 + u_t * 1.7);",
+  "  vec3 white = vec3(0.972, 0.976, 1.0);",
+  "  white *= 0.90 + 0.10 * streak;",
+  "  /* 明暗反转条（少量条在撕裂阶段变暗，增强故障感） */",
+  "  float invMask = step(0.80, r1) * smoothstep(0.30, 0.55, p) * (1.0 - smoothstep(0.80, 0.96, p));",
+  "  vec3 col = mix(white, vec3(0.10, 0.10, 0.13), invMask * 0.55);",
+  "  /* 色差只在竖条两侧：一侧暖橙、一侧冷青（避免紫色偏色） */",
+  "  float edgeDist = abs(d - halfW);",
+  "  float fringe = smoothstep(0.0, 0.018 + 0.02 * stretch, edgeDist);",
+  "  float fringeAmt = (0.35 * stretch + 0.55 * tear) * (1.0 - local * 0.5);",
+  "  float side = sign(lp - center);",
+  "  col += vec3(0.10, 0.045, -0.02) * (1.0 - fringe) * fringeAmt * step(0.0, side);",
+  "  col += vec3(-0.02, 0.045, 0.11) * (1.0 - fringe) * fringeAmt * step(side, 0.0);",
+  "  /* 预热阶段整屏近白 */",
+  "  col = mix(vec3(1.0), col, smoothstep(0.0, 0.10, p));",
+  "  /* alpha = 白条覆盖；条外露出下方真实 DOM */",
+  "  float alpha = bar;",
+  "  alpha *= 1.0 - smoothstep(0.94, 1.0, p);",
+  "  alpha = clamp(alpha, 0.0, 1.0);",
+  "  /* 标准预乘 alpha 输出（浏览器按同一规则与 DOM 合成） */",
+  "  gl_FragColor = vec4(col * alpha, alpha);",
+  "}"
+].join("\n");
+function compile(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const info = gl.getShaderInfoLog(shader);
+    gl.deleteShader(shader);
+    throw new Error("shader compile: " + info);
+  }
+  return shader;
+}
+function createTransition(canvas) {
+  const gl = canvas ? canvas.getContext("webgl", {
+    alpha: true,
+    antialias: false,
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: true
+  }) : null;
+  if (!gl) {
+    return {
+      supported: false,
+      render: function() {
+      },
+      resize: function() {
+      },
+      dispose: function() {
+      },
+      setNewImage: function() {
+      }
+    };
+  }
+  let program = null;
+  let buffer = null;
+  let aPos = null;
+  const uni = {};
+  try {
+    const vs = compile(gl, gl.VERTEX_SHADER, VERT);
+    const fs = compile(gl, gl.FRAGMENT_SHADER, FRAG);
+    program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error("link failed");
+    buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    aPos = gl.getAttribLocation(program, "a_pos");
+    uni.res = gl.getUniformLocation(program, "u_res");
+    uni.p = gl.getUniformLocation(program, "u_p");
+    uni.t = gl.getUniformLocation(program, "u_t");
+  } catch (error) {
+    return {
+      supported: false,
+      render: function() {
+      },
+      resize: function() {
+      },
+      dispose: function() {
+      },
+      setNewImage: function() {
+      }
+    };
+  }
+  function resize() {
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(2, Math.round(rect.width || window.innerWidth));
+    const h5 = Math.max(2, Math.round(rect.height || window.innerHeight));
+    const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h5 * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  function render(progress, timeSec) {
+    if (!canvas) return;
+    if (!canvas.width) resize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform2f(uni.res, canvas.width, canvas.height);
+    gl.uniform1f(uni.p, Math.max(0, Math.min(1, progress)));
+    gl.uniform1f(uni.t, timeSec || 0);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+  function dispose() {
+    try {
+      if (program) gl.deleteProgram(program);
+      if (buffer) gl.deleteBuffer(buffer);
+    } catch (error) {
+    }
+  }
+  return {
+    supported: true,
+    render,
+    resize,
+    setNewImage: function() {
+    },
+    dispose
+  };
+}
+
+// src/splash/index.js
+var ROOT_ID = "light-mirror-root";
+var VEIL_ID = "light-mirror-veil";
+if (window.__LIGHT_MIRROR_SPLASH__ && window.__LIGHT_MIRROR_SPLASH__.version) {
+  window.__LIGHT_MIRROR_SPLASH_LOADED__ = true;
+} else {
+  boot();
+}
+function boot() {
+  const state = {
+    cfg: null,
+    debug: null,
+    reduced: false,
+    mounted: false,
+    done: false,
+    root: null,
+    veil: null,
+    ui: null,
+    director: null,
+    audio: null,
+    transition: null,
+    listeners: [],
+    failsafe: 0,
+    prevOverflow: null,
+    prevBodyOverflow: null
+  };
+  state.debug = parseDebug();
+  state.cfg = normalizeConfig3(window.__LIGHT_MIRROR__);
+  state.reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) || state.debug.reduced;
+  const api = {
+    version: VERSION,
+    start,
+    replay,
+    stop,
+    debugSeek: function(seconds) {
+      if (state.director && typeof state.director.seekTo === "function") return state.director.seekTo(seconds);
+      return false;
+    },
+    stats: function() {
+      return {
+        version: VERSION,
+        mounted: state.mounted,
+        done: state.done,
+        nodes: state.root ? state.root.querySelectorAll("*").length + 1 : 0,
+        reduced: state.reduced,
+        debug: state.debug,
+        config: state.cfg,
+        webgl: state.transition ? state.transition.supported : null
+      };
+    }
+  };
+  window.__LIGHT_MIRROR_SPLASH__ = api;
+  window.__LIGHT_MIRROR_SPLASH_LOADED__ = true;
+  function normalizeConfig3(input) {
+    const out = {};
+    Object.keys(DEFAULTS).forEach(function(key) {
+      out[key] = DEFAULTS[key];
+    });
+    const src = input && typeof input === "object" ? input : {};
+    Object.keys(DEFAULTS).forEach(function(key) {
+      if (!(key in src) || src[key] === void 0 || src[key] === null) return;
+      const value = src[key];
+      if (BOOL_KEYS.indexOf(key) >= 0) {
+        out[key] = value === true || value === "true" || value === 1 || value === "1";
+      } else if (ENUMS[key]) {
+        const alias = ENUM_ALIASES[key] && ENUM_ALIASES[key][value];
+        const next = alias || value;
+        out[key] = ENUMS[key].indexOf(next) >= 0 ? next : DEFAULTS[key];
+      } else if (RANGES[key]) {
+        out[key] = clampNumber(value, RANGES[key][0], RANGES[key][1], DEFAULTS[key]);
+      } else {
+        out[key] = value;
+      }
+    });
+    if (state.debug && state.debug.mute) {
+      out.voice = false;
+      out.sfx = false;
+    }
+    return out;
+  }
+  function parseDebug() {
+    const result = { t: -1, play: false, mute: false, reduced: false, stats: false, finish: false, hold: -1 };
+    try {
+      const params = new URLSearchParams(window.location.search || "");
+      const preview = window.__LIGHT_MIRROR_PREVIEW__ === true;
+      const local = window.location.protocol === "file:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || params.has("lmdebug") || preview;
+      if (!local) return result;
+      if (params.has("t") || params.has("freeze")) {
+        result.t = clampNumber(params.get("t") || params.get("freeze"), 0, TIMELINE.total, -1);
+        result.play = true;
+      }
+      if (params.has("at")) {
+        result.t = clampNumber(params.get("at"), 0, 1, 0.6) * TIMELINE.total;
+        result.play = true;
+      }
+      if (params.has("hold")) {
+        result.hold = clampNumber(params.get("hold"), 0, TIMELINE.total, -1);
+        result.play = true;
+      }
+      if (params.get("play") === "1" || preview) result.play = true;
+      if (params.get("mute") === "1") result.mute = true;
+      if (params.get("reduced") === "1") result.reduced = true;
+      if (params.get("stats") === "1") result.stats = true;
+      if (params.get("finish") === "1") result.finish = true;
+    } catch (error) {
+    }
+    return result;
+  }
+  function ensureRoot() {
+    let root = document.getElementById(ROOT_ID);
+    if (!root) {
+      root = document.createElement("div");
+      root.id = ROOT_ID;
+      root.className = "lm-root lm-boot";
+      document.body.insertBefore(root, document.body.firstChild);
+    }
+    return root;
+  }
+  function ensureVeil() {
+    let veil = document.getElementById(VEIL_ID);
+    if (!veil) {
+      veil = document.createElement("div");
+      veil.id = VEIL_ID;
+      veil.setAttribute("aria-hidden", "true");
+      document.body.insertBefore(veil, document.body.firstChild);
+    }
+    return veil;
+  }
+  function lockPage() {
+    const html = document.documentElement;
+    html.classList.add("lm-lock");
+    html.setAttribute("data-lm-boot", "1");
+    if (state.prevOverflow == null) state.prevOverflow = html.style.overflow || "";
+    if (state.prevBodyOverflow == null) {
+      state.prevBodyOverflow = document.body ? document.body.style.overflow || "" : "";
+    }
+    html.style.overflow = "hidden";
+    if (document.body) document.body.style.overflow = "hidden";
+  }
+  function unlockPage() {
+    const html = document.documentElement;
+    html.classList.remove("lm-lock");
+    html.removeAttribute("data-lm-boot");
+    html.style.overflow = state.prevOverflow || "";
+    if (document.body) document.body.style.overflow = state.prevBodyOverflow || "";
+    state.prevOverflow = null;
+    state.prevBodyOverflow = null;
+  }
+  function addListener(target, type, fn, options) {
+    target.addEventListener(type, fn, options);
+    state.listeners.push(function() {
+      target.removeEventListener(type, fn, options);
+    });
+  }
+  function clearListeners() {
+    state.listeners.forEach(function(off) {
+      try {
+        off();
+      } catch (error) {
+      }
+    });
+    state.listeners = [];
+  }
+  function bindAudioUnlock() {
+    const unlock = function() {
+      if (state.audio) state.audio.unlock();
+    };
+    addListener(document, "pointerdown", unlock, { passive: true });
+    addListener(document, "keydown", unlock);
+  }
+  function start(overrideConfig) {
+    if (overrideConfig && typeof overrideConfig === "object") state.cfg = normalizeConfig3(overrideConfig);
+    try {
+      mount();
+      return true;
+    } catch (error) {
+      softFail(error);
+      return false;
+    }
+  }
+  function replay(overrideConfig) {
+    if (overrideConfig && typeof overrideConfig === "object") return Promise.resolve(start(overrideConfig));
+    const url = window.__LIGHT_MIRROR_CONFIG_URL__;
+    if (!url) return Promise.resolve(start());
+    return new Promise(function(resolve2) {
+      let finished = false;
+      const done = function(ok) {
+        if (finished) return;
+        finished = true;
+        resolve2(ok);
+      };
+      try {
+        fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" }).then(function(res) {
+          return res.json();
+        }).then(function(json) {
+          if (json && json.ok === true && json.config) done(start(json.config));
+          else done(start());
+        }).catch(function() {
+          done(start());
+        });
+        window.setTimeout(function() {
+          done(start());
+        }, 1200);
+      } catch (error) {
+        done(start());
+      }
+    });
+  }
+  function mount() {
+    window.__LIGHT_MIRROR_SPLASH_DONE__ = false;
+    window.__LIGHT_MIRROR_SPLASH_REASON__ = "";
+    if (state.mounted) teardown();
+    state.done = false;
+    const cfg = state.cfg;
+    const debug = state.debug;
+    const root = ensureRoot();
+    const veil = ensureVeil();
+    state.root = root;
+    state.veil = veil;
+    lockPage();
+    if (veil) veil.style.opacity = "1";
+    root.className = "lm-root";
+    root.style.display = "";
+    root.classList.toggle("lm-reduced", state.reduced);
+    const ui = buildScene(root, cfg, debug);
+    state.ui = ui;
+    const transition = createTransition(ui.webgl);
+    state.transition = transition;
+    state.audio = createAudio(cfg);
+    const director = createDirector({
+      root,
+      ui,
+      audio: state.audio,
+      transition,
+      reduced: state.reduced,
+      debug,
+      onFinish: function(reason) {
+        release(reason);
+      },
+      onRevealStart: function() {
+        beginReveal();
+      },
+      onFreeze: function(offsetMs) {
+        onFrozen(offsetMs);
+      }
+    });
+    state.director = director;
+    state.mounted = true;
+    root.classList.remove("lm-boot");
+    root.classList.add("lm-ready");
+    root.dataset.bootAt = String(Math.round(performance.now()));
+    window.__LIGHT_MIRROR_TAKEN_OVER__ = true;
+    bindAudioUnlock();
+    window.clearTimeout(state.failsafe);
+    if (debug.t < 0 && debug.hold < 0) {
+      state.failsafe = window.setTimeout(function() {
+        if (!state.done) softFail(new Error("splash timeout"));
+      }, TIMELINE.total * 1e3 + 3e3);
+    }
+    if (debug.stats) {
+      const count = ui.domCount();
+      try {
+        document.title = "LM nodes=" + count + " t=" + (debug.t >= 0 ? debug.t : "play");
+      } catch (error) {
+      }
+    }
+    if (debug.t >= 0) {
+      director.jumpDebug(debug.t);
+    } else {
+      director.play();
+      if (debug.hold >= 0) director.holdAt(debug.hold);
+    }
+    if (debug.finish) {
+      window.setTimeout(function() {
+        if (!state.done) release("debug-finish");
+      }, 260);
+    }
+  }
+  function beginReveal() {
+    const html = document.documentElement;
+    html.classList.add("lm-revealing");
+    html.classList.remove("lm-lock");
+    html.removeAttribute("data-lm-boot");
+    if (state.root) state.root.classList.add("lm-revealing");
+    if (state.veil) {
+      const veil = state.veil;
+      state.veil = null;
+      if (veil.parentNode) veil.parentNode.removeChild(veil);
+    }
+  }
+  function release(reason) {
+    if (state.done) return;
+    state.done = true;
+    window.clearTimeout(state.failsafe);
+    state.failsafe = 0;
+    clearListeners();
+    if (state.director) {
+      try {
+        state.director.dispose();
+      } catch (error) {
+      }
+    }
+    if (state.audio) {
+      try {
+        state.audio.dispose();
+      } catch (error) {
+      }
+    }
+    const root = state.root || document.getElementById(ROOT_ID);
+    const veil = state.veil || document.getElementById(VEIL_ID);
+    unlockPage();
+    if (root && root.parentNode) root.parentNode.removeChild(root);
+    if (veil && veil.parentNode) veil.parentNode.removeChild(veil);
+    state.root = null;
+    state.veil = null;
+    state.mounted = false;
+    state.director = null;
+    state.audio = null;
+    state.transition = null;
+    state.ui = null;
+    window.__LIGHT_MIRROR_SPLASH_DONE__ = true;
+    window.__LIGHT_MIRROR_SPLASH_REASON__ = reason || "done";
+  }
+  function stop() {
+    if (!state.mounted && state.done) return;
+    release("stop");
+  }
+  function softFail(error) {
+    try {
+      if (window.console && console.warn) console.warn("[light-mirror] splash fallback:", error);
+      window.__LIGHT_MIRROR_SPLASH_ERROR__ = String(error && error.message || error || "unknown");
+      if (state.director) state.director.dispose();
+      const root = state.root || document.getElementById(ROOT_ID);
+      const ui = state.ui;
+      if (ui && ui.scene) {
+        const fail = ui.scene.querySelector(".lm-fail");
+        if (fail) {
+          fail.hidden = false;
+          fail.textContent = "光之镜暂时失焦，正在返回世界…";
+        }
+        root && root.classList.add("lm-revealing");
+      }
+    } catch (inner) {
+    }
+    window.setTimeout(function() {
+      release("error");
+    }, 900);
+  }
+  function teardown() {
+    if (!state.mounted) return;
+    clearListeners();
+    if (state.director) {
+      try {
+        state.director.dispose();
+      } catch (error) {
+      }
+    }
+    if (state.audio) {
+      try {
+        state.audio.dispose();
+      } catch (error) {
+      }
+    }
+    if (state.root && state.root.parentNode) state.root.parentNode.removeChild(state.root);
+    if (state.veil && state.veil.parentNode) state.veil.parentNode.removeChild(state.veil);
+    unlockPage();
+    state.mounted = false;
+    state.director = null;
+    state.audio = null;
+    state.transition = null;
+    state.ui = null;
+    state.root = null;
+    state.veil = null;
+    state.done = false;
+  }
+  function onFrozen(offsetMs) {
+    const nodes = state.ui ? state.ui.domCount() : 0;
+    const text = "frozen t=" + (Number(offsetMs) / 1e3).toFixed(2) + "s | nodes " + nodes;
+    try {
+      if (state.ui && state.ui.debug) {
+        state.ui.debug.hidden = false;
+        state.ui.debug.textContent = text;
+      }
+      document.title = "LM " + text;
+    } catch (error) {
+    }
+  }
+  function currentDay() {
+    try {
+      return (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+    } catch (error) {
+      return "";
+    }
+  }
+  function shouldSelfPlay(cfg) {
+    if (!cfg.splashEnabled) return false;
+    try {
+      if (cfg.splashMode === "session" && sessionStorage.getItem(STORAGE.splashShown) === "1") return false;
+      if (cfg.splashMode === "daily" && localStorage.getItem(STORAGE.splashDay) === currentDay()) return false;
+    } catch (error) {
+    }
+    return true;
+  }
+  function markSelfPlayed(cfg) {
+    try {
+      if (cfg.splashMode === "session") sessionStorage.setItem(STORAGE.splashShown, "1");
+      if (cfg.splashMode === "daily") localStorage.setItem(STORAGE.splashDay, currentDay());
+    } catch (error) {
+    }
+  }
+  function afterBoot() {
+    const injected = window.__LIGHT_MIRROR__ && typeof window.__LIGHT_MIRROR__ === "object";
+    const rootExists = !!document.getElementById(ROOT_ID);
+    const skipByHost = window.__LIGHT_MIRROR_SKIP__ === true;
+    const force = state.debug.play || window.__LIGHT_MIRROR_PREVIEW__ === true;
+    if (skipByHost && !force) return;
+    if (rootExists) {
+      start();
+      return;
+    }
+    if (!force) {
+      if (injected) return;
+      if (!shouldSelfPlay(state.cfg)) return;
+    }
+    if (!injected && window.__LIGHT_MIRROR_CONFIG_URL__) {
+      fetch(window.__LIGHT_MIRROR_CONFIG_URL__, { headers: { Accept: "application/json" }, cache: "no-store" }).then(function(res) {
+        return res.json();
+      }).then(function(json) {
+        if (json && json.ok === true && json.config) {
+          state.cfg = normalizeConfig3(json.config);
+          if (force || shouldSelfPlay(state.cfg)) {
+            if (!force) markSelfPlayed(state.cfg);
+            start();
+          }
+        } else {
+          fallbackSelfPlay();
+        }
+      }).catch(fallbackSelfPlay);
+      return;
+    }
+    fallbackSelfPlay();
+    function fallbackSelfPlay() {
+      if (!force && !shouldSelfPlay(state.cfg)) return;
+      if (!force) markSelfPlayed(state.cfg);
+      start();
+    }
+  }
+  if (document.body) afterBoot();
+  else document.addEventListener("DOMContentLoaded", afterBoot, { once: true });
+}
+
+// src/client/splashRuntime.js
+var ROOT_ID2 = "light-mirror-root";
+function startFallbackIfNeeded() {
+  try {
+    if (document.getElementById(ROOT_ID2)) return;
+    if (window.__LIGHT_MIRROR_SKIP__ === true) return;
+    const api = window.__LIGHT_MIRROR_SPLASH__;
+    if (!api || typeof api.start !== "function") return;
+    const cfg = window.__LIGHT_MIRROR__;
+    if (cfg && cfg.splashEnabled === false) return;
+    if (window.__LIGHT_MIRROR_TAKEN_OVER__ === true) return;
+    const mode = cfg && cfg.splashMode;
+    if (mode === "session") {
+      try {
+        if (sessionStorage.getItem("light-mirror:splash-shown") === "1") return;
+      } catch (error) {
+      }
+    }
+    if (mode === "daily") {
+      try {
+        const day = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+        if (localStorage.getItem("light-mirror:splash-day") === day) return;
+      } catch (error) {
+      }
+    }
+    api.start(cfg && typeof cfg === "object" ? cfg : void 0);
+    window.setTimeout(function() {
+      try {
+        const current = window.__LIGHT_MIRROR__;
+        const mode2 = current && current.splashMode;
+        if (mode2 === "session") sessionStorage.setItem("light-mirror:splash-shown", "1");
+        if (mode2 === "daily") localStorage.setItem("light-mirror:splash-day", (/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
+      } catch (error) {
+      }
+    }, 1200);
+  } catch (error) {
+    try {
+      window.__LIGHT_MIRROR_SPLASH_CLIENT_ERROR__ = String(error && error.message || error);
+    } catch (inner) {
+    }
+  }
+}
+if (document.body) {
+  window.setTimeout(startFallbackIfNeeded, 0);
+} else {
+  document.addEventListener("DOMContentLoaded", startFallbackIfNeeded, { once: true });
+}
+
 // src/client/brand.js
 var ReactNS = __toESM(require("react"), 1);
 var React = ReactNS && typeof ReactNS.createElement === "function" ? ReactNS : ReactNS && ReactNS.default && typeof ReactNS.default.createElement === "function" ? ReactNS.default : ReactNS;

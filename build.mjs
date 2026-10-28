@@ -108,6 +108,7 @@ async function buildClient() {
     charset: 'utf8',
     logLevel: 'silent',
     define: { 'process.env.NODE_ENV': '"production"' },
+    loader: { '.css': 'text' },
   })
   const code = result.outputFiles.map((file) => file.text).join('\n')
   const out = CLIENT_HEAD + code + CLIENT_TAIL
@@ -140,6 +141,7 @@ async function buildSplash() {
     charset: 'utf8',
     logLevel: 'silent',
     define: { 'process.env.NODE_ENV': '"production"' },
+    loader: { '.css': 'text' },
   })
   let code = result.outputFiles.map((file) => file.text).join('\n')
   const banner = `/* dsh-light-mirror — splash runtime（由 build.mjs 生成，请勿手改） */\n`
