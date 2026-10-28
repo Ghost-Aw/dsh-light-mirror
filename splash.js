@@ -1181,7 +1181,10 @@ var __LM_SPLASH_BUNDLE__ = (() => {
   // src/splash/index.js
   var ROOT_ID = "light-mirror-root";
   var VEIL_ID = "light-mirror-veil";
-  if (window.__LIGHT_MIRROR_SPLASH__ && window.__LIGHT_MIRROR_SPLASH__.version) {
+  var LM_SPLASH_DISABLED = typeof window !== "undefined" && window.__LIGHT_MIRROR_SPLASH_DISABLE__ === true;
+  var LM_HAS_DOM = typeof window !== "undefined" && typeof document !== "undefined" && !!document.documentElement && !!document.body;
+  if (LM_SPLASH_DISABLED || !LM_HAS_DOM) {
+  } else if (window.__LIGHT_MIRROR_SPLASH__ && window.__LIGHT_MIRROR_SPLASH__.version) {
     window.__LIGHT_MIRROR_SPLASH_LOADED__ = true;
   } else {
     boot();

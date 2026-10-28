@@ -33,7 +33,12 @@ import { clampNumber } from './util.js'
 const ROOT_ID = 'light-mirror-root'
 const VEIL_ID = 'light-mirror-veil'
 
-if (window.__LIGHT_MIRROR_SPLASH__ && window.__LIGHT_MIRROR_SPLASH__.version) {
+const LM_SPLASH_DISABLED = typeof window !== 'undefined' && window.__LIGHT_MIRROR_SPLASH_DISABLE__ === true
+const LM_HAS_DOM =
+  typeof window !== 'undefined' && typeof document !== 'undefined' && !!document.documentElement && !!document.body
+if (LM_SPLASH_DISABLED || !LM_HAS_DOM) {
+  /* Node/测试环境（client bundle 集成测）没有真实 DOM：不启动，避免副作用。 */
+} else if (window.__LIGHT_MIRROR_SPLASH__ && window.__LIGHT_MIRROR_SPLASH__.version) {
   window.__LIGHT_MIRROR_SPLASH_LOADED__ = true
 } else {
   boot()

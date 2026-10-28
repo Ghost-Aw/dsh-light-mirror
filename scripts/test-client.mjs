@@ -174,6 +174,8 @@ let captured = null
 let windowStub = null
 
 windowStub = {
+  /* 单元测试不启动 splash 运行时（由 splash 自己的 QA 覆盖） */
+  __LIGHT_MIRROR_SPLASH_DISABLE__: true,
   __LIGHT_MIRROR__: {
     enabled: true,
     uiMode: 'auto',
