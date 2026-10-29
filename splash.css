@@ -180,6 +180,36 @@ html.lm-lock {
 }
 
 /* 大黑星：自下而上生长（--bigClip 由 JS 设置） */
+/* 旧版星体 DOM 兼容：防止 JS/CSS 版本错位时把旧 SVG 显示成默认黑剪影 */
+.lm-star-base,
+.lm-star-ghost {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.lm-star-base .lm-star-large {
+  fill: #ffffff;
+  opacity: 0.97;
+  filter: blur(4px);
+}
+
+.lm-star-base .lm-star-medium {
+  fill: #ffffff;
+}
+
+.lm-star-fill .lm-star-small {
+  fill: #0d0c14;
+}
+
+.lm-star-ghost {
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.lm-star-fill {
+  clip-path: inset(var(--clipPct, 100%) 0 0 0);
+}
 .lm-star-big {
   clip-path: inset(var(--bigClip, 100%) 0 0 0);
 }

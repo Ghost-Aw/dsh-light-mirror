@@ -177,21 +177,21 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     for (let i = 1; i < pts.length; i += 1) d += "L" + pts[i][0].toFixed(2) + "," + pts[i][1].toFixed(2);
     return d + "Z";
   }
-  function hyperStarSvg(HT, HB, WH, cls, stroke) {
+  function hyperStarSvg(HT, HB, WH, cls, stroke, color, style) {
     const d = hyperStarPath(HT, HB, WH);
-    return '<svg class="lm-star-svg ' + cls + '" viewBox="0 0 ' + STAR_VB_W + " " + STAR_VB_H + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="' + d + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="1.1"' : "") + "/></svg>";
+    return '<svg class="lm-star-svg ' + cls + '" viewBox="0 0 ' + STAR_VB_W + " " + STAR_VB_H + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true"' + (style ? ' style="' + style + '"' : "") + '><path d="' + d + '" fill="' + (color || "#ffffff") + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="1.1"' : "") + "/></svg>";
   }
   function starHaloSvg() {
-    return hyperStarSvg(298, 278, 126, "lm-star-halo-svg");
+    return hyperStarSvg(298, 278, 126, "lm-star-halo-svg", null, "#ffffff", "filter:blur(15px);opacity:.92");
   }
   function starBigSvg() {
-    return hyperStarSvg(266, 248, 113, "lm-star-big-svg", "rgba(120,122,140,0.32)");
+    return hyperStarSvg(266, 248, 113, "lm-star-big-svg", "rgba(120,122,140,0.32)", "#050509");
   }
   function starCoreSvg() {
-    return hyperStarSvg(146, 136, 62, "lm-star-core-svg");
+    return hyperStarSvg(146, 136, 62, "lm-star-core-svg", null, "#f6f7fc", "filter:drop-shadow(0 0 8px rgba(255,255,255,.4)) drop-shadow(0 0 24px rgba(214,226,250,.22))");
   }
   function starSmallSvg() {
-    return hyperStarSvg(56, 52, 23.5, "lm-star-small-svg");
+    return hyperStarSvg(56, 52, 23.5, "lm-star-small-svg", null, "#040407");
   }
 
   // src/splash/dom.js
@@ -295,7 +295,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     return '<svg class="lm-burstcross-svg" viewBox="0 0 400 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="22"/></filter></defs><path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>';
   }
   function buildScene(root, cfg, debug) {
-    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-halo">' + starHaloSvg() + '</div><div class="lm-star-big lm-star-fill">' + starBigSvg() + '</div><div class="lm-star-core">' + starCoreSvg() + '</div><div class="lm-star-small">' + starSmallSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
+    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-halo">' + starHaloSvg() + '</div><div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div><div class="lm-star-core">' + starCoreSvg() + '</div><div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
     const q = function(sel) {
       return root.querySelector(sel);
     };
@@ -341,8 +341,14 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       const p = Math.max(0, Math.min(1, Number(progress) || 0));
       const big = Math.max(0, Math.min(1, p / 0.72));
       const small = Math.max(0, Math.min(1, (p - 0.42) / 0.58));
-      if (ui.starBig) ui.starBig.style.setProperty("--bigClip", ((1 - big) * 100).toFixed(2) + "%");
-      if (ui.starSmall) ui.starSmall.style.setProperty("--smallClip", ((1 - small) * 100).toFixed(2) + "%");
+      if (ui.starBig) {
+        ui.starBig.style.setProperty("--bigClip", ((1 - big) * 100).toFixed(2) + "%");
+        ui.starBig.style.clipPath = "inset(" + ((1 - big) * 100).toFixed(2) + "% 0 0 0)";
+      }
+      if (ui.starSmall) {
+        ui.starSmall.style.setProperty("--smallClip", ((1 - small) * 100).toFixed(2) + "%");
+        ui.starSmall.style.clipPath = "inset(" + ((1 - small) * 100).toFixed(2) + "% 0 0 0)";
+      }
       ui.starWrap.style.setProperty("--fill", p.toFixed(4));
     };
     ui.setShake = function(scale, scaleX) {

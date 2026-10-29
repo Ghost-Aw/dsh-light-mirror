@@ -42,7 +42,7 @@ export function hyperStarPath(HT, HB, WH, k) {
   return d + 'Z'
 }
 
-export function hyperStarSvg(HT, HB, WH, cls, stroke) {
+export function hyperStarSvg(HT, HB, WH, cls, stroke, color, style) {
   const d = hyperStarPath(HT, HB, WH)
   return (
     '<svg class="lm-star-svg ' +
@@ -51,9 +51,13 @@ export function hyperStarSvg(HT, HB, WH, cls, stroke) {
     STAR_VB_W +
     ' ' +
     STAR_VB_H +
-    '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+    '" preserveAspectRatio="xMidYMid meet" aria-hidden="true"' +
+    (style ? ' style="' + style + '"' : '') +
+    '>' +
     '<path d="' +
     d +
+    '" fill="' +
+    (color || '#ffffff') +
     '"' +
     (stroke ? ' stroke="' + stroke + '" stroke-width="1.1"' : '') +
     '/>' +
@@ -62,17 +66,17 @@ export function hyperStarSvg(HT, HB, WH, cls, stroke) {
 }
 
 export function starHaloSvg() {
-  return hyperStarSvg(298, 278, 126, 'lm-star-halo-svg')
+  return hyperStarSvg(298, 278, 126, 'lm-star-halo-svg', null, '#ffffff', 'filter:blur(15px);opacity:.92')
 }
 
 export function starBigSvg() {
-  return hyperStarSvg(266, 248, 113, 'lm-star-big-svg', 'rgba(120,122,140,0.32)')
+  return hyperStarSvg(266, 248, 113, 'lm-star-big-svg', 'rgba(120,122,140,0.32)', '#050509')
 }
 
 export function starCoreSvg() {
-  return hyperStarSvg(146, 136, 62, 'lm-star-core-svg')
+  return hyperStarSvg(146, 136, 62, 'lm-star-core-svg', null, '#f6f7fc', 'filter:drop-shadow(0 0 8px rgba(255,255,255,.4)) drop-shadow(0 0 24px rgba(214,226,250,.22))')
 }
 
 export function starSmallSvg() {
-  return hyperStarSvg(56, 52, 23.5, 'lm-star-small-svg')
+  return hyperStarSvg(56, 52, 23.5, 'lm-star-small-svg', null, '#040407')
 }

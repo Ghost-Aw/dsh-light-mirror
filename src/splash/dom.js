@@ -173,9 +173,9 @@ export function buildScene(root, cfg, debug) {
     '<div class="lm-star-wrap" aria-hidden="true">' +
     '<div class="lm-star-glow"></div>' +
     '<div class="lm-star-halo">' + starHaloSvg() + '</div>' +
-    '<div class="lm-star-big lm-star-fill">' + starBigSvg() + '</div>' +
+    '<div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div>' +
     '<div class="lm-star-core">' + starCoreSvg() + '</div>' +
-    '<div class="lm-star-small">' + starSmallSvg() + '</div>' +
+    '<div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div>' +
     '</div>' +
     '<div class="lm-burst" aria-hidden="true">' +
     '<div class="lm-glow"></div>' +
@@ -247,8 +247,14 @@ export function buildScene(root, cfg, debug) {
     /* 大黑星先长（占填充前 72%），小黑星后长（从 42% 开始）。 */
     const big = Math.max(0, Math.min(1, p / 0.72))
     const small = Math.max(0, Math.min(1, (p - 0.42) / 0.58))
-    if (ui.starBig) ui.starBig.style.setProperty('--bigClip', ((1 - big) * 100).toFixed(2) + '%')
-    if (ui.starSmall) ui.starSmall.style.setProperty('--smallClip', ((1 - small) * 100).toFixed(2) + '%')
+    if (ui.starBig) {
+      ui.starBig.style.setProperty('--bigClip', ((1 - big) * 100).toFixed(2) + '%')
+      ui.starBig.style.clipPath = 'inset(' + ((1 - big) * 100).toFixed(2) + '% 0 0 0)'
+    }
+    if (ui.starSmall) {
+      ui.starSmall.style.setProperty('--smallClip', ((1 - small) * 100).toFixed(2) + '%')
+      ui.starSmall.style.clipPath = 'inset(' + ((1 - small) * 100).toFixed(2) + '% 0 0 0)'
+    }
     ui.starWrap.style.setProperty('--fill', p.toFixed(4))
   }
   ui.setShake = function (scale, scaleX) {
