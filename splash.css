@@ -137,11 +137,11 @@ html.lm-lock {
 .lm-star-wrap {
   position: absolute;
   left: 50%;
-  top: 47%;
+  top: 50%;
   z-index: 7;
   width: min(34vmin, 380px);
   height: min(72vmin, 800px);
-  translate: -50% -50%;
+  translate: -50% calc(-50% + 1.25%);
   transform-origin: 50% 50%;
   opacity: 0;
   pointer-events: none;
@@ -157,6 +157,14 @@ html.lm-lock {
   background: radial-gradient(circle, rgba(255, 255, 255, 0.42) 0%, rgba(214, 226, 250, 0.18) 32%, transparent 68%);
   
   animation: lm-star-glow 3.6s ease-in-out infinite;
+}
+
+.lm-star-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .lm-star-halo,
@@ -776,7 +784,7 @@ html.lm-lock:has(#light-mirror-root.lm-transitioning) body {
   .lm-star-wrap {
     width: min(44vmin, 300px);
     height: min(66vmin, 560px);
-    top: 46%;
+    top: 50%;
   }
 
   .lm-bands {
