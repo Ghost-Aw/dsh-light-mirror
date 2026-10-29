@@ -145,6 +145,55 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     musicVolume: "light-mirror:music-volume"
   };
 
+  // src/splash/star.js
+  var STAR_VB_W = 400;
+  var STAR_VB_H = 720;
+  var STAR_CX = 200;
+  var STAR_CY = 360;
+  function hyperStarPath(HT, HB, WH, k) {
+    const kk = k || 1.8;
+    const n = 150;
+    const pts = [];
+    const push = function(x, y) {
+      pts.push([x, y]);
+    };
+    for (let i = 0; i <= n; i += 1) {
+      const t = i / n;
+      push(STAR_CX + WH * Math.pow(t, kk), STAR_CY - HT * Math.pow(1 - t, kk));
+    }
+    for (let i = 1; i <= n; i += 1) {
+      const t = i / n;
+      push(STAR_CX + WH * Math.pow(1 - t, kk), STAR_CY + HB * Math.pow(t, kk));
+    }
+    for (let i = 1; i <= n; i += 1) {
+      const t = i / n;
+      push(STAR_CX - WH * Math.pow(t, kk), STAR_CY + HB * Math.pow(1 - t, kk));
+    }
+    for (let i = 1; i <= n; i += 1) {
+      const t = i / n;
+      push(STAR_CX - WH * Math.pow(1 - t, kk), STAR_CY - HT * Math.pow(t, kk));
+    }
+    let d = "M" + pts[0][0].toFixed(2) + "," + pts[0][1].toFixed(2);
+    for (let i = 1; i < pts.length; i += 1) d += "L" + pts[i][0].toFixed(2) + "," + pts[i][1].toFixed(2);
+    return d + "Z";
+  }
+  function hyperStarSvg(HT, HB, WH, cls, stroke) {
+    const d = hyperStarPath(HT, HB, WH);
+    return '<svg class="lm-star-svg ' + cls + '" viewBox="0 0 ' + STAR_VB_W + " " + STAR_VB_H + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="' + d + '"' + (stroke ? ' stroke="' + stroke + '" stroke-width="1.1"' : "") + "/></svg>";
+  }
+  function starHaloSvg() {
+    return hyperStarSvg(298, 278, 126, "lm-star-halo-svg");
+  }
+  function starBigSvg() {
+    return hyperStarSvg(266, 248, 113, "lm-star-big-svg", "rgba(120,122,140,0.32)");
+  }
+  function starCoreSvg() {
+    return hyperStarSvg(146, 136, 62, "lm-star-core-svg");
+  }
+  function starSmallSvg() {
+    return hyperStarSvg(56, 52, 23.5, "lm-star-small-svg");
+  }
+
   // src/splash/dom.js
   function resolveUrl(path) {
     if (typeof path !== "string") return "";
@@ -181,59 +230,6 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     });
     img.addEventListener("error", next);
     next();
-  }
-  function slenderStarPath(scale, wobbleAmp, seed) {
-    const cx = 100;
-    const cy = 180;
-    const waist = 3.2;
-    const innerY = 46;
-    const pts = [
-      [100, 6],
-      [cx + waist, cy - innerY],
-      [136, 180],
-      [cx + waist, cy + innerY],
-      [100, 354],
-      [cx - waist, cy + innerY],
-      [64, 180],
-      [cx - waist, cy - innerY]
-    ];
-    let s = seed || 1;
-    const rand = function() {
-      s = s * 16807 % 2147483647;
-      return s / 2147483647;
-    };
-    const out = [];
-    for (let i = 0; i < pts.length; i += 1) {
-      const a = pts[i];
-      const b = pts[(i + 1) % pts.length];
-      const steps = 7;
-      for (let k = 0; k < steps; k += 1) {
-        const t = k / steps;
-        let x = a[0] + (b[0] - a[0]) * t;
-        let y = a[1] + (b[1] - a[1]) * t;
-        if (wobbleAmp > 0) {
-          const nx = -(b[1] - a[1]);
-          const ny = b[0] - a[0];
-          const len = Math.hypot(nx, ny) || 1;
-          const off = Math.sin(t * Math.PI * 3 + rand() * 6.283) * wobbleAmp;
-          x += nx / len * off;
-          y += ny / len * off;
-        }
-        out.push([cx + (x - cx) * scale, cy + (y - cy) * scale]);
-      }
-    }
-    let d = "M" + out[0][0].toFixed(2) + "," + out[0][1].toFixed(2);
-    for (let i = 1; i < out.length; i += 1) d += "L" + out[i][0].toFixed(2) + "," + out[i][1].toFixed(2);
-    return d + "Z";
-  }
-  function starBaseSvg() {
-    const large = slenderStarPath(1, 2.2, 11);
-    const medium = slenderStarPath(0.52, 0, 11);
-    return '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmStarEdge" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="4.6" result="b"/><feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="b" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/></filter><mask id="lmStarCut"><rect x="0" y="0" width="200" height="360" fill="#fff"/><path d="' + medium + '" fill="#000"/></mask></defs><path class="lm-star-large" d="' + large + '" filter="url(#lmStarEdge)" mask="url(#lmStarCut)"/><path class="lm-star-medium" d="' + medium + '"/></svg>';
-  }
-  function starFillSvg() {
-    const small = slenderStarPath(0.27, 0, 11);
-    return '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path class="lm-star-small" d="' + small + '"/></svg>';
   }
   function bandsHtml() {
     const list = [];
@@ -295,11 +291,11 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     return list.join("");
   }
   function burstCrossSvg() {
-    const d = slenderStarPath(1.55, 0, 23);
-    return '<svg class="lm-burstcross-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="22"/></filter></defs><path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>';
+    const d = hyperStarPath(300, 280, 98);
+    return '<svg class="lm-burstcross-svg" viewBox="0 0 400 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="22"/></filter></defs><path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>';
   }
   function buildScene(root, cfg, debug) {
-    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-base">' + starBaseSvg() + '</div><div class="lm-star-fill">' + starFillSvg() + '</div><div class="lm-star-ghost lm-star-ghost-cyan">' + starBaseSvg() + '</div><div class="lm-star-ghost lm-star-ghost-pink">' + starBaseSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
+    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-halo">' + starHaloSvg() + '</div><div class="lm-star-big lm-star-fill">' + starBigSvg() + '</div><div class="lm-star-core">' + starCoreSvg() + '</div><div class="lm-star-small">' + starSmallSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
     const q = function(sel) {
       return root.querySelector(sel);
     };
@@ -311,8 +307,11 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       scene: q(".lm-scene"),
       bands: qa(".lm-bands > i"),
       starWrap: q(".lm-star-wrap"),
-      starBase: q(".lm-star-base"),
-      starFill: q(".lm-star-fill"),
+      starHalo: q(".lm-star-halo"),
+      starBig: q(".lm-star-big"),
+      starFill: q(".lm-star-big"),
+      starCore: q(".lm-star-core"),
+      starSmall: q(".lm-star-small"),
       burst: q(".lm-burst"),
       rings: qa(".lm-rings > i"),
       feather: q(".lm-feather"),
@@ -340,8 +339,10 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     };
     ui.setFill = function(progress) {
       const p = Math.max(0, Math.min(1, Number(progress) || 0));
-      const clip = ((1 - p) * 100).toFixed(2) + "%";
-      ui.starFill.style.setProperty("--clipPct", clip);
+      const big = Math.max(0, Math.min(1, p / 0.72));
+      const small = Math.max(0, Math.min(1, (p - 0.42) / 0.58));
+      if (ui.starBig) ui.starBig.style.setProperty("--bigClip", ((1 - big) * 100).toFixed(2) + "%");
+      if (ui.starSmall) ui.starSmall.style.setProperty("--smallClip", ((1 - small) * 100).toFixed(2) + "%");
       ui.starWrap.style.setProperty("--fill", p.toFixed(4));
     };
     ui.setShake = function(scale, scaleX) {

@@ -10,6 +10,13 @@
  */
 
 import { MEDIA } from '../shared/content.js'
+import {
+  hyperStarPath,
+  starHaloSvg,
+  starBigSvg,
+  starCoreSvg,
+  starSmallSvg,
+} from './star.js'
 
 function resolveUrl(path) {
   if (typeof path !== 'string') return ''
@@ -51,85 +58,7 @@ function mountImage(img) {
   next()
 }
 
-/* 大中小三层细长十字星（用户方法）：
- *   - 大星 white：外侧边缘正弦不规则 + 高斯模糊 + 噪波置换裁边；
- *   - 中星 white：平滑、覆盖在大星上（大星被中星挖空）；
- *   - 小星 dark：中央生长部分（CSS clip 从下往上显露）。
- * 轮廓取图8 主体十字星：四芒细长（纵臂 348，横臂仅 72），腰部极窄。 */
-function slenderStarPath(scale, wobbleAmp, seed) {
-  const cx = 100
-  const cy = 180
-  const waist = 3.2
-  const innerY = 46
-  const pts = [
-    [100, 6],
-    [cx + waist, cy - innerY],
-    [136, 180],
-    [cx + waist, cy + innerY],
-    [100, 354],
-    [cx - waist, cy + innerY],
-    [64, 180],
-    [cx - waist, cy - innerY],
-  ]
-  let s = seed || 1
-  const rand = function () {
-    s = (s * 16807) % 2147483647
-    return s / 2147483647
-  }
-  const out = []
-  for (let i = 0; i < pts.length; i += 1) {
-    const a = pts[i]
-    const b = pts[(i + 1) % pts.length]
-    const steps = 7
-    for (let k = 0; k < steps; k += 1) {
-      const t = k / steps
-      let x = a[0] + (b[0] - a[0]) * t
-      let y = a[1] + (b[1] - a[1]) * t
-      if (wobbleAmp > 0) {
-        const nx = -(b[1] - a[1])
-        const ny = b[0] - a[0]
-        const len = Math.hypot(nx, ny) || 1
-        const off = Math.sin(t * Math.PI * 3 + rand() * 6.283) * wobbleAmp
-        x += (nx / len) * off
-        y += (ny / len) * off
-      }
-      out.push([cx + (x - cx) * scale, cy + (y - cy) * scale])
-    }
-  }
-  let d = 'M' + out[0][0].toFixed(2) + ',' + out[0][1].toFixed(2)
-  for (let i = 1; i < out.length; i += 1) d += 'L' + out[i][0].toFixed(2) + ',' + out[i][1].toFixed(2)
-  return d + 'Z'
-}
-
-function starBaseSvg() {
-  const large = slenderStarPath(1, 2.2, 11)
-  const medium = slenderStarPath(0.52, 0, 11)
-  return (
-    '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
-    '<defs>' +
-    '<filter id="lmStarEdge" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">' +
-    '<feGaussianBlur stdDeviation="4.6" result="b"/>' +
-    '<feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="7" result="n"/>' +
-    '<feDisplacementMap in="b" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>' +
-    '</filter>' +
-    '<mask id="lmStarCut"><rect x="0" y="0" width="200" height="360" fill="#fff"/><path d="' +
-    medium +
-    '" fill="#000"/></mask>' +
-    '</defs>' +
-    '<path class="lm-star-large" d="' + large + '" filter="url(#lmStarEdge)" mask="url(#lmStarCut)"/>' +
-    '<path class="lm-star-medium" d="' + medium + '"/>' +
-    '</svg>'
-  )
-}
-
-function starFillSvg() {
-  const small = slenderStarPath(0.27, 0, 11)
-  return (
-    '<svg class="lm-star-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
-    '<path class="lm-star-small" d="' + small + '"/>' +
-    '</svg>'
-  )
-}
+/* 十字星：新结构见 star.js（大白光晕/大黑/中白/小黑）。 */
 
 /* 光带：左右多、中间少；高度中间凹陷（两侧高中央低） */
 function bandsHtml() {
@@ -226,9 +155,9 @@ function riseHtml() {
 
 /* 模糊细长白色十字星光晕（独立 filter id，避免与主星 defs 冲突） */
 function burstCrossSvg() {
-  const d = slenderStarPath(1.55, 0, 23)
+  const d = hyperStarPath(300, 280, 98)
   return (
-    '<svg class="lm-burstcross-svg" viewBox="0 0 200 360" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+    '<svg class="lm-burstcross-svg" viewBox="0 0 400 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
     '<defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%">' +
     '<feGaussianBlur stdDeviation="22"/></filter></defs>' +
     '<path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>'
@@ -243,10 +172,10 @@ export function buildScene(root, cfg, debug) {
     '<div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div>' +
     '<div class="lm-star-wrap" aria-hidden="true">' +
     '<div class="lm-star-glow"></div>' +
-    '<div class="lm-star-base">' + starBaseSvg() + '</div>' +
-    '<div class="lm-star-fill">' + starFillSvg() + '</div>' +
-    '<div class="lm-star-ghost lm-star-ghost-cyan">' + starBaseSvg() + '</div>' +
-    '<div class="lm-star-ghost lm-star-ghost-pink">' + starBaseSvg() + '</div>' +
+    '<div class="lm-star-halo">' + starHaloSvg() + '</div>' +
+    '<div class="lm-star-big lm-star-fill">' + starBigSvg() + '</div>' +
+    '<div class="lm-star-core">' + starCoreSvg() + '</div>' +
+    '<div class="lm-star-small">' + starSmallSvg() + '</div>' +
     '</div>' +
     '<div class="lm-burst" aria-hidden="true">' +
     '<div class="lm-glow"></div>' +
@@ -280,8 +209,11 @@ export function buildScene(root, cfg, debug) {
     scene: q('.lm-scene'),
     bands: qa('.lm-bands > i'),
     starWrap: q('.lm-star-wrap'),
-    starBase: q('.lm-star-base'),
-    starFill: q('.lm-star-fill'),
+    starHalo: q('.lm-star-halo'),
+    starBig: q('.lm-star-big'),
+    starFill: q('.lm-star-big'),
+    starCore: q('.lm-star-core'),
+    starSmall: q('.lm-star-small'),
     burst: q('.lm-burst'),
     rings: qa('.lm-rings > i'),
     feather: q('.lm-feather'),
@@ -312,8 +244,11 @@ export function buildScene(root, cfg, debug) {
   }
   ui.setFill = function (progress) {
     const p = Math.max(0, Math.min(1, Number(progress) || 0))
-    const clip = ((1 - p) * 100).toFixed(2) + '%'
-    ui.starFill.style.setProperty('--clipPct', clip)
+    /* 大黑星先长（占填充前 72%），小黑星后长（从 42% 开始）。 */
+    const big = Math.max(0, Math.min(1, p / 0.72))
+    const small = Math.max(0, Math.min(1, (p - 0.42) / 0.58))
+    if (ui.starBig) ui.starBig.style.setProperty('--bigClip', ((1 - big) * 100).toFixed(2) + '%')
+    if (ui.starSmall) ui.starSmall.style.setProperty('--smallClip', ((1 - small) * 100).toFixed(2) + '%')
     ui.starWrap.style.setProperty('--fill', p.toFixed(4))
   }
   ui.setShake = function (scale, scaleX) {

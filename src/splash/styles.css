@@ -1,4 +1,4 @@
-﻿/* ============================================================================
+/* ============================================================================
  * 鍏変箣闀?路 澶╃┖宀?鈥?splash v5 鏍峰紡
  * ----------------------------------------------------------------------------
  * 娣辫壊鍦烘櫙 + 涓嬩晶绔栫洿涓婃诞鍏夊甫锛堝乏鍙冲/涓棿灏戙€佹暣浣撲腑闂村嚬闄凤級
@@ -159,74 +159,49 @@ html.lm-lock {
   animation: lm-star-glow 3.6s ease-in-out infinite;
 }
 
-.lm-star-base,
-.lm-star-fill,
-.lm-star-ghost {
+.lm-star-halo,
+.lm-star-big,
+.lm-star-core,
+.lm-star-small,
+.lm-star-fill {
   position: absolute;
   inset: 0;
   display: block;
 }
 
-.lm-star-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+/* 底部大白星：模糊后作为光晕 */
+.lm-star-halo svg {
+  filter: blur(15px);
+  opacity: 0.92;
 }
 
-/* 涓夊眰鏄熶綋锛氬ぇ鏄燂紙妯＄硦+鍣尝瑁佽竟锛夆啋 涓槦 white锛堟寲绌哄ぇ鏄燂級鈫?灏忔槦 dark锛堢敓闀块儴鍒嗭級 */
-.lm-star-large {
+.lm-star-halo path {
   fill: #ffffff;
-  opacity: 0.97;
 }
 
-.lm-star-medium {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.42)) drop-shadow(0 0 26px rgba(214, 226, 250, 0.28));
+/* 大黑星：自下而上生长（--bigClip 由 JS 设置） */
+.lm-star-big {
+  clip-path: inset(var(--bigClip, 100%) 0 0 0);
 }
 
-/* 娣辫壊閮ㄥ垎 = 涓ぎ灏忓崄瀛楁槦锛屼粠涓嬪線涓婄敓闀匡紙clip 杩涘害鐢?JS 璁剧疆 --clipPct=(1-p)*100%锛?*/
-.lm-star-fill {
-  clip-path: inset(var(--clipPct, 100%) 0 0 0);
+.lm-star-big path {
+  fill: #050509;
 }
 
+/* 中白星：锐利白芯 */
+.lm-star-core path {
+  fill: #f6f7fc;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 24px rgba(214, 226, 250, 0.22));
+}
+
+/* 小黑星：后段自下而上生长（--smallClip 由 JS 设置） */
 .lm-star-small {
-  fill: #0d0c14;
-  filter: drop-shadow(0 0 10px rgba(9, 8, 14, 0.9));
+  clip-path: inset(var(--smallClip, 100%) 0 0 0);
 }
 
-/* RGB 鑹叉暎 ghost锛堢垎鍙?鎶栧姩鏃跺嚭鐜帮級 */
-.lm-star-ghost {
-  opacity: 0;
-  mix-blend-mode: screen;
+.lm-star-small path {
+  fill: #040407;
 }
-
-.lm-star-ghost .lm-star-large,
-.lm-star-ghost .lm-star-medium {
-  filter: drop-shadow(0 0 10px currentColor);
-}
-
-.lm-star-ghost-cyan {
-  color: #7fd8e8;
-}
-
-.lm-star-ghost-cyan .lm-star-large,
-.lm-star-ghost-cyan .lm-star-medium {
-  fill: rgba(127, 216, 232, 0.55);
-}
-
-.lm-star-ghost-pink {
-  color: #e88fd0;
-}
-
-.lm-star-ghost-pink .lm-star-large,
-.lm-star-ghost-pink .lm-star-medium {
-  fill: rgba(232, 143, 208, 0.5);
-}
-
-/* 鈹€鈹€ 5. 鐖嗗彂锛氭斁灏勫厜 / 鐜?/ 铏瑰僵缇界姸寮?/ 鏄熺偣 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
-
 .lm-burst {
   position: absolute;
   inset: 0;
