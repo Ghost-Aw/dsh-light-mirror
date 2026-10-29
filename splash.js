@@ -2,7 +2,7 @@
 var __LM_SPLASH_BUNDLE__ = (() => {
   // src/shared/content.js
   var ROUTE_BASE = "/light-mirror";
-  var VERSION = "2.0.0";
+  var VERSION = "3.0.1";
   var MEDIA = {
     photo: {
       sceneTerminal: ROUTE_BASE + "/media/photo/scene-terminal.webp",

@@ -14,7 +14,7 @@ export const NS = 'dsh-light-mirror'
 export const ROW_ID = 'light-mirror'
 export const ROUTE_BASE = '/light-mirror'
 export const CONFIG_NAME = 'light-mirror.json'
-export const VERSION = '2.0.0'
+export const VERSION = '3.0.1'
 
 /** 媒体资源路由（Host 静态服务 media/ 目录）。 */
 export const MEDIA = {
