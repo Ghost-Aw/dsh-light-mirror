@@ -18,6 +18,7 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { EventEmitter } from 'node:events'
 import { Writable, finished } from 'node:stream'
+import { VERSION } from '../src/shared/content.js'
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const TMP_HOME = fs.mkdtempSync(path.join(os.tmpdir(), 'lm-host-test-'))
@@ -221,7 +222,7 @@ await checkAsync('health 返回 ok', async () => {
   const body = JSON.parse(res.body.toString('utf8'))
   assert.equal(body.ok, true)
   assert.equal(body.name, 'dsh-light-mirror')
-  assert.equal(body.version, '2.0.0')
+  assert.equal(body.version, VERSION)
 })
 
 await checkAsync('metrics 返回系统数据', async () => {
