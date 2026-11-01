@@ -337,11 +337,30 @@ function boot() {
       }
     }
 
-    if (debug.t >= 0) {
-      director.jumpDebug(debug.t)
-    } else {
+    function beginNormalPlay() {
       director.play()
       if (debug.hold >= 0) director.holdAt(debug.hold)
+    }
+
+    /* APNG 倒计时必须在时间轴开始前已经加载并播放第一帧，
+       否则 APNG 解码延迟会让倒计时和 3.0s 的十字星交接错位。 */
+    const countdownImg = ui.countdown
+    if (debug.t >= 0) {
+      director.jumpDebug(debug.t)
+    } else if (state.reduced) {
+      beginNormalPlay()
+    } else if (countdownImg && !(countdownImg.complete && countdownImg.naturalWidth)) {
+      let begun = false
+      const beginOnce = function () {
+        if (begun) return
+        begun = true
+        beginNormalPlay()
+      }
+      countdownImg.addEventListener('load', beginOnce, { once: true })
+      countdownImg.addEventListener('error', beginOnce, { once: true })
+      window.setTimeout(beginOnce, 1200)
+    } else {
+      beginNormalPlay()
     }
 
     if (debug.finish) {
@@ -373,6 +392,13 @@ function boot() {
     if (state.director) {
       try {
         state.director.dispose()
+      } catch (error) {
+        /* noop */
+      }
+    }
+    if (state.ui && state.ui.stopParticleStar) {
+      try {
+        state.ui.stopParticleStar()
       } catch (error) {
         /* noop */
       }

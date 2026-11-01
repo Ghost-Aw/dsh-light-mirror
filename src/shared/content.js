@@ -14,7 +14,7 @@ export const NS = 'dsh-light-mirror'
 export const ROW_ID = 'light-mirror'
 export const ROUTE_BASE = '/light-mirror'
 export const CONFIG_NAME = 'light-mirror.json'
-export const VERSION = '3.0.1'
+export const VERSION = '3.1.0'
 
 /** 媒体资源路由（Host 静态服务 media/ 目录）。 */
 export const MEDIA = {
@@ -32,6 +32,7 @@ export const MEDIA = {
     /* 仅中央主体紧凑版（20~34px 品牌位兜底） */
     phanesCore: ROUTE_BASE + '/media/art/emblem-phanes-core.png',
     phanesCutout: ROUTE_BASE + '/media/art/emblem-phanes-cutout.png',
+  countdown432: ROUTE_BASE + '/media/art/countdown-432-v2.png',
     /* 品牌图案：光之镜终端 / 天空岛 / 派蒙表情 / 派蒙头像 */
     patternTerminal: ROUTE_BASE + '/media/art/pattern-terminal.png',
     patternTerminalGold: ROUTE_BASE + '/media/art/pattern-terminal-gold.png',
@@ -195,16 +196,16 @@ export const LM_COLORS = {
 
 /** 启动动画（v5：深色光带场 → 中央十字星填充/抖动/爆发 → 白屏 → WebGL glitch 转场）。 */
 export const SPLASH = {
-  total: 10.2,
+  total: 11.9,
   voiceLinkAt: 1.4,
-  voiceWelcomeAt: 5.2,
-  starAt: 1.9,
-  fillAt: 3.0,
-  shakeAt: 5.6,
-  burstAt: 6.3,
-  whiteAt: 7.6,
-  transitionAt: 7.9,
-  revealAt: 9.4,
+  voiceWelcomeAt: 7.2,
+  starAt: 3.6,
+  fillAt: 4.7,
+  shakeAt: 7.3,
+  burstAt: 8.0,
+  whiteAt: 9.3,
+  transitionAt: 9.6,
+  revealAt: 11.1,
   /** 旧字段保留（v4 调试接口兼容）。 */
   titleAt: 4.8,
   statusAt: 8.6,

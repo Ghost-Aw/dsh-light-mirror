@@ -15,20 +15,21 @@
 import { VOICE_LINES } from '../shared/content.js'
 
 export const TIMELINE = {
-  total: 10.2,
+  total: 11.9,
+  countdownEnd: 3.6,
   voiceLinkAt: 1.4,
-  starAt: 1.9,
-  fillStart: 3.0,
-  fillEnd: 5.6,
-  shakeStart: 5.6,
-  shakeEnd: 6.3,
-  voiceWelcomeAt: 5.2,
-  burstAt: 6.3,
-  whiteFullAt: 7.6,
-  transitionStart: 7.9,
-  transitionEnd: 9.1,
-  revealAt: 9.4,
-  totalEnd: 10.2,
+  starAt: 3.6,
+  fillStart: 4.7,
+  fillEnd: 7.3,
+  shakeStart: 7.3,
+  shakeEnd: 8.0,
+  voiceWelcomeAt: 7.2,
+  burstAt: 8.0,
+  whiteFullAt: 9.3,
+  transitionStart: 9.6,
+  transitionEnd: 10.8,
+  revealAt: 11.1,
+  totalEnd: 11.9,
 }
 
 export const REDUCED_TIMELINE = {
@@ -40,10 +41,10 @@ export const REDUCED_TIMELINE = {
 
 /* v6 爆发三阶段（时间轴总长/语音/转场不变） */
 export const BURST_PHASES = {
-  burst1At: 6.3,
-  burst2At: 6.85,
-  burst3At: 7.2,
-  whiteFullAt: 7.6,
+  burst1At: 8.0,
+  burst2At: 8.55,
+  burst3At: 8.9,
+  whiteFullAt: 9.3,
 }
 
 function burstPhaseAt(t) {
@@ -138,32 +139,34 @@ export function createDirector(opts) {
     raf = window.requestAnimationFrame(tick)
   }
 
-  function cleanupShake() {
-    if (ui.starWrap) ui.starWrap.classList.remove('lm-shaking')
+  function cleanupGlitch() {
+    root.classList.remove('lm-glitching')
+    if (ui.clearGlitch) ui.clearGlitch()
     if (ui.starFill) ui.starFill.classList.remove('lm-shaking')
+    if (ui.starWrap) ui.starWrap.classList.remove('lm-shaking')
   }
 
-  function shakeLoop() {
+  function glitchLoop() {
     if (!ui.starWrap) return
-    ui.starWrap.classList.add('lm-shaking')
-    if (ui.starFill) ui.starFill.classList.add('lm-shaking')
+    root.classList.add('lm-glitching')
+    ui.starWrap.classList.add('lm-glitching')
     let steps = 0
-    const totalSteps = Math.round(((TIMELINE.shakeEnd - TIMELINE.shakeStart) * 1000) / 50)
+    const totalSteps = Math.round(((TIMELINE.shakeEnd - TIMELINE.shakeStart) * 1000) / 45)
     const id = window.setInterval(function () {
       if (finished || frozen) return
       steps += 1
-      const jitter = function () {
-        return 1 + (Math.random() * 2 - 1) * 0.06
-      }
-      ui.setShake(jitter(), jitter())
+      const seed = 1 + Math.floor(Math.random() * 70)
+      const scale = 6 + Math.random() * 26
+      const dx = (Math.random() * 2 - 1) * 13
+      const dy = (Math.random() * 2 - 1) * 4
+      ui.setGlitch(seed, scale, dx, dy)
       if (steps >= totalSteps) {
         window.clearInterval(id)
         const index = intervals.indexOf(id)
         if (index >= 0) intervals.splice(index, 1)
-        ui.setShake(1, 1)
-        cleanupShake()
+        cleanupGlitch()
       }
-    }, 50)
+    }, 45)
     intervals.push(id)
   }
 
@@ -207,6 +210,8 @@ export function createDirector(opts) {
       }
     }
     root.classList.add('lm-revealing')
+    root.classList.add('lm-star-gone')
+    if (ui.stopParticleStar) ui.stopParticleStar()
     if (transition && transition.supported && ui.webgl) {
       ui.webgl.classList.add('is-out')
     }
@@ -214,14 +219,29 @@ export function createDirector(opts) {
   }
 
   function playNormal() {
+    ui.startCountdown()
     audio.sfx.hum()
     later(function () {
       audio.sfx.bloom()
     }, 0.8)
 
     later(function () {
+      ui.stopCountdown()
+    }, TIMELINE.countdownEnd)
+
+    /* 光晕/粒子星提前 0.3s 开始淡入，倒计时最后一帧在上面同步淡出，
+       避免交接时圆光晕突然弹出；APNG 本身只播放一次并停在最后一帧，不会闪回 4。 */
+    later(function () {
       root.classList.add('lm-star-on')
-      if (ui.starWrap) ui.starWrap.style.opacity = '1'
+      root.classList.add('lm-star-handoff')
+      window.requestAnimationFrame(function () {
+        root.classList.add('lm-star-visible')
+      })
+    }, Math.max(0, TIMELINE.starAt - 0.45))
+
+    later(function () {
+      ui.stopCountdown()
+      ui.startParticleStar()
     }, TIMELINE.starAt)
 
     later(function () {
@@ -236,7 +256,7 @@ export function createDirector(opts) {
 
     later(function () {
       ui.setFill(1)
-      shakeLoop()
+      glitchLoop()
     }, TIMELINE.shakeStart)
 
     later(function () {
@@ -268,6 +288,11 @@ export function createDirector(opts) {
     }, TIMELINE.transitionStart)
 
     later(function () {
+      root.classList.add('lm-star-gone')
+      if (ui.stopParticleStar) ui.stopParticleStar()
+    }, TIMELINE.transitionEnd)
+
+    later(function () {
       root.dataset.stepReveal = '1'
       reveal()
     }, TIMELINE.revealAt)
@@ -278,7 +303,9 @@ export function createDirector(opts) {
   }
 
   function playReduced() {
+    ui.stopCountdown()
     root.classList.add('lm-reduced')
+    ui.startParticleStar()
     ui.setFill(1)
     if (ui.starWrap) ui.starWrap.style.opacity = '1'
     later(function () {
@@ -309,26 +336,42 @@ export function createDirector(opts) {
   /* ── 调试 / 逐帧 QA ─────────────────────────────────────────────────── */
 
   function applyStateAt(t) {
+    if (t < TIMELINE.countdownEnd) ui.startCountdown()
+    else ui.stopCountdown()
     if (t >= TIMELINE.starAt) {
       root.classList.add('lm-star-on')
-      if (ui.starWrap) ui.starWrap.style.opacity = '1'
+      root.classList.add('lm-star-handoff')
+      root.classList.add('lm-star-visible')
+      ui.startParticleStar()
+    } else if (t >= TIMELINE.starAt - 0.45) {
+      root.classList.add('lm-star-on')
+      root.classList.add('lm-star-handoff')
+      root.classList.add('lm-star-visible')
     }
     if (t >= TIMELINE.fillStart && t < TIMELINE.shakeStart) {
       ui.setFill(easeInOut(clamp01((t - TIMELINE.fillStart) / (TIMELINE.fillEnd - TIMELINE.fillStart))))
     }
     if (t >= TIMELINE.shakeStart && t < TIMELINE.burstAt) {
       ui.setFill(1)
-      const step = Math.floor((t - TIMELINE.shakeStart) / 0.05)
-      const seed = Math.sin(step * 12.9898) * 43758.5453
-      const j1 = 1 + ((seed - Math.floor(seed)) * 2 - 1) * 0.05
-      ui.setShake(j1, 2 - j1)
-      if (ui.starWrap) ui.starWrap.classList.add('lm-shaking')
-    } else if (ui.starWrap) {
-      ui.setShake(1, 1)
-      ui.starWrap.classList.remove('lm-shaking')
+      const step = Math.floor((t - TIMELINE.shakeStart) / 0.045)
+      const seed = (step * 37) % 70 + 1
+      const scale = 10 + (step * 13) % 24
+      const dx = ((step * 7) % 19) - 9
+      const dy = ((step * 5) % 9) - 4
+      root.classList.add('lm-glitching')
+      if (ui.starWrap) {
+        ui.starWrap.classList.add('lm-glitching')
+        ui.setGlitch(seed, scale, dx, dy)
+      }
+    } else {
+      cleanupGlitch()
     }
     ui.setBurstPhase(burstPhaseAt(t))
     if (t >= TIMELINE.whiteFullAt) ui.setWhite(true)
+    if (t >= TIMELINE.transitionEnd) {
+      root.classList.add('lm-star-gone')
+      if (ui.stopParticleStar) ui.stopParticleStar()
+    }
     if (t >= TIMELINE.transitionStart && transition && transition.supported) {
       ui.setTransition(true)
       const duration = TIMELINE.transitionEnd - TIMELINE.transitionStart

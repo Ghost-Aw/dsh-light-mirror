@@ -1,6 +1,6 @@
 {
     "name":  "dsh-light-mirror",
-    "version":  "3.0.0",
+    "version":  "3.1.0",
     "description":  "光之镜 · 天空岛 —— DeepSeek Harness 主题/启动动画插件：深色启动动画（光带/十字星/爆发/白场撕裂转场）、双模式主界面（终端/神殿）、程序绘制动态背景、观测栏、五档品牌图案。",
     "license":  "MIT",
     "type":  "module",

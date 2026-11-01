@@ -69,7 +69,7 @@ dsh plugin --profile web add github:Ghost-Aw/dsh-light-mirror
 ### 方式二：本地 tarball 安装
 
 ```powershell
-dsh plugin --profile web add file:C:/path/to/dsh-light-mirror-3.0.0.tgz
+dsh plugin --profile web add file:C:/path/to/dsh-light-mirror-3.1.0.tgz
 ```
 
 ### 方式三：开发模式（链接源码目录）

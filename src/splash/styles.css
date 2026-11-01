@@ -226,10 +226,11 @@ html.lm-lock {
   fill: #050509;
 }
 
-/* 中白星：锐利白芯 */
-.lm-star-core path {
-  fill: #f6f7fc;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4)) drop-shadow(0 0 24px rgba(214, 226, 250, 0.22));
+/* 中白星·粒子版本：canvas 由 particleStar.js 逐帧绘制 */
+.lm-star-core {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 7px rgba(255, 255, 255, 0.32));
 }
 
 /* 小黑星：后段自下而上生长（--smallClip 由 JS 设置） */
@@ -493,6 +494,16 @@ html.lm-lock {
 }
 
 /* 鈹€鈹€ 7. 鐘舵€佺被锛氬～鍏呭畬鎴?/ 鎶栧姩 / 鐧藉睆 / 杞満 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+
+/* 倒计时 1 粒子星接棒：直接以粒子星全亮出现，避免白芯交接时亮度下陷 */
+.lm-star-on.lm-star-handoff .lm-star-wrap {
+  animation: none !important;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.lm-star-on.lm-star-handoff.lm-star-visible .lm-star-wrap {
+  opacity: 1 !important;
+}
 
 .lm-star-on .lm-star-wrap {
   animation: lm-star-in 1.5s ease-out both;
@@ -1437,3 +1448,72 @@ html.lm-lock:has(#light-mirror-root.lm-transitioning) body {
 
 
 
+
+/* ── 4→3→2 像素重组倒计时（透明 APNG，结束由 live 十字星接棒）── */
+.lm-countdown {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 0.9vmin);
+  z-index: 8;
+  width: min(46vmin, 520px);
+  height: min(46vmin, 520px);
+  translate: -50% -50%;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 0 18px rgba(160, 190, 255, 0.18));
+  transition: opacity 0.45s ease;
+}
+
+.lm-countdown.is-on {
+  opacity: 1;
+}
+
+.lm-reduced .lm-countdown {
+  display: none;
+}
+
+/* ── 深色填满后的 glitch：SVG 横向撕裂 + RGB 色散 + 扫描线 ── */
+.lm-glitch-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lm-star-wrap.lm-glitching {
+  filter: url(#lmGlitchFilter) brightness(1.16);
+}
+
+.lm-star-wrap.lm-glitching::after {
+  content: '';
+  position: absolute;
+  inset: -4%;
+  z-index: 9;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 5px,
+    rgba(255, 255, 255, 0.055) 6px,
+    transparent 7px 13px,
+    rgba(160, 220, 255, 0.035) 14px,
+    transparent 15px 20px
+  );
+  mix-blend-mode: screen;
+  animation: lm-glitch-scan 0.16s steps(2) infinite;
+}
+
+@keyframes lm-glitch-scan {
+  0% { opacity: 0.35; translate: 0 0; }
+  50% { opacity: 0.7; translate: 0 -3px; }
+  100% { opacity: 0.25; translate: 0 2px; }
+}
+
+/* 撕裂转场结束后十字星必须彻底离场，避免真实界面上的残影 */
+#light-mirror-root.lm-root.lm-star-gone .lm-star-wrap,
+#light-mirror-root.lm-root.lm-star-gone .lm-countdown {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: none !important;
+}

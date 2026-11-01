@@ -10,11 +10,11 @@
  */
 
 import { MEDIA } from '../shared/content.js'
+import { createParticleStar } from './particleStar.js'
 import {
   hyperStarPath,
   starHaloSvg,
   starBigSvg,
-  starCoreSvg,
   starSmallSvg,
 } from './star.js'
 
@@ -170,13 +170,25 @@ export function buildScene(root, cfg, debug) {
     '<div class="lm-bg" aria-hidden="true"></div>' +
     '<div class="lm-fog" aria-hidden="true"></div>' +
     '<div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div>' +
+    '<img class="lm-countdown" alt="" aria-hidden="true" data-src="' + (MEDIA.art && MEDIA.art.countdown432 ? MEDIA.art.countdown432 : '') + '">' +
     '<div class="lm-star-wrap" aria-hidden="true">' +
     '<div class="lm-star-glow"></div>' +
     '<div class="lm-star-halo">' + starHaloSvg() + '</div>' +
     '<div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div>' +
-    '<div class="lm-star-core">' + starCoreSvg() + '</div>' +
+    '<canvas class="lm-star-core" aria-hidden="true"></canvas>' +
     '<div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div>' +
     '</div>' +
+    '<svg class="lm-glitch-defs" width="0" height="0" aria-hidden="true"><defs>' +
+    '<filter id="lmGlitchFilter" x="-18%" y="-18%" width="136%" height="136%" color-interpolation-filters="sRGB">' +
+    '<feTurbulence id="lmGlitchTurb" type="fractalNoise" baseFrequency="0.0008 0.55" numOctaves="2" seed="4" result="noise"/>' +
+    '<feDisplacementMap id="lmGlitchDisp" in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="disp"/>' +
+    '<feOffset in="disp" dx="-7" dy="0" result="shiftR"/>' +
+    '<feColorMatrix in="shiftR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>' +
+    '<feOffset in="disp" dx="7" dy="0" result="shiftC"/>' +
+    '<feColorMatrix in="shiftC" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="cyan"/>' +
+    '<feBlend in="red" in2="cyan" mode="screen" result="chroma"/>' +
+    '<feBlend in="disp" in2="chroma" mode="screen"/>' +
+    '</filter></defs></svg>' +
     '<div class="lm-burst" aria-hidden="true">' +
     '<div class="lm-glow"></div>' +
     '<div class="lm-radials">' + radialsHtml() + '</div>' +
@@ -208,6 +220,7 @@ export function buildScene(root, cfg, debug) {
     root: root,
     scene: q('.lm-scene'),
     bands: qa('.lm-bands > i'),
+    countdown: q('.lm-countdown'),
     starWrap: q('.lm-star-wrap'),
     starHalo: q('.lm-star-halo'),
     starBig: q('.lm-star-big'),
@@ -226,6 +239,22 @@ export function buildScene(root, cfg, debug) {
   }
 
   mountImage(ui.newScene)
+  mountImage(ui.countdown)
+
+  const particleStar = ui.starCore ? createParticleStar(ui.starCore, { count: 4600 }) : null
+  ui.particleStar = particleStar
+  ui.startParticleStar = function () {
+    if (!particleStar) return
+    particleStar.setReduced(root.classList.contains('lm-reduced'))
+    particleStar.start()
+  }
+  ui.stopParticleStar = function () {
+    if (!particleStar) return
+    particleStar.stop()
+  }
+  ui.resizeParticleStar = function () {
+    if (particleStar) particleStar.resize()
+  }
 
   if (debug && debug.stats) {
     const dbg = document.createElement('div')
@@ -234,6 +263,26 @@ export function buildScene(root, cfg, debug) {
     ui.debug = dbg
   }
 
+  ui.startCountdown = function () {
+    if (!ui.countdown) return
+    const raw = ui.countdown.getAttribute('data-src') || ''
+    const url = resolveUrl(raw)
+    /* 第一次直接显示已预载的 APNG（播放开始前 Host 已等待 load）；
+       重播/再次预览时才重置 src 让 APNG 从第一帧重新播放。 */
+    if (ui.countdown.dataset.lmuiPlayed === '1' && url) {
+      try {
+        ui.countdown.src = url + (window.location.protocol === 'file:' ? '' : '?v=' + Date.now())
+      } catch (e) {
+        /* noop */
+      }
+    }
+    ui.countdown.dataset.lmuiPlayed = '1'
+    ui.countdown.classList.add('is-on')
+  }
+  ui.stopCountdown = function () {
+    if (!ui.countdown) return
+    ui.countdown.classList.remove('is-on')
+  }
   ui.setSubtitle = function (text) {
     if (text) {
       ui.subtitle.textContent = text
@@ -259,6 +308,19 @@ export function buildScene(root, cfg, debug) {
   }
   ui.setShake = function (scale, scaleX) {
     ui.starWrap.style.transform = 'scale(' + Number(scale).toFixed(4) + ',' + Number(scaleX).toFixed(4) + ')'
+  }
+  const glitchTurb = q('#lmGlitchTurb')
+  const glitchDisp = q('#lmGlitchDisp')
+  ui.setGlitch = function (seed, scale, dx, dy) {
+    if (glitchTurb) glitchTurb.setAttribute('seed', String(Math.max(1, Math.round(seed))))
+    if (glitchDisp) glitchDisp.setAttribute('scale', String(Math.max(2, Math.min(42, Number(scale) || 14))))
+    if (ui.starWrap) ui.starWrap.style.transform = 'translate(' + Number(dx).toFixed(1) + 'px,' + Number(dy).toFixed(1) + 'px)'
+  }
+  ui.clearGlitch = function () {
+    if (ui.starWrap) {
+      ui.starWrap.classList.remove('lm-glitching')
+      ui.starWrap.style.transform = ''
+    }
   }
   ui.setBurst = function (on) {
     root.classList.toggle('lm-bursting', !!on)

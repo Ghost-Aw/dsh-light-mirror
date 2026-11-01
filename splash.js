@@ -2,7 +2,7 @@
 var __LM_SPLASH_BUNDLE__ = (() => {
   // src/shared/content.js
   var ROUTE_BASE = "/light-mirror";
-  var VERSION = "3.0.1";
+  var VERSION = "3.1.0";
   var MEDIA = {
     photo: {
       sceneTerminal: ROUTE_BASE + "/media/photo/scene-terminal.webp",
@@ -18,6 +18,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       /* 仅中央主体紧凑版（20~34px 品牌位兜底） */
       phanesCore: ROUTE_BASE + "/media/art/emblem-phanes-core.png",
       phanesCutout: ROUTE_BASE + "/media/art/emblem-phanes-cutout.png",
+      countdown432: ROUTE_BASE + "/media/art/countdown-432-v2.png",
       /* 品牌图案：光之镜终端 / 天空岛 / 派蒙表情 / 派蒙头像 */
       patternTerminal: ROUTE_BASE + "/media/art/pattern-terminal.png",
       patternTerminalGold: ROUTE_BASE + "/media/art/pattern-terminal-gold.png",
@@ -187,11 +188,184 @@ var __LM_SPLASH_BUNDLE__ = (() => {
   function starBigSvg() {
     return hyperStarSvg(266, 248, 113, "lm-star-big-svg", "rgba(120,122,140,0.32)", "#050509");
   }
-  function starCoreSvg() {
-    return hyperStarSvg(146, 136, 62, "lm-star-core-svg", null, "#f6f7fc", "filter:drop-shadow(0 0 8px rgba(255,255,255,.4)) drop-shadow(0 0 24px rgba(214,226,250,.22))");
-  }
   function starSmallSvg() {
     return hyperStarSvg(56, 52, 23.5, "lm-star-small-svg", null, "#040407");
+  }
+
+  // src/splash/particleStar.js
+  var VB_W = 400;
+  var VB_H = 720;
+  function createParticleStar(canvas, options) {
+    if (!canvas || !canvas.getContext) return null;
+    const opts = options || {};
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const targetCount = Math.max(600, Math.min(9e3, opts.count || 4600));
+    const shapes = new Path2D(hyperStarPath(146, 136, 62));
+    const probe = document.createElement("canvas");
+    probe.width = VB_W;
+    probe.height = VB_H;
+    const pctx = probe.getContext("2d");
+    let particles = [];
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let raf = 0;
+    let active = false;
+    let startedAt = 0;
+    let running = false;
+    let reduced = false;
+    function buildParticles() {
+      const raw = [];
+      let guard = 0;
+      while (raw.length < targetCount && guard < targetCount * 80) {
+        guard += 1;
+        const x = 138 + Math.random() * 124;
+        const y = 214 + Math.random() * 282;
+        if (!pctx.isPointInPath(shapes, x, y)) continue;
+        const dx = x - 200;
+        const dy = y - 360;
+        const r = Math.hypot(dx, dy) / 180;
+        const angle = Math.atan2(dy, dx);
+        raw.push({
+          x,
+          y,
+          r,
+          angle,
+          phase: angle * 1.35 + r * 3.1 + Math.random() * 0.6,
+          phase2: angle * 0.9 + r * 2.2 + Math.random() * 1.2,
+          amp: 0.9 + Math.random() * 1.3,
+          speed: 0.65 + Math.random() * 0.5,
+          flow: Math.random() < 0.045,
+          flowDir: Math.random() < 0.5 ? -1 : 1,
+          seed: Math.random() * 6.283,
+          startX: 200 + (Math.random() * 2 - 1) * 38,
+          startY: 360 + (Math.random() * 2 - 1) * 74
+        });
+      }
+      particles = raw;
+    }
+    function layout() {
+      const rect = canvas.getBoundingClientRect();
+      const nextW = Math.max(1, Math.round(rect.width || canvas.clientWidth || 1));
+      const nextH = Math.max(1, Math.round(rect.height || canvas.clientHeight || 1));
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (nextW === width && nextH === height) return;
+      width = nextW;
+      height = nextH;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (!particles.length) buildParticles();
+    }
+    function starTransform() {
+      const scale = Math.min(width / VB_W, height / VB_H);
+      return {
+        scale,
+        ox: (width - VB_W * scale) / 2,
+        oy: (height - VB_H * scale) / 2
+      };
+    }
+    function drawParticle(x, y, size, alpha) {
+      ctx.globalAlpha = alpha;
+      ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    }
+    function drawStatic() {
+      layout();
+      ctx.clearRect(0, 0, width, height);
+      const tr = starTransform();
+      ctx.save();
+      ctx.translate(tr.ox, tr.oy);
+      ctx.scale(tr.scale, tr.scale);
+      ctx.fillStyle = "#f6f7fc";
+      ctx.globalCompositeOperation = "lighter";
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i];
+        ctx.globalAlpha = 0.72;
+        ctx.fillRect(p.x - 0.45, p.y - 0.45, 0.9, 0.9);
+      }
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
+    function render(now) {
+      if (!running) return;
+      layout();
+      const t = Math.max(0, (now - startedAt) / 1e3);
+      const assemble = active ? Math.min(1, Math.max(0, (t - 0.04) / 0.95)) : 0;
+      const assembleEase = assemble * assemble * (3 - 2 * assemble);
+      const tr = starTransform();
+      ctx.clearRect(0, 0, width, height);
+      ctx.save();
+      ctx.translate(tr.ox, tr.oy);
+      ctx.scale(tr.scale, tr.scale);
+      ctx.globalCompositeOperation = "lighter";
+      const clock = t;
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i];
+        const baseX = p.x;
+        const baseY = p.y;
+        const wave = Math.sin(clock * 1.55 * p.speed + p.phase) + Math.sin(clock * 0.48 + p.seed) * 0.35;
+        const wave2 = Math.cos(clock * 1.18 * p.speed + p.phase2);
+        let x = baseX + wave * p.amp;
+        let y = baseY + wave2 * p.amp * 0.72;
+        if (p.flow) {
+          const drift = Math.sin(clock * 0.42 + p.seed) * 2.2 * p.flowDir;
+          x += Math.cos(p.angle) * -drift;
+          y += Math.sin(p.angle) * -drift;
+        }
+        const breath = 0.5 + 0.5 * Math.sin(clock * 1.9 + p.phase2);
+        const alpha = 0.36 + breath * 0.44;
+        const size = 0.72 + breath * 0.75;
+        ctx.globalAlpha = 0.08 * alpha;
+        ctx.fillRect(x - 1.35, y - 1.35, 2.7, 2.7);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = breath > 0.55 ? "#ffffff" : "#e8eeff";
+        ctx.fillRect(x - size / 2, y - size / 2, size, size);
+      }
+      ctx.restore();
+      ctx.globalAlpha = 1;
+      if (active) raf = window.requestAnimationFrame(render);
+    }
+    function start() {
+      if (running) return;
+      running = true;
+      active = true;
+      startedAt = performance.now();
+      layout();
+      if (reduced) {
+        drawStatic();
+        return;
+      }
+      raf = window.requestAnimationFrame(render);
+    }
+    function stop() {
+      running = false;
+      active = false;
+      if (raf) window.cancelAnimationFrame(raf);
+      raf = 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    function resize() {
+      if (running) {
+        layout();
+        if (reduced) {
+          drawStatic();
+        } else if (!raf) {
+          raf = window.requestAnimationFrame(render);
+        }
+      }
+    }
+    function setReduced(value) {
+      reduced = !!value;
+      if (reduced && running) {
+        if (raf) window.cancelAnimationFrame(raf);
+        raf = 0;
+        drawStatic();
+      }
+    }
+    return { start, stop, resize, setReduced, isRunning: function() {
+      return running;
+    } };
   }
 
   // src/splash/dom.js
@@ -295,7 +469,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     return '<svg class="lm-burstcross-svg" viewBox="0 0 400 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><defs><filter id="lmBurstCrossBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="22"/></filter></defs><path d="' + d + '" fill="#ffffff" filter="url(#lmBurstCrossBlur)"/></svg>';
   }
   function buildScene(root, cfg, debug) {
-    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-halo">' + starHaloSvg() + '</div><div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div><div class="lm-star-core">' + starCoreSvg() + '</div><div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div></div><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
+    root.innerHTML = '<div class="lm-scene"><div class="lm-bg" aria-hidden="true"></div><div class="lm-fog" aria-hidden="true"></div><div class="lm-bands" aria-hidden="true">' + bandsHtml() + '</div><img class="lm-countdown" alt="" aria-hidden="true" data-src="' + (MEDIA.art && MEDIA.art.countdown432 ? MEDIA.art.countdown432 : "") + '"><div class="lm-star-wrap" aria-hidden="true"><div class="lm-star-glow"></div><div class="lm-star-halo">' + starHaloSvg() + '</div><div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div><canvas class="lm-star-core" aria-hidden="true"></canvas><div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div></div><svg class="lm-glitch-defs" width="0" height="0" aria-hidden="true"><defs><filter id="lmGlitchFilter" x="-18%" y="-18%" width="136%" height="136%" color-interpolation-filters="sRGB"><feTurbulence id="lmGlitchTurb" type="fractalNoise" baseFrequency="0.0008 0.55" numOctaves="2" seed="4" result="noise"/><feDisplacementMap id="lmGlitchDisp" in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="disp"/><feOffset in="disp" dx="-7" dy="0" result="shiftR"/><feColorMatrix in="shiftR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feOffset in="disp" dx="7" dy="0" result="shiftC"/><feColorMatrix in="shiftC" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="cyan"/><feBlend in="red" in2="cyan" mode="screen" result="chroma"/><feBlend in="disp" in2="chroma" mode="screen"/></filter></defs></svg><div class="lm-burst" aria-hidden="true"><div class="lm-glow"></div><div class="lm-radials">' + radialsHtml() + '</div><div class="lm-burstcross">' + burstCrossSvg() + '</div><div class="lm-rise">' + riseHtml() + '</div><div class="lm-rings"><i></i><i></i><i></i></div><div class="lm-dots"></div><div class="lm-iri"></div><div class="lm-sparks">' + new Array(10).fill("<i></i>").join("") + '</div></div><img class="lm-newscene" alt="" aria-hidden="true" data-src="' + (MEDIA.photo && MEDIA.photo.bgDark ? MEDIA.photo.bgDark : "") + '" data-dev-fallback="' + devFallback("bgDark") + '"><canvas class="lm-webgl" aria-hidden="true"></canvas><div class="lm-white" aria-hidden="true"></div><div class="lm-subtitle" aria-live="polite"></div><div class="lm-fail" hidden></div></div>';
     const q = function(sel) {
       return root.querySelector(sel);
     };
@@ -306,6 +480,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       root,
       scene: q(".lm-scene"),
       bands: qa(".lm-bands > i"),
+      countdown: q(".lm-countdown"),
       starWrap: q(".lm-star-wrap"),
       starHalo: q(".lm-star-halo"),
       starBig: q(".lm-star-big"),
@@ -323,12 +498,44 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       debug: null
     };
     mountImage(ui.newScene);
+    mountImage(ui.countdown);
+    const particleStar = ui.starCore ? createParticleStar(ui.starCore, { count: 4600 }) : null;
+    ui.particleStar = particleStar;
+    ui.startParticleStar = function() {
+      if (!particleStar) return;
+      particleStar.setReduced(root.classList.contains("lm-reduced"));
+      particleStar.start();
+    };
+    ui.stopParticleStar = function() {
+      if (!particleStar) return;
+      particleStar.stop();
+    };
+    ui.resizeParticleStar = function() {
+      if (particleStar) particleStar.resize();
+    };
     if (debug && debug.stats) {
       const dbg = document.createElement("div");
       dbg.className = "lm-debug";
       ui.scene.appendChild(dbg);
       ui.debug = dbg;
     }
+    ui.startCountdown = function() {
+      if (!ui.countdown) return;
+      const raw = ui.countdown.getAttribute("data-src") || "";
+      const url = resolveUrl(raw);
+      if (ui.countdown.dataset.lmuiPlayed === "1" && url) {
+        try {
+          ui.countdown.src = url + (window.location.protocol === "file:" ? "" : "?v=" + Date.now());
+        } catch (e) {
+        }
+      }
+      ui.countdown.dataset.lmuiPlayed = "1";
+      ui.countdown.classList.add("is-on");
+    };
+    ui.stopCountdown = function() {
+      if (!ui.countdown) return;
+      ui.countdown.classList.remove("is-on");
+    };
     ui.setSubtitle = function(text) {
       if (text) {
         ui.subtitle.textContent = text;
@@ -353,6 +560,19 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     };
     ui.setShake = function(scale, scaleX) {
       ui.starWrap.style.transform = "scale(" + Number(scale).toFixed(4) + "," + Number(scaleX).toFixed(4) + ")";
+    };
+    const glitchTurb = q("#lmGlitchTurb");
+    const glitchDisp = q("#lmGlitchDisp");
+    ui.setGlitch = function(seed, scale, dx, dy) {
+      if (glitchTurb) glitchTurb.setAttribute("seed", String(Math.max(1, Math.round(seed))));
+      if (glitchDisp) glitchDisp.setAttribute("scale", String(Math.max(2, Math.min(42, Number(scale) || 14))));
+      if (ui.starWrap) ui.starWrap.style.transform = "translate(" + Number(dx).toFixed(1) + "px," + Number(dy).toFixed(1) + "px)";
+    };
+    ui.clearGlitch = function() {
+      if (ui.starWrap) {
+        ui.starWrap.classList.remove("lm-glitching");
+        ui.starWrap.style.transform = "";
+      }
     };
     ui.setBurst = function(on) {
       root.classList.toggle("lm-bursting", !!on);
@@ -614,20 +834,21 @@ var __LM_SPLASH_BUNDLE__ = (() => {
 
   // src/splash/stages.js
   var TIMELINE = {
-    total: 10.2,
+    total: 11.9,
+    countdownEnd: 3.6,
     voiceLinkAt: 1.4,
-    starAt: 1.9,
-    fillStart: 3,
-    fillEnd: 5.6,
-    shakeStart: 5.6,
-    shakeEnd: 6.3,
-    voiceWelcomeAt: 5.2,
-    burstAt: 6.3,
-    whiteFullAt: 7.6,
-    transitionStart: 7.9,
-    transitionEnd: 9.1,
-    revealAt: 9.4,
-    totalEnd: 10.2
+    starAt: 3.6,
+    fillStart: 4.7,
+    fillEnd: 7.3,
+    shakeStart: 7.3,
+    shakeEnd: 8,
+    voiceWelcomeAt: 7.2,
+    burstAt: 8,
+    whiteFullAt: 9.3,
+    transitionStart: 9.6,
+    transitionEnd: 10.8,
+    revealAt: 11.1,
+    totalEnd: 11.9
   };
   var REDUCED_TIMELINE = {
     total: 4.2,
@@ -636,10 +857,10 @@ var __LM_SPLASH_BUNDLE__ = (() => {
     totalEnd: 4.2
   };
   var BURST_PHASES = {
-    burst1At: 6.3,
-    burst2At: 6.85,
-    burst3At: 7.2,
-    whiteFullAt: 7.6
+    burst1At: 8,
+    burst2At: 8.55,
+    burst3At: 8.9,
+    whiteFullAt: 9.3
   };
   function burstPhaseAt(t) {
     if (t >= BURST_PHASES.burst3At) return 3;
@@ -721,31 +942,33 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       };
       raf = window.requestAnimationFrame(tick);
     }
-    function cleanupShake() {
-      if (ui.starWrap) ui.starWrap.classList.remove("lm-shaking");
+    function cleanupGlitch() {
+      root.classList.remove("lm-glitching");
+      if (ui.clearGlitch) ui.clearGlitch();
       if (ui.starFill) ui.starFill.classList.remove("lm-shaking");
+      if (ui.starWrap) ui.starWrap.classList.remove("lm-shaking");
     }
-    function shakeLoop() {
+    function glitchLoop() {
       if (!ui.starWrap) return;
-      ui.starWrap.classList.add("lm-shaking");
-      if (ui.starFill) ui.starFill.classList.add("lm-shaking");
+      root.classList.add("lm-glitching");
+      ui.starWrap.classList.add("lm-glitching");
       let steps = 0;
-      const totalSteps = Math.round((TIMELINE.shakeEnd - TIMELINE.shakeStart) * 1e3 / 50);
+      const totalSteps = Math.round((TIMELINE.shakeEnd - TIMELINE.shakeStart) * 1e3 / 45);
       const id = window.setInterval(function() {
         if (finished || frozen) return;
         steps += 1;
-        const jitter = function() {
-          return 1 + (Math.random() * 2 - 1) * 0.06;
-        };
-        ui.setShake(jitter(), jitter());
+        const seed = 1 + Math.floor(Math.random() * 70);
+        const scale = 6 + Math.random() * 26;
+        const dx = (Math.random() * 2 - 1) * 13;
+        const dy = (Math.random() * 2 - 1) * 4;
+        ui.setGlitch(seed, scale, dx, dy);
         if (steps >= totalSteps) {
           window.clearInterval(id);
           const index = intervals.indexOf(id);
           if (index >= 0) intervals.splice(index, 1);
-          ui.setShake(1, 1);
-          cleanupShake();
+          cleanupGlitch();
         }
-      }, 50);
+      }, 45);
       intervals.push(id);
     }
     function startTransition() {
@@ -786,19 +1009,32 @@ var __LM_SPLASH_BUNDLE__ = (() => {
         }
       }
       root.classList.add("lm-revealing");
+      root.classList.add("lm-star-gone");
+      if (ui.stopParticleStar) ui.stopParticleStar();
       if (transition && transition.supported && ui.webgl) {
         ui.webgl.classList.add("is-out");
       }
       if (ui.newScene) ui.newScene.style.opacity = "0";
     }
     function playNormal() {
+      ui.startCountdown();
       audio.sfx.hum();
       later(function() {
         audio.sfx.bloom();
       }, 0.8);
       later(function() {
+        ui.stopCountdown();
+      }, TIMELINE.countdownEnd);
+      later(function() {
         root.classList.add("lm-star-on");
-        if (ui.starWrap) ui.starWrap.style.opacity = "1";
+        root.classList.add("lm-star-handoff");
+        window.requestAnimationFrame(function() {
+          root.classList.add("lm-star-visible");
+        });
+      }, Math.max(0, TIMELINE.starAt - 0.45));
+      later(function() {
+        ui.stopCountdown();
+        ui.startParticleStar();
       }, TIMELINE.starAt);
       later(function() {
         showSubtitle("link", 2.6);
@@ -810,7 +1046,7 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       }, TIMELINE.fillStart);
       later(function() {
         ui.setFill(1);
-        shakeLoop();
+        glitchLoop();
       }, TIMELINE.shakeStart);
       later(function() {
         showSubtitle("welcome", 3.9);
@@ -835,6 +1071,10 @@ var __LM_SPLASH_BUNDLE__ = (() => {
         audio.sfx.wipe();
       }, TIMELINE.transitionStart);
       later(function() {
+        root.classList.add("lm-star-gone");
+        if (ui.stopParticleStar) ui.stopParticleStar();
+      }, TIMELINE.transitionEnd);
+      later(function() {
         root.dataset.stepReveal = "1";
         reveal();
       }, TIMELINE.revealAt);
@@ -843,7 +1083,9 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       }, TIMELINE.totalEnd);
     }
     function playReduced() {
+      ui.stopCountdown();
       root.classList.add("lm-reduced");
+      ui.startParticleStar();
       ui.setFill(1);
       if (ui.starWrap) ui.starWrap.style.opacity = "1";
       later(function() {
@@ -870,26 +1112,42 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       playNormal();
     }
     function applyStateAt(t) {
+      if (t < TIMELINE.countdownEnd) ui.startCountdown();
+      else ui.stopCountdown();
       if (t >= TIMELINE.starAt) {
         root.classList.add("lm-star-on");
-        if (ui.starWrap) ui.starWrap.style.opacity = "1";
+        root.classList.add("lm-star-handoff");
+        root.classList.add("lm-star-visible");
+        ui.startParticleStar();
+      } else if (t >= TIMELINE.starAt - 0.45) {
+        root.classList.add("lm-star-on");
+        root.classList.add("lm-star-handoff");
+        root.classList.add("lm-star-visible");
       }
       if (t >= TIMELINE.fillStart && t < TIMELINE.shakeStart) {
         ui.setFill(easeInOut(clamp01((t - TIMELINE.fillStart) / (TIMELINE.fillEnd - TIMELINE.fillStart))));
       }
       if (t >= TIMELINE.shakeStart && t < TIMELINE.burstAt) {
         ui.setFill(1);
-        const step = Math.floor((t - TIMELINE.shakeStart) / 0.05);
-        const seed = Math.sin(step * 12.9898) * 43758.5453;
-        const j1 = 1 + ((seed - Math.floor(seed)) * 2 - 1) * 0.05;
-        ui.setShake(j1, 2 - j1);
-        if (ui.starWrap) ui.starWrap.classList.add("lm-shaking");
-      } else if (ui.starWrap) {
-        ui.setShake(1, 1);
-        ui.starWrap.classList.remove("lm-shaking");
+        const step = Math.floor((t - TIMELINE.shakeStart) / 0.045);
+        const seed = step * 37 % 70 + 1;
+        const scale = 10 + step * 13 % 24;
+        const dx = step * 7 % 19 - 9;
+        const dy = step * 5 % 9 - 4;
+        root.classList.add("lm-glitching");
+        if (ui.starWrap) {
+          ui.starWrap.classList.add("lm-glitching");
+          ui.setGlitch(seed, scale, dx, dy);
+        }
+      } else {
+        cleanupGlitch();
       }
       ui.setBurstPhase(burstPhaseAt(t));
       if (t >= TIMELINE.whiteFullAt) ui.setWhite(true);
+      if (t >= TIMELINE.transitionEnd) {
+        root.classList.add("lm-star-gone");
+        if (ui.stopParticleStar) ui.stopParticleStar();
+      }
       if (t >= TIMELINE.transitionStart && transition && transition.supported) {
         ui.setTransition(true);
         const duration = TIMELINE.transitionEnd - TIMELINE.transitionStart;
@@ -1454,11 +1712,27 @@ var __LM_SPLASH_BUNDLE__ = (() => {
         } catch (error) {
         }
       }
-      if (debug.t >= 0) {
-        director.jumpDebug(debug.t);
-      } else {
+      function beginNormalPlay() {
         director.play();
         if (debug.hold >= 0) director.holdAt(debug.hold);
+      }
+      const countdownImg = ui.countdown;
+      if (debug.t >= 0) {
+        director.jumpDebug(debug.t);
+      } else if (state.reduced) {
+        beginNormalPlay();
+      } else if (countdownImg && !(countdownImg.complete && countdownImg.naturalWidth)) {
+        let begun = false;
+        const beginOnce = function() {
+          if (begun) return;
+          begun = true;
+          beginNormalPlay();
+        };
+        countdownImg.addEventListener("load", beginOnce, { once: true });
+        countdownImg.addEventListener("error", beginOnce, { once: true });
+        window.setTimeout(beginOnce, 1200);
+      } else {
+        beginNormalPlay();
       }
       if (debug.finish) {
         window.setTimeout(function() {
@@ -1487,6 +1761,12 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       if (state.director) {
         try {
           state.director.dispose();
+        } catch (error) {
+        }
+      }
+      if (state.ui && state.ui.stopParticleStar) {
+        try {
+          state.ui.stopParticleStar();
         } catch (error) {
         }
       }
