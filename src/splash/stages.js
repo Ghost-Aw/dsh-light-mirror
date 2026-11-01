@@ -157,9 +157,7 @@ export function createDirector(opts) {
       steps += 1
       const seed = 1 + Math.floor(Math.random() * 70)
       const scale = 6 + Math.random() * 26
-      const dx = (Math.random() * 2 - 1) * 13
-      const dy = (Math.random() * 2 - 1) * 4
-      ui.setGlitch(seed, scale, dx, dy)
+      ui.setGlitch(seed, scale)
       if (steps >= totalSteps) {
         window.clearInterval(id)
         const index = intervals.indexOf(id)
@@ -287,6 +285,12 @@ export function createDirector(opts) {
       audio.sfx.wipe()
     }, TIMELINE.transitionStart)
 
+    /* 完全白场后立即清星，别让残影穿过撕裂转场 */
+    later(function () {
+      root.classList.add('lm-star-gone')
+      if (ui.stopParticleStar) ui.stopParticleStar()
+    }, TIMELINE.whiteFullAt + 0.08)
+
     later(function () {
       root.classList.add('lm-star-gone')
       if (ui.stopParticleStar) ui.stopParticleStar()
@@ -356,19 +360,17 @@ export function createDirector(opts) {
       const step = Math.floor((t - TIMELINE.shakeStart) / 0.045)
       const seed = (step * 37) % 70 + 1
       const scale = 10 + (step * 13) % 24
-      const dx = ((step * 7) % 19) - 9
-      const dy = ((step * 5) % 9) - 4
       root.classList.add('lm-glitching')
       if (ui.starWrap) {
         ui.starWrap.classList.add('lm-glitching')
-        ui.setGlitch(seed, scale, dx, dy)
+        ui.setGlitch(seed, scale)
       }
     } else {
       cleanupGlitch()
     }
     ui.setBurstPhase(burstPhaseAt(t))
     if (t >= TIMELINE.whiteFullAt) ui.setWhite(true)
-    if (t >= TIMELINE.transitionEnd) {
+    if (t >= TIMELINE.whiteFullAt + 0.08) {
       root.classList.add('lm-star-gone')
       if (ui.stopParticleStar) ui.stopParticleStar()
     }

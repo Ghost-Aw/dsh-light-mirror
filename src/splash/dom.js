@@ -177,14 +177,20 @@ export function buildScene(root, cfg, debug) {
     '<div class="lm-star-big lm-star-fill" style="clip-path:inset(100% 0 0 0)">' + starBigSvg() + '</div>' +
     '<canvas class="lm-star-core" aria-hidden="true"></canvas>' +
     '<div class="lm-star-small" style="clip-path:inset(100% 0 0 0)">' + starSmallSvg() + '</div>' +
+    '<div class="lm-glitch-bars" aria-hidden="true">' + new Array(12).fill('<i></i>').join('') + '</div>' +
     '</div>' +
     '<svg class="lm-glitch-defs" width="0" height="0" aria-hidden="true"><defs>' +
     '<filter id="lmGlitchFilter" x="-18%" y="-18%" width="136%" height="136%" color-interpolation-filters="sRGB">' +
-    '<feTurbulence id="lmGlitchTurb" type="fractalNoise" baseFrequency="0.0008 0.55" numOctaves="2" seed="4" result="noise"/>' +
-    '<feDisplacementMap id="lmGlitchDisp" in="SourceGraphic" in2="noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="disp"/>' +
-    '<feOffset in="disp" dx="-7" dy="0" result="shiftR"/>' +
+    '<feTurbulence id="lmGlitchTurb" type="turbulence" baseFrequency="0.00045 0.026" numOctaves="1" seed="4" result="noise"/>' +
+    '<feComponentTransfer in="noise" result="blocks">' +
+    '<feFuncR type="discrete" tableValues="0 0.12 0.28 0.45 0.63 0.82 1"/>' +
+    '<feFuncG type="discrete" tableValues="0 0.12 0.28 0.45 0.63 0.82 1"/>' +
+    '<feFuncB type="discrete" tableValues="0 0.12 0.28 0.45 0.63 0.82 1"/>' +
+    '</feComponentTransfer>' +
+    '<feDisplacementMap id="lmGlitchDisp" in="SourceGraphic" in2="blocks" scale="14" xChannelSelector="R" yChannelSelector="G" result="disp"/>' +
+    '<feOffset in="disp" dx="-6" dy="0" result="shiftR"/>' +
     '<feColorMatrix in="shiftR" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>' +
-    '<feOffset in="disp" dx="7" dy="0" result="shiftC"/>' +
+    '<feOffset in="disp" dx="6" dy="0" result="shiftC"/>' +
     '<feColorMatrix in="shiftC" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="cyan"/>' +
     '<feBlend in="red" in2="cyan" mode="screen" result="chroma"/>' +
     '<feBlend in="disp" in2="chroma" mode="screen"/>' +
@@ -227,6 +233,7 @@ export function buildScene(root, cfg, debug) {
     starFill: q('.lm-star-big'),
     starCore: q('.lm-star-core'),
     starSmall: q('.lm-star-small'),
+    glitchBars: qa('.lm-glitch-bars > i'),
     burst: q('.lm-burst'),
     rings: qa('.lm-rings > i'),
     feather: q('.lm-feather'),
@@ -311,16 +318,42 @@ export function buildScene(root, cfg, debug) {
   }
   const glitchTurb = q('#lmGlitchTurb')
   const glitchDisp = q('#lmGlitchDisp')
-  ui.setGlitch = function (seed, scale, dx, dy) {
-    if (glitchTurb) glitchTurb.setAttribute('seed', String(Math.max(1, Math.round(seed))))
-    if (glitchDisp) glitchDisp.setAttribute('scale', String(Math.max(2, Math.min(42, Number(scale) || 14))))
-    if (ui.starWrap) ui.starWrap.style.transform = 'translate(' + Number(dx).toFixed(1) + 'px,' + Number(dy).toFixed(1) + 'px)'
+  function hash(n) {
+    const x = Math.sin(n * 127.1 + 311.7) * 43758.5453
+    return x - Math.floor(x)
+  }
+  ui.setGlitch = function (seed, scale) {
+    const s = Math.max(1, Math.round(seed))
+    if (glitchTurb) glitchTurb.setAttribute('seed', String(s))
+    if (glitchDisp) glitchDisp.setAttribute('scale', String(Math.max(2, Math.min(30, Number(scale) || 14))))
+    for (let i = 0; i < ui.glitchBars.length; i += 1) {
+      const bar = ui.glitchBars[i]
+      const r1 = hash(s * 1.7 + i * 3.1)
+      const r2 = hash(s * 2.3 + i * 5.7)
+      const r3 = hash(s * 0.9 + i * 7.3)
+      const thin = i < 8
+      const height = thin ? 1 + (i % 2) : 6 + Math.round(r3 * 16)
+      const width = thin ? 12 + Math.round(r1 * 88) : 28 + Math.round(r1 * 62)
+      const left = Math.round(r2 * (100 - width))
+      const top = Math.round(r1 * 96)
+      const shift = (r3 * 2 - 1) * (thin ? 18 : 26)
+      bar.style.top = top + '%'
+      bar.style.left = left + '%'
+      bar.style.width = width + '%'
+      bar.style.height = height + 'px'
+      bar.style.transform = 'translateX(' + shift.toFixed(1) + 'px)'
+      bar.style.opacity = (thin ? 0.5 + r2 * 0.4 : 0.12 + r2 * 0.18).toFixed(2)
+      bar.style.background =
+        i % 3 === 0
+          ? 'rgba(255, 55, 105, 0.85)'
+          : i % 3 === 1
+            ? 'rgba(80, 230, 255, 0.85)'
+            : 'rgba(240, 246, 255, 0.8)'
+    }
   }
   ui.clearGlitch = function () {
-    if (ui.starWrap) {
-      ui.starWrap.classList.remove('lm-glitching')
-      ui.starWrap.style.transform = ''
-    }
+    if (ui.starWrap) ui.starWrap.classList.remove('lm-glitching')
+    if (ui.starWrap) ui.starWrap.style.transform = ''
   }
   ui.setBurst = function (on) {
     root.classList.toggle('lm-bursting', !!on)

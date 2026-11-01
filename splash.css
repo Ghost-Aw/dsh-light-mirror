@@ -1517,3 +1517,27 @@ html.lm-lock:has(#light-mirror-root.lm-transitioning) body {
   visibility: hidden !important;
   transition: none !important;
 }
+
+
+/* 块状/细线状 glitch 条 */
+.lm-glitch-bars {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.lm-star-wrap.lm-glitching .lm-glitch-bars {
+  opacity: 1;
+}
+
+.lm-glitch-bars > i {
+  position: absolute;
+  display: block;
+  height: 1px;
+  background: rgba(240, 246, 255, 0.8);
+  transform-origin: center;
+}
