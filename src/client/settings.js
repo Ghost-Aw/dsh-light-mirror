@@ -461,12 +461,15 @@ function MirrorSettings(props) {
     setBusy(true)
     setNotice('')
     setError('')
+    const live = draft ? normalizeConfig(draft) : null
     readConfig()
       .then((result) => {
-        setDraft(result.config)
+        const config = live || result.config
+        /* 预览使用当前草稿（含未保存的语音/音量改动），让滑杆调整立即能听见效果。 */
+        setDraft(config)
         setSaved(result.config)
-        onLive(result.config)
-        return replaySplash(result.config)
+        onLive(config)
+        return replaySplash(config)
       })
       .then(() => setNotice('正在播放启动动画预览。'))
       .catch((err) => setError('预览失败：' + messageOf(err)))
@@ -675,7 +678,7 @@ function MirrorSettings(props) {
         Row,
         {
           label: '立即预览',
-          hint: '重新读取已保存的配置并播放一次启动动画；不会改动当前主界面。',
+          hint: '用当前设置播放一次启动动画预览（未保存的改动也会生效）；不会改动当前主界面。',
         },
         h(
           'button',

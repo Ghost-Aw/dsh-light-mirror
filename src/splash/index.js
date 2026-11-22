@@ -23,6 +23,7 @@ import {
   ENUM_ALIASES,
   STORAGE,
   VERSION,
+  ROUTE_BASE,
 } from '../shared/content.js'
 import { buildScene } from './dom.js'
 import { createAudio } from './audio.js'
@@ -526,7 +527,52 @@ function boot() {
     }
   }
 
+  function fetchBootConfig() {
+    const url = window.__LIGHT_MIRROR_CONFIG_URL__ || (ROUTE_BASE + '/config')
+    if (!url || typeof fetch !== 'function') return Promise.resolve(null)
+    let timer = 0
+    let controller = null
+    const request = (() => {
+      try {
+        if (typeof AbortController === 'function') {
+          controller = new AbortController()
+          timer = window.setTimeout(function () {
+            try {
+              controller.abort()
+            } catch (error) {
+              /* noop */
+            }
+          }, 900)
+        }
+        return fetch(url, {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store',
+          credentials: 'same-origin',
+          signal: controller ? controller.signal : undefined,
+        })
+      } catch (error) {
+        return Promise.reject(error)
+      }
+    })()
+    return request
+      .then(function (res) {
+        if (!res || !res.ok) throw new Error('config unavailable')
+        return res.json()
+      })
+      .then(function (json) {
+        return json && json.ok === true && json.config && typeof json.config === 'object' ? json.config : null
+      })
+      .catch(function () {
+        return null
+      })
+      .then(function (cfg) {
+        if (timer) window.clearTimeout(timer)
+        return cfg
+      })
+  }
+
   function afterBoot() {
+    window.__LIGHT_MIRROR_AFTERBOOT__ = true
     const injected = window.__LIGHT_MIRROR__ && typeof window.__LIGHT_MIRROR__ === 'object'
     const rootExists = !!document.getElementById(ROOT_ID)
     const skipByHost = window.__LIGHT_MIRROR_SKIP__ === true
@@ -536,32 +582,32 @@ function boot() {
       start()
       return
     }
-    if (!force) {
-      if (injected) return
-      if (!shouldSelfPlay(state.cfg)) return
-    }
-    if (!injected && window.__LIGHT_MIRROR_CONFIG_URL__) {
-      fetch(window.__LIGHT_MIRROR_CONFIG_URL__, { headers: { Accept: 'application/json' }, cache: 'no-store' })
-        .then(function (res) {
-          return res.json()
-        })
-        .then(function (json) {
-          if (json && json.ok === true && json.config) {
-            state.cfg = normalizeConfig(json.config)
-            if (force || shouldSelfPlay(state.cfg)) {
-              if (!force) markSelfPlayed(state.cfg)
-              start()
-            }
-          } else {
-            fallbackSelfPlay()
-          }
-        })
-        .catch(fallbackSelfPlay)
+    /* 预览/debug 是显式请求，直接用已注入的配置起播。 */
+    if (force) {
+      fallbackSelfPlay()
       return
     }
-    fallbackSelfPlay()
+    /* Host 注入过配置但 root 不在（例如首屏被外部移除）：用注入配置兜底起播。 */
+    if (injected) {
+      fallbackSelfPlay()
+      return
+    }
+
+    /* 桌面端 Host 不注入首屏配置：先读一次已保存配置，保证声音设置生效。 */
+    fetchBootConfig().then(function (saved) {
+      if (saved) {
+        state.cfg = normalizeConfig(saved)
+        try {
+          window.__LIGHT_MIRROR__ = saved
+        } catch (error) {
+          /* noop */
+        }
+      }
+      fallbackSelfPlay()
+    })
 
     function fallbackSelfPlay() {
+      if (!force && (window.__LIGHT_MIRROR_TAKEN_OVER__ === true || document.getElementById(ROOT_ID))) return
       if (!force && !shouldSelfPlay(state.cfg)) return
       if (!force) markSelfPlayed(state.cfg)
       start()

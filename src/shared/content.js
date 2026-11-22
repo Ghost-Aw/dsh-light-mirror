@@ -14,7 +14,7 @@ export const NS = 'dsh-light-mirror'
 export const ROW_ID = 'light-mirror'
 export const ROUTE_BASE = '/light-mirror'
 export const CONFIG_NAME = 'light-mirror.json'
-export const VERSION = '3.1.0'
+export const VERSION = '3.1.1'
 
 /** 媒体资源路由（Host 静态服务 media/ 目录）。 */
 export const MEDIA = {
@@ -268,7 +268,7 @@ export const UI_COPY = {
   save: '保存',
   saved: '已保存。',
   resetDone: '已恢复默认。',
-  splashNote: '启动动画设置将在下次页面加载时生效；可点「立即预览」先看效果。',
+  splashNote: '语音/音量等启动动画设置保存后会在下次页面加载时生效；可点「立即预览」先看当前设置效果。',
   versionPrefix: '版本 v',
 }
 

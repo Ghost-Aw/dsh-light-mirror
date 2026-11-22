@@ -47,7 +47,7 @@ module.exports = __toCommonJS(index_exports);
 
 // src/shared/content.js
 var ROUTE_BASE = "/light-mirror";
-var VERSION = "3.1.0";
+var VERSION = "3.1.1";
 var MEDIA = {
   photo: {
     sceneTerminal: ROUTE_BASE + "/media/photo/scene-terminal.webp",
@@ -251,7 +251,7 @@ var UI_COPY = {
   save: "保存",
   saved: "已保存。",
   resetDone: "已恢复默认。",
-  splashNote: "启动动画设置将在下次页面加载时生效；可点「立即预览」先看效果。",
+  splashNote: "语音/音量等启动动画设置保存后会在下次页面加载时生效；可点「立即预览」先看当前设置效果。",
   versionPrefix: "版本 v"
 };
 var THEME_ID = "light-mirror";
@@ -4765,7 +4765,46 @@ function boot() {
     } catch (error) {
     }
   }
+  function fetchBootConfig() {
+    const url = window.__LIGHT_MIRROR_CONFIG_URL__ || ROUTE_BASE + "/config";
+    if (!url || typeof fetch !== "function") return Promise.resolve(null);
+    let timer = 0;
+    let controller = null;
+    const request = (() => {
+      try {
+        if (typeof AbortController === "function") {
+          controller = new AbortController();
+          timer = window.setTimeout(function() {
+            try {
+              controller.abort();
+            } catch (error) {
+            }
+          }, 900);
+        }
+        return fetch(url, {
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+          credentials: "same-origin",
+          signal: controller ? controller.signal : void 0
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    })();
+    return request.then(function(res) {
+      if (!res || !res.ok) throw new Error("config unavailable");
+      return res.json();
+    }).then(function(json) {
+      return json && json.ok === true && json.config && typeof json.config === "object" ? json.config : null;
+    }).catch(function() {
+      return null;
+    }).then(function(cfg) {
+      if (timer) window.clearTimeout(timer);
+      return cfg;
+    });
+  }
   function afterBoot() {
+    window.__LIGHT_MIRROR_AFTERBOOT__ = true;
     const injected = window.__LIGHT_MIRROR__ && typeof window.__LIGHT_MIRROR__ === "object";
     const rootExists = !!document.getElementById(ROOT_ID);
     const skipByHost = window.__LIGHT_MIRROR_SKIP__ === true;
@@ -4775,28 +4814,26 @@ function boot() {
       start();
       return;
     }
-    if (!force) {
-      if (injected) return;
-      if (!shouldSelfPlay(state.cfg)) return;
-    }
-    if (!injected && window.__LIGHT_MIRROR_CONFIG_URL__) {
-      fetch(window.__LIGHT_MIRROR_CONFIG_URL__, { headers: { Accept: "application/json" }, cache: "no-store" }).then(function(res) {
-        return res.json();
-      }).then(function(json) {
-        if (json && json.ok === true && json.config) {
-          state.cfg = normalizeConfig3(json.config);
-          if (force || shouldSelfPlay(state.cfg)) {
-            if (!force) markSelfPlayed(state.cfg);
-            start();
-          }
-        } else {
-          fallbackSelfPlay();
-        }
-      }).catch(fallbackSelfPlay);
+    if (force) {
+      fallbackSelfPlay();
       return;
     }
-    fallbackSelfPlay();
+    if (injected) {
+      fallbackSelfPlay();
+      return;
+    }
+    fetchBootConfig().then(function(saved) {
+      if (saved) {
+        state.cfg = normalizeConfig3(saved);
+        try {
+          window.__LIGHT_MIRROR__ = saved;
+        } catch (error) {
+        }
+      }
+      fallbackSelfPlay();
+    });
     function fallbackSelfPlay() {
+      if (!force && (window.__LIGHT_MIRROR_TAKEN_OVER__ === true || document.getElementById(ROOT_ID))) return;
       if (!force && !shouldSelfPlay(state.cfg)) return;
       if (!force) markSelfPlayed(state.cfg);
       start();
@@ -4808,39 +4845,90 @@ function boot() {
 
 // src/client/splashRuntime.js
 var ROOT_ID2 = "light-mirror-root";
+var CONFIG_ROUTE = "/light-mirror/config";
+var CONFIG_TIMEOUT_MS = 900;
+var fallbackStarted = false;
+function readSavedConfig() {
+  if (typeof fetch !== "function") return Promise.resolve(null);
+  let timer = 0;
+  let controller = null;
+  const request = (() => {
+    try {
+      if (typeof AbortController === "function") {
+        controller = new AbortController();
+        timer = window.setTimeout(function() {
+          try {
+            controller.abort();
+          } catch (error) {
+          }
+        }, CONFIG_TIMEOUT_MS);
+      }
+      return fetch(CONFIG_ROUTE, {
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: controller ? controller.signal : void 0
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  })();
+  return request.then(function(res) {
+    if (!res || !res.ok) throw new Error("config unavailable");
+    return res.json();
+  }).then(function(json) {
+    return json && json.ok === true && json.config && typeof json.config === "object" ? json.config : null;
+  }).catch(function() {
+    return null;
+  }).then(function(cfg) {
+    if (timer) window.clearTimeout(timer);
+    return cfg;
+  });
+}
+function shouldSkipForMode(cfg) {
+  const mode = cfg && cfg.splashMode;
+  try {
+    if (mode === "session" && sessionStorage.getItem("light-mirror:splash-shown") === "1") return true;
+    if (mode === "daily") {
+      const day = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+      if (localStorage.getItem("light-mirror:splash-day") === day) return true;
+    }
+  } catch (error) {
+  }
+  return false;
+}
+function markPlayed(cfg) {
+  const mode = cfg && cfg.splashMode;
+  try {
+    if (mode === "session") sessionStorage.setItem("light-mirror:splash-shown", "1");
+    if (mode === "daily") localStorage.setItem("light-mirror:splash-day", (/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
+  } catch (error) {
+  }
+}
 function startFallbackIfNeeded() {
   try {
+    if (fallbackStarted) return;
     if (document.getElementById(ROOT_ID2)) return;
     if (window.__LIGHT_MIRROR_SKIP__ === true) return;
+    if (window.__LIGHT_MIRROR_AFTERBOOT__ === true) return;
     const api = window.__LIGHT_MIRROR_SPLASH__;
     if (!api || typeof api.start !== "function") return;
-    const cfg = window.__LIGHT_MIRROR__;
-    if (cfg && cfg.splashEnabled === false) return;
     if (window.__LIGHT_MIRROR_TAKEN_OVER__ === true) return;
-    const mode = cfg && cfg.splashMode;
-    if (mode === "session") {
-      try {
-        if (sessionStorage.getItem("light-mirror:splash-shown") === "1") return;
-      } catch (error) {
-      }
-    }
-    if (mode === "daily") {
-      try {
-        const day = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
-        if (localStorage.getItem("light-mirror:splash-day") === day) return;
-      } catch (error) {
-      }
-    }
-    api.start(cfg && typeof cfg === "object" ? cfg : void 0);
-    window.setTimeout(function() {
-      try {
-        const current = window.__LIGHT_MIRROR__;
-        const mode2 = current && current.splashMode;
-        if (mode2 === "session") sessionStorage.setItem("light-mirror:splash-shown", "1");
-        if (mode2 === "daily") localStorage.setItem("light-mirror:splash-day", (/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
-      } catch (error) {
-      }
-    }, 1200);
+    fallbackStarted = true;
+    const injected = window.__LIGHT_MIRROR__;
+    const start = function(cfg) {
+      if (fallbackStarted === "done") return;
+      if (window.__LIGHT_MIRROR_TAKEN_OVER__ === true) return;
+      fallbackStarted = "done";
+      if (cfg && typeof cfg === "object") window.__LIGHT_MIRROR__ = cfg;
+      if (cfg && cfg.splashEnabled === false) return;
+      if (shouldSkipForMode(cfg)) return;
+      api.start(cfg && typeof cfg === "object" ? cfg : void 0);
+      markPlayed(cfg);
+    };
+    readSavedConfig().then(function(saved) {
+      start(saved || (injected && typeof injected === "object" ? injected : void 0));
+    });
   } catch (error) {
     try {
       window.__LIGHT_MIRROR_SPLASH_CLIENT_ERROR__ = String(error && error.message || error);
@@ -6381,7 +6469,7 @@ function registerRail(ctx, store, keep) {
 var ReactNS4 = __toESM(require("react"), 1);
 var React4 = ReactNS4 && typeof ReactNS4.createElement === "function" ? ReactNS4 : ReactNS4 && ReactNS4.default && typeof ReactNS4.default.createElement === "function" ? ReactNS4.default : ReactNS4;
 var h4 = React4.createElement;
-var CONFIG_ROUTE = "/light-mirror/config";
+var CONFIG_ROUTE2 = "/light-mirror/config";
 var SPLASH_SCRIPT = "/light-mirror/splash.js";
 var CONFIG_DISPLAY = "~/.dsh/light-mirror.json";
 function configUrl() {
@@ -6390,7 +6478,7 @@ function configUrl() {
     if (typeof injected === "string" && injected) return injected;
   } catch (e) {
   }
-  return CONFIG_ROUTE;
+  return CONFIG_ROUTE2;
 }
 function normalizeConfig(input) {
   const out = Object.assign({}, DEFAULTS);
@@ -6737,11 +6825,13 @@ function MirrorSettings(props) {
     setBusy(true);
     setNotice("");
     setError("");
+    const live = draft ? normalizeConfig(draft) : null;
     readConfig().then((result) => {
-      setDraft(result.config);
+      const config = live || result.config;
+      setDraft(config);
       setSaved(result.config);
-      onLive(result.config);
-      return replaySplash(result.config);
+      onLive(config);
+      return replaySplash(config);
     }).then(() => setNotice("正在播放启动动画预览。")).catch((err) => setError("预览失败：" + messageOf(err))).then(() => setBusy(false));
   };
   const versionLine = h4(
@@ -6939,7 +7029,7 @@ function MirrorSettings(props) {
         Row,
         {
           label: "立即预览",
-          hint: "重新读取已保存的配置并播放一次启动动画；不会改动当前主界面。"
+          hint: "用当前设置播放一次启动动画预览（未保存的改动也会生效）；不会改动当前主界面。"
         },
         h4(
           "button",
@@ -7590,7 +7680,7 @@ function createBackgroundController(store) {
 var PLUGIN_ID = "dsh-light-mirror";
 var STYLE_MAIN = PLUGIN_ID + "/main.css";
 var STYLE_SETTINGS = PLUGIN_ID + "/settings.css";
-var CONFIG_ROUTE2 = ROUTE_BASE + "/config";
+var CONFIG_ROUTE3 = ROUTE_BASE + "/config";
 var METRICS_ROUTE = ROUTE_BASE + "/metrics";
 function canUseDOM() {
   return typeof window !== "undefined" && typeof document !== "undefined";
@@ -7840,7 +7930,7 @@ function apply(ctx) {
     window.__LIGHT_MIRROR_UI__ = {
       plugin: PLUGIN_ID,
       version: VERSION,
-      configRoute: CONFIG_ROUTE2,
+      configRoute: CONFIG_ROUTE3,
       metricsRoute: METRICS_ROUTE,
       getConfig() {
         return store.get();

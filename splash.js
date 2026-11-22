@@ -2,7 +2,7 @@
 var __LM_SPLASH_BUNDLE__ = (() => {
   // src/shared/content.js
   var ROUTE_BASE = "/light-mirror";
-  var VERSION = "3.1.0";
+  var VERSION = "3.1.1";
   var MEDIA = {
     photo: {
       sceneTerminal: ROUTE_BASE + "/media/photo/scene-terminal.webp",
@@ -1900,7 +1900,46 @@ var __LM_SPLASH_BUNDLE__ = (() => {
       } catch (error) {
       }
     }
+    function fetchBootConfig() {
+      const url = window.__LIGHT_MIRROR_CONFIG_URL__ || ROUTE_BASE + "/config";
+      if (!url || typeof fetch !== "function") return Promise.resolve(null);
+      let timer = 0;
+      let controller = null;
+      const request = (() => {
+        try {
+          if (typeof AbortController === "function") {
+            controller = new AbortController();
+            timer = window.setTimeout(function() {
+              try {
+                controller.abort();
+              } catch (error) {
+              }
+            }, 900);
+          }
+          return fetch(url, {
+            headers: { Accept: "application/json" },
+            cache: "no-store",
+            credentials: "same-origin",
+            signal: controller ? controller.signal : void 0
+          });
+        } catch (error) {
+          return Promise.reject(error);
+        }
+      })();
+      return request.then(function(res) {
+        if (!res || !res.ok) throw new Error("config unavailable");
+        return res.json();
+      }).then(function(json) {
+        return json && json.ok === true && json.config && typeof json.config === "object" ? json.config : null;
+      }).catch(function() {
+        return null;
+      }).then(function(cfg) {
+        if (timer) window.clearTimeout(timer);
+        return cfg;
+      });
+    }
     function afterBoot() {
+      window.__LIGHT_MIRROR_AFTERBOOT__ = true;
       const injected = window.__LIGHT_MIRROR__ && typeof window.__LIGHT_MIRROR__ === "object";
       const rootExists = !!document.getElementById(ROOT_ID);
       const skipByHost = window.__LIGHT_MIRROR_SKIP__ === true;
@@ -1910,28 +1949,26 @@ var __LM_SPLASH_BUNDLE__ = (() => {
         start();
         return;
       }
-      if (!force) {
-        if (injected) return;
-        if (!shouldSelfPlay(state.cfg)) return;
-      }
-      if (!injected && window.__LIGHT_MIRROR_CONFIG_URL__) {
-        fetch(window.__LIGHT_MIRROR_CONFIG_URL__, { headers: { Accept: "application/json" }, cache: "no-store" }).then(function(res) {
-          return res.json();
-        }).then(function(json) {
-          if (json && json.ok === true && json.config) {
-            state.cfg = normalizeConfig(json.config);
-            if (force || shouldSelfPlay(state.cfg)) {
-              if (!force) markSelfPlayed(state.cfg);
-              start();
-            }
-          } else {
-            fallbackSelfPlay();
-          }
-        }).catch(fallbackSelfPlay);
+      if (force) {
+        fallbackSelfPlay();
         return;
       }
-      fallbackSelfPlay();
+      if (injected) {
+        fallbackSelfPlay();
+        return;
+      }
+      fetchBootConfig().then(function(saved) {
+        if (saved) {
+          state.cfg = normalizeConfig(saved);
+          try {
+            window.__LIGHT_MIRROR__ = saved;
+          } catch (error) {
+          }
+        }
+        fallbackSelfPlay();
+      });
       function fallbackSelfPlay() {
+        if (!force && (window.__LIGHT_MIRROR_TAKEN_OVER__ === true || document.getElementById(ROOT_ID))) return;
         if (!force && !shouldSelfPlay(state.cfg)) return;
         if (!force) markSelfPlayed(state.cfg);
         start();
